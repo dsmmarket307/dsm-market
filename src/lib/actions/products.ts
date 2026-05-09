@@ -152,3 +152,30 @@ export async function rejectVendor(vendorId: string) {
   revalidatePath('/dashboard/admin/vendors')
   return { success: true }
 }
+export async function deleteProduct(productId: string) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: "No autenticado" }
+
+  const admin = getAdminClient()
+
+  const { data: product } = await admin
+    .from("products")
+    .select("seller_id")
+    .eq("id", productId)
+    .single()
+
+  if (product?.seller_id !== user.id) return { error: "No autorizado" }
+
+  await admin.from("product_images").delete().eq("product_id", productId)
+
+  const { error } = await admin
+    .from("products")
+    .delete()
+    .eq("id", productId)
+
+  if (error) return { error: error.message }
+
+  revalidatePath("/dashboard/vendor")
+  return { success: true }
+}

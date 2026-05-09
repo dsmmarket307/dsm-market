@@ -4,13 +4,26 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 
+const transportadoras = [
+  'Selecciona la transportadora',
+  'Servientrega',
+  'Interrapidisimo',
+  'Envia',
+  'TCC',
+  'Coordinadora',
+  'Deprisa',
+  'Veloces',
+  'La Libertad',
+  'Otro',
+]
+
 export default function CheckoutPage() {
   const router = useRouter()
   const supabase = createClient()
   const [item, setItem] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [processing, setProcessing] = useState(false)
-  const [shippingCost, setShippingCost] = useState(0)
+  const [transportadora, setTransportadora] = useState('')
   const [address, setAddress] = useState({
     nombre: '',
     telefono: '',
@@ -24,10 +37,8 @@ export default function CheckoutPage() {
     async function load() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) { router.push('/auth/login'); return }
-
       const stored = sessionStorage.getItem('checkout_item')
       if (!stored) { router.push('/dashboard/buyer/products'); return }
-
       setItem(JSON.parse(stored))
       setLoading(false)
     }
@@ -35,12 +46,15 @@ export default function CheckoutPage() {
   }, [])
 
   const subtotal = item ? item.price * item.quantity : 0
-  const platformFee = Math.round(subtotal * 0.05)
-  const total = subtotal + shippingCost
+  const total = subtotal
 
   async function handleCheckout() {
     if (!address.nombre || !address.telefono || !address.direccion || !address.ciudad) {
       alert('Por favor completa todos los campos de envio')
+      return
+    }
+    if (!transportadora || transportadora === 'Selecciona la transportadora') {
+      alert('Por favor selecciona una transportadora')
       return
     }
     setProcessing(true)
@@ -55,13 +69,13 @@ export default function CheckoutPage() {
             price: item.price,
             quantity: item.quantity,
           }],
-          shipping_cost: shippingCost,
-          shipping_address: address,
+          shipping_cost: 0,
+          shipping_address: { ...address, transportadora },
         }),
       })
       const data = await res.json()
       if (data.init_point) {
-        sessionStorage.setItem('shipping_address', JSON.stringify(address))
+        sessionStorage.setItem('shipping_address', JSON.stringify({ ...address, transportadora }))
         window.location.href = data.init_point
       } else {
         alert('Error al procesar el pago')
@@ -88,9 +102,7 @@ export default function CheckoutPage() {
 
       <div style={{ maxWidth: '900px', margin: '0 auto', padding: 'clamp(1.5rem, 4vw, 3rem) clamp(1rem, 4vw, 2rem)', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '2rem' }}>
 
-        {/* Formulario */}
         <div>
-          {/* Producto */}
           <div style={{ marginBottom: '2rem', paddingBottom: '1.5rem', borderBottom: '1px solid #f0f0f0' }}>
             <p style={{ fontSize: '0.65rem', letterSpacing: '3px', textTransform: 'uppercase', color: '#C9A84C', marginBottom: '1rem' }}>Tu pedido</p>
             <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', padding: '1rem', border: '1px solid #f0f0f0', borderRadius: '4px' }}>
@@ -107,7 +119,6 @@ export default function CheckoutPage() {
             </div>
           </div>
 
-          {/* Direccion */}
           <p style={{ fontSize: '0.65rem', letterSpacing: '3px', textTransform: 'uppercase', color: '#C9A84C', marginBottom: '1rem' }}>Direccion de envio</p>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             {[
@@ -135,22 +146,24 @@ export default function CheckoutPage() {
 
             <div>
               <label style={{ display: 'block', fontSize: '0.65rem', letterSpacing: '2px', textTransform: 'uppercase', color: '#888', marginBottom: '0.5rem' }}>
-                Costo de envio (COP)
+                Elige la transportadora para tu envio
               </label>
-              <input
-                type="number" value={shippingCost}
-                onChange={e => setShippingCost(Number(e.target.value))}
-                placeholder="0"
+              <select
+                value={transportadora}
+                onChange={e => setTransportadora(e.target.value)}
                 style={{ width: '100%', padding: '0.75rem 1rem', border: '1px solid #ddd', fontSize: '0.875rem', color: '#111', outline: 'none', background: '#fafafa', boxSizing: 'border-box' }}
                 onFocus={e => (e.target.style.borderColor = '#C9A84C')}
                 onBlur={e => (e.target.style.borderColor = '#ddd')}
-              />
-              <p style={{ fontSize: '0.7rem', color: '#aaa', marginTop: '0.5rem' }}>El vendedor define el costo de envio.</p>
+              >
+                {transportadoras.map(t => (
+                  <option key={t} value={t}>{t}</option>
+                ))}
+              </select>
+              <p style={{ fontSize: '0.7rem', color: '#aaa', marginTop: '0.5rem' }}>El costo del envio lo coordinas directamente con el vendedor.</p>
             </div>
           </div>
         </div>
 
-        {/* Resumen */}
         <div>
           <div style={{ border: '1px solid #eee', borderTop: '3px solid #C9A84C', padding: '1.5rem', position: 'sticky', top: '80px' }}>
             <p style={{ fontSize: '0.65rem', letterSpacing: '3px', textTransform: 'uppercase', color: '#888', marginBottom: '1.5rem' }}>Resumen</p>
@@ -159,14 +172,6 @@ export default function CheckoutPage() {
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.875rem' }}>
                 <span style={{ color: '#666' }}>Subtotal</span>
                 <span style={{ color: '#111' }}>${subtotal.toLocaleString('es-CO')}</span>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.875rem' }}>
-                <span style={{ color: '#666' }}>Envio</span>
-                <span style={{ color: '#111' }}>${shippingCost.toLocaleString('es-CO')}</span>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', color: '#aaa', paddingTop: '0.5rem', borderTop: '1px solid #f0f0f0' }}>
-                <span>Comision plataforma (5%)</span>
-                <span>${platformFee.toLocaleString('es-CO')}</span>
               </div>
             </div>
 
