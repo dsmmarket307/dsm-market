@@ -41,7 +41,7 @@ export default async function VendorOrdersPage() {
                   <p style={{ fontSize: "1.125rem", fontWeight: 700, color: "#111" }}>${Number(order.total_price ?? 0).toLocaleString("es-CO")}</p>
                   <p style={{ fontSize: "0.75rem", color: "#888" }}>{new Date(order.created_at).toLocaleDateString("es-CO")}</p>
                 </div>
-                <span style={{ fontSize: "0.75rem", padding: "0.25rem 0.75rem", background: order.status === "released" ? "#e8f5e9" : order.status === "delivered" ? "#e8f5e9" : order.status === "shipped" ? "#fff8e1" : order.status === "paid" ? "#e3f2fd" : "#f5f5f5", color: order.status === "released" ? "#2e7d32" : order.status === "delivered" ? "#2e7d32" : order.status === "shipped" ? "#f57f17" : order.status === "paid" ? "#1565c0" : "#555", border: "1px solid #eee" }}>
+                <span style={{ fontSize: "0.75rem", padding: "0.25rem 0.75rem", background: order.status === "released" ? "#e8f5e9" : order.status === "shipped" ? "#fff8e1" : order.status === "paid" ? "#e3f2fd" : "#f5f5f5", color: order.status === "released" ? "#2e7d32" : order.status === "shipped" ? "#f57f17" : order.status === "paid" ? "#1565c0" : "#555", border: "1px solid #eee" }}>
                   {order.status === "released" ? "Pago liberado" : order.status === "delivered" ? "Entregado" : order.status === "shipped" ? "Enviado" : order.status === "paid" ? "Pago recibido" : "Pendiente"}
                 </span>
               </div>
@@ -74,7 +74,7 @@ export default async function VendorOrdersPage() {
                       <label style={{ fontSize: "0.75rem", color: "#888", display: "block", marginBottom: "0.25rem" }}>Numero de guia</label>
                       <input name="trackingNumber" required placeholder="Ej: 1234567890" style={{ width: "100%", padding: "0.625rem", border: "1px solid #ddd", fontSize: "0.875rem", outline: "none" }} />
                     </div>
-                    <button type="submit" style={{ padding: "0.625rem 1.25rem", background: "#C9A84C", color: "#fff", border: "none", cursor: "pointer", fontSize: "0.8rem", fontWeight: 600, whiteSpace: "nowrap" }}>
+                    <button type="submit" style={{ padding: "0.625rem 1.25rem", background: "#C9A84C", color: "#fff", border: "none", cursor: "pointer", fontSize: "0.8rem", fontWeight: 600 }}>
                       Subir guia
                     </button>
                   </div>

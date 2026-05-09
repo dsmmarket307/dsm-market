@@ -29,20 +29,13 @@ export default async function HomePage() {
 
   const { data: banners } = await admin
     .from("banners")
-    .select("*")
+    .select("id, title, subtitle, image_url, link, active, position")
     .eq("active", true)
     .order("position", { ascending: true })
 
-  const seen = new Set()
-  const featured = (allProducts ?? []).filter((p: any) => {
-    if (seen.has(p.category)) return false
-    seen.add(p.category)
-    return true
-  }).slice(0, 6)
-
   return (
     <LandingClient
-      products={featured}
+      products={allProducts ?? []}
       images={images ?? []}
       banners={banners ?? []}
     />

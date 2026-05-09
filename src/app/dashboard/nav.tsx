@@ -9,6 +9,7 @@ export default function DashboardNav({ role, name, email }: any) {
     { href: "/dashboard/admin/orders", label: "Ordenes y Pagos" },
   ] : role === "seller" ? [
     { href: "/dashboard/vendor", label: "Inicio" },
+    { href: "/dashboard/vendor/orders", label: "Mis Ordenes" },
     { href: "/dashboard/vendor/products/new", label: "Nuevo producto" },
   ] : [
     { href: "/dashboard/buyer", label: "Inicio" },

@@ -52,7 +52,7 @@ export default function VendorOrdenesPage() {
 
   const statusLabel: Record<string, string> = {
     pending_payment: 'Pago pendiente',
-    paid: 'Pagado',
+    paid: 'Pagado - Sube tu guia',
     processing: 'Procesando',
     shipped: 'Enviado',
     delivered: 'Entregado',
@@ -94,59 +94,84 @@ export default function VendorOrdenesPage() {
           </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-            {orders.map(order => (
-              <div key={order.id} style={{ border: '1px solid #eee', borderRadius: '4px', overflow: 'hidden' }}>
-                <div style={{ padding: '1rem 1.5rem', background: '#fafafa', borderBottom: '1px solid #eee', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.5rem' }}>
-                  <div>
-                    <p style={{ fontSize: '0.7rem', color: '#aaa', marginBottom: '0.25rem' }}>Orden #{order.id.slice(0, 8)}</p>
-                    <p style={{ fontSize: '0.75rem', color: '#888' }}>{new Date(order.created_at).toLocaleDateString('es-CO')}</p>
-                  </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
+            {orders.map(order => {
+              const dsm_fee = Math.round(Number(order.total) * 0.05)
+              const mp_fee = Math.round(Number(order.total) * 0.0339)
+              const ganancia = Number(order.total) - dsm_fee - mp_fee
+
+              return (
+                <div key={order.id} style={{ border: '1px solid #eee', borderRadius: '4px', overflow: 'hidden' }}>
+
+                  {/* Header orden */}
+                  <div style={{ padding: '1rem 1.5rem', background: '#fafafa', borderBottom: '1px solid #eee', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.5rem' }}>
+                    <div>
+                      <p style={{ fontSize: '0.7rem', color: '#aaa', marginBottom: '0.25rem' }}>Orden #{order.id.slice(0, 8)}</p>
+                      <p style={{ fontSize: '0.75rem', color: '#888' }}>{new Date(order.created_at).toLocaleDateString('es-CO')}</p>
+                    </div>
                     <span style={{ fontSize: '0.65rem', padding: '0.25rem 0.75rem', borderRadius: '999px', fontWeight: 600, background: '#f0f0f0', color: statusColor[order.status] ?? '#888' }}>
                       {statusLabel[order.status] ?? order.status}
                     </span>
-                    <p style={{ fontSize: '0.875rem', fontWeight: 600, color: '#1D9E75' }}>
-                      Tu ganancia: ${Number(order.seller_amount).toLocaleString('es-CO')}
-                    </p>
                   </div>
-                </div>
 
-                <div style={{ padding: '1rem 1.5rem' }}>
-                  {order.order_items?.map((item: any) => (
-                    <div key={item.id} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.875rem', padding: '0.5rem 0', borderBottom: '1px solid #f9f9f9' }}>
-                      <span style={{ color: '#555' }}>{item.products?.name} x{item.quantity}</span>
-                      <span style={{ color: '#111', fontWeight: 500 }}>${Number(item.subtotal).toLocaleString('es-CO')}</span>
+                  {/* Productos */}
+                  <div style={{ padding: '1rem 1.5rem', borderBottom: '1px solid #f0f0f0' }}>
+                    {order.order_items?.map((item: any) => (
+                      <div key={item.id} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.875rem', padding: '0.375rem 0' }}>
+                        <span style={{ color: '#555' }}>{item.products?.name} x{item.quantity}</span>
+                        <span style={{ color: '#111', fontWeight: 500 }}>${Number(item.subtotal).toLocaleString('es-CO')}</span>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Desglose financiero */}
+                  <div style={{ padding: '1rem 1.5rem', background: '#fafafa', borderBottom: '1px solid #f0f0f0' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', marginBottom: '0.5rem' }}>
+                      <span style={{ color: '#666' }}>Venta bruta</span>
+                      <span style={{ color: '#111', fontWeight: 500 }}>${Number(order.total).toLocaleString('es-CO')}</span>
                     </div>
-                  ))}
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', marginBottom: '0.5rem' }}>
+                      <span style={{ color: '#dc2626' }}>Comision DSM 5%</span>
+                      <span style={{ color: '#dc2626' }}>-${dsm_fee.toLocaleString('es-CO')}</span>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', marginBottom: '0.75rem' }}>
+                      <span style={{ color: '#dc2626' }}>Comision Mercado Pago 3.39%</span>
+                      <span style={{ color: '#dc2626' }}>-${mp_fee.toLocaleString('es-CO')}</span>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.875rem', paddingTop: '0.75rem', borderTop: '1px solid #eee' }}>
+                      <span style={{ color: '#111', fontWeight: 700 }}>Tu ganancia neta</span>
+                      <span style={{ color: '#1D9E75', fontWeight: 700, fontSize: '1rem' }}>${ganancia.toLocaleString('es-CO')}</span>
+                    </div>
+                  </div>
+
+                  {/* Guia de envio */}
+                  {order.status === 'paid' && !order.guia_url && (
+                    <div style={{ padding: '1rem 1.5rem', background: '#fffbeb', borderTop: '1px solid #fef3c7' }}>
+                      <p style={{ fontSize: '0.8rem', color: '#92400e', fontWeight: 500, marginBottom: '0.75rem' }}>
+                        Debes subir la guia de envio para que se libere tu pago
+                      </p>
+                      <label style={{ display: 'inline-block', padding: '0.625rem 1.25rem', background: '#C9A84C', color: '#fff', fontSize: '0.75rem', fontWeight: 700, letterSpacing: '1px', textTransform: 'uppercase', cursor: 'pointer' }}>
+                        {uploading[order.id] ? 'Subiendo...' : 'Subir guia de envio'}
+                        <input type="file" accept="image/*,.pdf" style={{ display: 'none' }}
+                          onChange={e => { const f = e.target.files?.[0]; if (f) handleGuia(order.id, f) }} />
+                      </label>
+                    </div>
+                  )}
+
+                  {order.guia_url && (
+                    <div style={{ padding: '1rem 1.5rem', background: '#e8f5e9', borderTop: '1px solid #c8e6c9', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.5rem' }}>
+                      <p style={{ fontSize: '0.8rem', color: '#2e7d32', fontWeight: 500 }}>Guia de envio subida</p>
+                      <a href={order.guia_url} target="_blank" style={{ fontSize: '0.75rem', color: '#2e7d32', textDecoration: 'none', fontWeight: 600 }}>Ver guia</a>
+                    </div>
+                  )}
+
+                  {success[order.id] && (
+                    <div style={{ padding: '0.75rem 1.5rem', background: '#e8f5e9', borderTop: '1px solid #c8e6c9' }}>
+                      <p style={{ fontSize: '0.8rem', color: '#2e7d32' }}>Guia subida correctamente. La orden esta en camino.</p>
+                    </div>
+                  )}
                 </div>
-
-                {order.status === 'paid' && !order.guia_url && (
-                  <div style={{ padding: '1rem 1.5rem', background: '#fffbeb', borderTop: '1px solid #fef3c7' }}>
-                    <p style={{ fontSize: '0.8rem', color: '#92400e', fontWeight: 500, marginBottom: '0.75rem' }}>
-                      Debes subir la guia de envio para que se libere tu pago
-                    </p>
-                    <label style={{ display: 'inline-block', padding: '0.625rem 1.25rem', background: '#C9A84C', color: '#fff', fontSize: '0.75rem', fontWeight: 700, letterSpacing: '1px', textTransform: 'uppercase', cursor: 'pointer' }}>
-                      {uploading[order.id] ? 'Subiendo...' : 'Subir guia de envio'}
-                      <input type="file" accept="image/*,.pdf" style={{ display: 'none' }}
-                        onChange={e => { const f = e.target.files?.[0]; if (f) handleGuia(order.id, f) }} />
-                    </label>
-                  </div>
-                )}
-
-                {order.guia_url && (
-                  <div style={{ padding: '1rem 1.5rem', background: '#e8f5e9', borderTop: '1px solid #c8e6c9', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.5rem' }}>
-                    <p style={{ fontSize: '0.8rem', color: '#2e7d32', fontWeight: 500 }}>Guia de envio subida</p>
-                    <a href={order.guia_url} target="_blank" style={{ fontSize: '0.75rem', color: '#2e7d32', textDecoration: 'none', fontWeight: 600 }}>Ver guia</a>
-                  </div>
-                )}
-
-                {success[order.id] && (
-                  <div style={{ padding: '0.75rem 1.5rem', background: '#e8f5e9', borderTop: '1px solid #c8e6c9' }}>
-                    <p style={{ fontSize: '0.8rem', color: '#2e7d32' }}>Guia subida correctamente. La orden esta en camino.</p>
-                  </div>
-                )}
-              </div>
-            ))}
+              )
+            })}
           </div>
         )}
       </div>

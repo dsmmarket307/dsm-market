@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 
 export default function LandingClient({ products, images, banners }: any) {
   const router = useRouter()
+  console.log('banners recibidos:', banners)
   const [search, setSearch] = useState('')
   const [currentBanner, setCurrentBanner] = useState(0)
   const [selectedCategory, setSelectedCategory] = useState('')
@@ -48,29 +49,39 @@ export default function LandingClient({ products, images, banners }: any) {
           </button>
         </div>
         <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-          <a href="/auth/login" style={{ fontSize: '0.875rem', color: '#555', textDecoration: 'none', padding: '0.5rem 0.75rem', display: 'none' }} className="desktop-only">Ingresar</a>
           <a href="/auth/login" style={{ fontSize: '0.8rem', color: '#555', textDecoration: 'none', padding: '0.5rem 0.75rem' }}>Ingresar</a>
           <a href="/auth/register" style={{ fontSize: '0.8rem', background: '#C9A84C', color: '#fff', padding: '0.5rem 1rem', textDecoration: 'none', borderRadius: '4px', fontWeight: 600 }}>Registrarse</a>
         </div>
       </nav>
 
-      {/* HERO BANNER */}
-      {banners.length > 0 ? (
-        <div style={{ position: 'relative', width: '100%', height: 'clamp(200px, 40vw, 420px)', overflow: 'hidden' }}>
+      {/* BANNER CARRUSEL */}
+      {banners.length > 0 && (
+        <div style={{ position: 'relative', width: '100%', height: 'clamp(220px, 40vw, 480px)', overflow: 'hidden' }}>
           {banners.map((banner: any, i: number) => (
             <div key={banner.id} style={{ position: 'absolute', inset: 0, transition: 'opacity 0.8s ease', opacity: i === currentBanner ? 1 : 0 }}>
               {banner.image_url ? (
-                <img src={banner.image_url} alt={banner.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-              ) : (
-                <div style={{ width: '100%', height: '100%', background: 'linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%)', display: 'flex', flexDirection: 'column', alignItems: 'flex-start', justifyContent: 'center', padding: 'clamp(1.5rem, 5vw, 4rem)' }}>
-                  <p style={{ color: '#C9A84C', fontSize: '0.7rem', letterSpacing: '4px', textTransform: 'uppercase', marginBottom: '1rem' }}>{banner.tag ?? 'DMS Market'}</p>
-                  <h2 style={{ color: '#fff', fontSize: 'clamp(1.5rem, 4vw, 3rem)', fontWeight: 300, lineHeight: 1.2, maxWidth: '600px', marginBottom: '1rem' }}>{banner.title}</h2>
-                  {banner.subtitle && <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: 'clamp(0.8rem, 2vw, 1rem)', maxWidth: '500px', marginBottom: '2rem' }}>{banner.subtitle}</p>}
-                  {banner.cta_text && (
-                    <a href={banner.cta_link ?? '/auth/register'} style={{ display: 'inline-block', background: '#C9A84C', color: '#fff', padding: '0.875rem 2rem', textDecoration: 'none', fontSize: '0.8rem', fontWeight: 700, letterSpacing: '2px', textTransform: 'uppercase' }}>
-                      {banner.cta_text}
+                <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+                  <img src={banner.image_url} alt={banner.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to right, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.2) 50%, transparent 100%)' }} />
+                  <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'flex-start', justifyContent: 'center', padding: 'clamp(1.5rem, 6vw, 5rem)' }}>
+                    <p style={{ color: '#C9A84C', fontSize: '0.65rem', letterSpacing: '4px', textTransform: 'uppercase', marginBottom: '0.75rem' }}>DMS Market</p>
+                    <h2 style={{ color: '#fff', fontSize: 'clamp(1.25rem, 4vw, 2.75rem)', fontWeight: 300, lineHeight: 1.2, maxWidth: '550px', marginBottom: '0.75rem', textShadow: '0 2px 12px rgba(0,0,0,0.4)' }}>{banner.title}</h2>
+                    {banner.subtitle && (
+                      <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: 'clamp(0.8rem, 2vw, 1rem)', maxWidth: '420px', marginBottom: '1.75rem', lineHeight: 1.6 }}>{banner.subtitle}</p>
+                    )}
+                    <a href={banner.link ?? '/auth/register'} style={{ display: 'inline-block', background: '#C9A84C', color: '#fff', padding: '0.75rem 2rem', textDecoration: 'none', fontSize: '0.75rem', fontWeight: 700, letterSpacing: '2px', textTransform: 'uppercase' }}>
+                      Ver mas
                     </a>
-                  )}
+                  </div>
+                </div>
+              ) : (
+                <div style={{ width: '100%', height: '100%', background: 'linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%)', display: 'flex', flexDirection: 'column', alignItems: 'flex-start', justifyContent: 'center', padding: 'clamp(1.5rem, 6vw, 5rem)' }}>
+                  <p style={{ color: '#C9A84C', fontSize: '0.65rem', letterSpacing: '4px', textTransform: 'uppercase', marginBottom: '0.75rem' }}>DMS Market</p>
+                  <h2 style={{ color: '#fff', fontSize: 'clamp(1.25rem, 4vw, 2.75rem)', fontWeight: 300, lineHeight: 1.2, maxWidth: '550px', marginBottom: '0.75rem' }}>{banner.title}</h2>
+                  {banner.subtitle && <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: 'clamp(0.8rem, 2vw, 1rem)', maxWidth: '420px', marginBottom: '1.75rem' }}>{banner.subtitle}</p>}
+                  <a href={banner.link ?? '/auth/register'} style={{ display: 'inline-block', background: '#C9A84C', color: '#fff', padding: '0.75rem 2rem', textDecoration: 'none', fontSize: '0.75rem', fontWeight: 700, letterSpacing: '2px', textTransform: 'uppercase' }}>
+                    Ver mas
+                  </a>
                 </div>
               )}
             </div>
@@ -80,20 +91,8 @@ export default function LandingClient({ products, images, banners }: any) {
               <button key={i} onClick={() => setCurrentBanner(i)} style={{ width: i === currentBanner ? '28px' : '8px', height: '8px', borderRadius: '4px', background: i === currentBanner ? '#C9A84C' : 'rgba(255,255,255,0.4)', border: 'none', cursor: 'pointer', transition: 'all 0.3s' }} />
             ))}
           </div>
-          <button onClick={() => setCurrentBanner(p => (p - 1 + banners.length) % banners.length)} style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', background: 'rgba(0,0,0,0.3)', color: '#fff', border: 'none', width: '36px', height: '36px', borderRadius: '50%', cursor: 'pointer', fontSize: '1.2rem', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10 }}>&#8249;</button>
-          <button onClick={() => setCurrentBanner(p => (p + 1) % banners.length)} style={{ position: 'absolute', right: '1rem', top: '50%', transform: 'translateY(-50%)', background: 'rgba(0,0,0,0.3)', color: '#fff', border: 'none', width: '36px', height: '36px', borderRadius: '50%', cursor: 'pointer', fontSize: '1.2rem', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10 }}>&#8250;</button>
-        </div>
-      ) : (
-        <div style={{ background: 'linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%)', padding: 'clamp(3rem, 8vw, 6rem) clamp(1.5rem, 5vw, 4rem)', textAlign: 'center' }}>
-          <p style={{ color: '#C9A84C', fontSize: '0.7rem', letterSpacing: '4px', textTransform: 'uppercase', marginBottom: '1rem' }}>Marketplace Colombiano</p>
-          <h1 style={{ color: '#fff', fontSize: 'clamp(2rem, 5vw, 3.5rem)', fontWeight: 300, lineHeight: 1.2, marginBottom: '1.5rem', maxWidth: '700px', margin: '0 auto 1.5rem' }}>
-            Compra y vende con <span style={{ color: '#C9A84C' }}>confianza</span>
-          </h1>
-          <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: 'clamp(0.875rem, 2vw, 1rem)', marginBottom: '2.5rem' }}>Pagos protegidos. Vendedores verificados. 100% colombiano.</p>
-          <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
-            <a href="/auth/register" style={{ display: 'inline-block', background: '#C9A84C', color: '#fff', padding: '0.875rem 2rem', textDecoration: 'none', fontSize: '0.8rem', fontWeight: 700, letterSpacing: '2px', textTransform: 'uppercase' }}>Empezar ahora</a>
-            <a href="/auth/login" style={{ display: 'inline-block', background: 'transparent', color: '#fff', padding: '0.875rem 2rem', textDecoration: 'none', fontSize: '0.8rem', fontWeight: 600, letterSpacing: '2px', textTransform: 'uppercase', border: '1px solid rgba(255,255,255,0.3)' }}>Iniciar sesion</a>
-          </div>
+          <button onClick={() => setCurrentBanner(p => (p - 1 + banners.length) % banners.length)} style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', background: 'rgba(0,0,0,0.35)', color: '#fff', border: 'none', width: '40px', height: '40px', borderRadius: '50%', cursor: 'pointer', fontSize: '1.4rem', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10 }}>&#8249;</button>
+          <button onClick={() => setCurrentBanner(p => (p + 1) % banners.length)} style={{ position: 'absolute', right: '1rem', top: '50%', transform: 'translateY(-50%)', background: 'rgba(0,0,0,0.35)', color: '#fff', border: 'none', width: '40px', height: '40px', borderRadius: '50%', cursor: 'pointer', fontSize: '1.4rem', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10 }}>&#8250;</button>
         </div>
       )}
 
@@ -144,7 +143,7 @@ export default function LandingClient({ products, images, banners }: any) {
                 >
                   <div style={{ position: 'relative', paddingBottom: '100%', background: '#f8f8f8', overflow: 'hidden' }}>
                     {img ? (
-                      <img src={img} alt={product.name} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.3s' }} />
+                      <img src={img} alt={product.name} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
                     ) : (
                       <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                         <p style={{ fontSize: '0.75rem', color: '#ccc' }}>Sin imagen</p>
@@ -155,7 +154,7 @@ export default function LandingClient({ products, images, banners }: any) {
                     <p style={{ fontSize: '0.6rem', color: '#C9A84C', textTransform: 'uppercase', marginBottom: '0.25rem', fontWeight: 700, letterSpacing: '1px' }}>{product.category}</p>
                     <p style={{ fontSize: 'clamp(0.75rem, 2vw, 0.875rem)', marginBottom: '0.5rem', overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', minHeight: '2.5rem', color: '#222', lineHeight: 1.4 }}>{product.name}</p>
                     <p style={{ fontSize: 'clamp(0.875rem, 2.5vw, 1rem)', fontWeight: 700, color: '#111', marginBottom: '0.5rem' }}>${Number(product.price).toLocaleString('es-CO')}</p>
-                    <div style={{ background: 'linear-gradient(135deg, #C9A84C, #b8943d)', color: '#fff', padding: '0.375rem', textAlign: 'center', fontSize: '0.7rem', fontWeight: 700, letterSpacing: '1px', textTransform: 'uppercase', borderRadius: '4px' }}>Ver producto</div>
+                    <div style={{ background: '#C9A84C', color: '#fff', padding: '0.375rem', textAlign: 'center', fontSize: '0.7rem', fontWeight: 700, letterSpacing: '1px', textTransform: 'uppercase', borderRadius: '4px' }}>Ver producto</div>
                   </div>
                 </div>
               )
@@ -175,7 +174,7 @@ export default function LandingClient({ products, images, banners }: any) {
               { num: '02', title: 'Compra o vende', desc: 'Publica productos o encuentra exactamente lo que necesitas.' },
               { num: '03', title: 'Pago protegido', desc: 'Tu dinero queda retenido 7 dias hasta confirmar la entrega.' },
             ].map((s) => (
-              <div key={s.num} style={{ background: '#fff', border: '1px solid #eee', padding: '2rem 1.5rem', borderTop: '3px solid #C9A84C', borderRadius: '0 0 8px 8px' }}>
+              <div key={s.num} style={{ background: '#fff', border: '1px solid #eee', padding: '2rem 1.5rem', borderTop: '3px solid #C9A84C' }}>
                 <p style={{ fontSize: '2.5rem', fontWeight: 200, color: '#C9A84C', marginBottom: '1rem', lineHeight: 1 }}>{s.num}</p>
                 <h3 style={{ fontSize: '1rem', fontWeight: 600, color: '#111', marginBottom: '0.75rem' }}>{s.title}</h3>
                 <p style={{ fontSize: '0.8rem', color: '#666', lineHeight: 1.7 }}>{s.desc}</p>
@@ -190,7 +189,7 @@ export default function LandingClient({ products, images, banners }: any) {
         <div style={{ maxWidth: '1100px', margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '2rem' }}>
           {[
             { icon: '🔒', title: 'Pagos seguros', desc: 'Sistema escrow que protege tu dinero hasta confirmar la entrega.' },
-            { icon: '✅', title: 'Vendedores verificados', desc: 'Todos los vendedores pasan por un proceso de verificacion de identidad.' },
+            { icon: '✅', title: 'Vendedores verificados', desc: 'Todos los vendedores pasan por verificacion de identidad.' },
             { icon: '📦', title: 'Envio flexible', desc: 'El vendedor elige la transportadora. Tu pagas solo el envio real.' },
             { icon: '🇨🇴', title: '100% colombiano', desc: 'Plataforma hecha en Colombia para colombianos.' },
           ].map(item => (
@@ -208,7 +207,7 @@ export default function LandingClient({ products, images, banners }: any) {
         <p style={{ color: '#C9A84C', fontSize: '0.65rem', letterSpacing: '4px', textTransform: 'uppercase', marginBottom: '1rem' }}>Cupos limitados</p>
         <h2 style={{ fontSize: 'clamp(1.5rem, 4vw, 2.5rem)', fontWeight: 300, color: '#fff', marginBottom: '1rem' }}>Vende en DMS Market</h2>
         <p style={{ fontSize: 'clamp(0.8rem, 2vw, 0.95rem)', color: 'rgba(255,255,255,0.5)', marginBottom: '2rem', maxWidth: '500px', margin: '0 auto 2rem' }}>
-          Solo 5% de comision. Sin mensualidades. Sin costos ocultos. Tu decides cuando y cuanto vender.
+          Solo 5% de comision. Sin mensualidades. Sin costos ocultos.
         </p>
         <a href="/auth/register" style={{ display: 'inline-block', background: '#C9A84C', color: '#fff', padding: '1rem 2.5rem', textDecoration: 'none', fontSize: '0.8rem', fontWeight: 700, letterSpacing: '2px', textTransform: 'uppercase' }}>
           Quiero ser vendedor
@@ -221,7 +220,6 @@ export default function LandingClient({ products, images, banners }: any) {
         <p style={{ fontSize: '0.75rem', color: '#999' }}>2025 DMS Market. Colombia</p>
         <div style={{ display: 'flex', gap: '1.25rem' }}>
           <a href="/politicas" style={{ fontSize: '0.75rem', color: '#999', textDecoration: 'none' }}>Politicas</a>
-          <a href="/politicas" style={{ fontSize: '0.75rem', color: '#999', textDecoration: 'none' }}>Privacidad</a>
           <a href="/auth/login" style={{ fontSize: '0.75rem', color: '#C9A84C', textDecoration: 'none', fontWeight: 600 }}>Ingresar</a>
         </div>
       </footer>
