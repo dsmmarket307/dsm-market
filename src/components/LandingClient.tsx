@@ -61,7 +61,7 @@ export default function LandingClient({ products, images, banners }: any) {
             <div key={banner.id} style={{ position: 'absolute', inset: 0, transition: 'opacity 0.8s ease', opacity: i === currentBanner ? 1 : 0 }}>
               {banner.image_url ? (
                 <div style={{ position: 'relative', width: '100%', height: '100%' }}>
-                  <img src={banner.image_url} alt={banner.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                 <img src={banner.image_url} alt={banner.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                   <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to right, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.2) 50%, transparent 100%)' }} />
                   <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'flex-start', justifyContent: 'center', padding: 'clamp(1.5rem, 6vw, 5rem)' }}>
                     <p style={{ color: '#C9A84C', fontSize: '0.65rem', letterSpacing: '4px', textTransform: 'uppercase', marginBottom: '0.75rem' }}>DMS Market</p>
