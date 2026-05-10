@@ -1,7 +1,6 @@
 ﻿"use client"
 
 import { useState } from "react"
-import { createDispute } from "@/lib/actions/disputes"
 import { useRouter } from "next/navigation"
 
 const reasons = [
@@ -17,27 +16,37 @@ export default function BuyerDisputesPage() {
   const [error, setError] = useState("")
   const [success, setSuccess] = useState(false)
   const [loading, setLoading] = useState(false)
-  const [previews, setPreviews] = useState([])
-  const [files, setFiles] = useState([])
+  const [previews, setPreviews] = useState<string[]>([])
+  const [files, setFiles] = useState<File[]>([])
 
-  function handleFiles(e) {
-    const selected = Array.from(e.target.files ?? [])
+  function handleFiles(e: React.ChangeEvent<HTMLInputElement>) {
+    const selected = Array.from(e.target.files ?? []) as File[]
     setFiles(selected)
-    setPreviews(selected.map((f) => URL.createObjectURL(f)))
+    setPreviews(selected.map((f: File) => URL.createObjectURL(f)))
   }
 
-  async function handleSubmit(e) {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
     setError("")
     setLoading(true)
     const formData = new FormData(e.currentTarget)
-    files.forEach((f) => formData.append("evidence", f))
-    const result = await createDispute(formData)
-    if (result?.error) {
-      setError(result.error)
+    files.forEach((f: File) => formData.append("evidence", f))
+
+    try {
+      const res = await fetch('/api/disputes', {
+        method: 'POST',
+        body: formData,
+      })
+      const data = await res.json()
+      if (data?.error) {
+        setError(data.error)
+        setLoading(false)
+      } else {
+        setSuccess(true)
+      }
+    } catch {
+      setError("Error al enviar la disputa")
       setLoading(false)
-    } else {
-      setSuccess(true)
     }
   }
 
@@ -45,7 +54,7 @@ export default function BuyerDisputesPage() {
     return (
       <div style={{ padding: "2rem", maxWidth: "700px", margin: "0 auto", background: "#fff", minHeight: "100vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", textAlign: "center" }}>
         <div style={{ width: "60px", height: "60px", background: "#e8f5e9", border: "1px solid #4CAF7D", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "1.5rem" }}>
-          <span style={{ fontSize: "1.5rem", color: "#4CAF7D" }}>✓</span>
+          <span style={{ fontSize: "1.5rem", color: "#4CAF7D" }}>OK</span>
         </div>
         <h2 style={{ fontSize: "1.5rem", fontWeight: 700, color: "#111", marginBottom: "0.75rem" }}>Disputa enviada</h2>
         <p style={{ fontSize: "0.875rem", color: "#888", marginBottom: "2rem" }}>Hemos recibido tu caso. Un asesor de DMS Market revisara tu situacion y te contactara pronto.</p>
@@ -71,7 +80,6 @@ export default function BuyerDisputesPage() {
       )}
 
       <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
-
         <div>
           <label style={{ display: "block", fontSize: "0.75rem", color: "#888", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "0.5rem" }}>Tipo de problema *</label>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.75rem" }}>
@@ -86,28 +94,28 @@ export default function BuyerDisputesPage() {
 
         <div>
           <label style={{ display: "block", fontSize: "0.75rem", color: "#888", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "0.5rem" }}>Numero de orden (opcional)</label>
-          <input name="order_id" type="text" placeholder="Ej: abc12345..." style={{ width: "100%", padding: "0.75rem 1rem", border: "1px solid #ddd", fontSize: "0.875rem", outline: "none", color: "#111" }} />
+          <input name="order_id" type="text" placeholder="Ej: abc12345..." style={{ width: "100%", padding: "0.75rem 1rem", border: "1px solid #ddd", fontSize: "0.875rem", outline: "none", color: "#111", boxSizing: "border-box" }} />
         </div>
 
         <div>
           <label style={{ display: "block", fontSize: "0.75rem", color: "#888", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "0.5rem" }}>Descripcion del problema *</label>
-          <textarea name="description" required rows={5} placeholder="Describe detalladamente lo que ocurrio..." style={{ width: "100%", padding: "0.75rem 1rem", border: "1px solid #ddd", fontSize: "0.875rem", outline: "none", color: "#111", resize: "vertical" }} />
+          <textarea name="description" required rows={5} placeholder="Describe detalladamente lo que ocurrio..." style={{ width: "100%", padding: "0.75rem 1rem", border: "1px solid #ddd", fontSize: "0.875rem", outline: "none", color: "#111", resize: "vertical", boxSizing: "border-box", fontFamily: "sans-serif" }} />
         </div>
 
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
           <div>
             <label style={{ display: "block", fontSize: "0.75rem", color: "#888", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "0.5rem" }}>Celular de contacto *</label>
-            <input name="phone" type="tel" required placeholder="Ej: 3001234567" style={{ width: "100%", padding: "0.75rem 1rem", border: "1px solid #ddd", fontSize: "0.875rem", outline: "none", color: "#111" }} />
+            <input name="phone" type="tel" required placeholder="Ej: 3001234567" style={{ width: "100%", padding: "0.75rem 1rem", border: "1px solid #ddd", fontSize: "0.875rem", outline: "none", color: "#111", boxSizing: "border-box" }} />
           </div>
           <div>
             <label style={{ display: "block", fontSize: "0.75rem", color: "#888", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "0.5rem" }}>Correo electronico *</label>
-            <input name="email" type="email" required placeholder="tu@correo.com" style={{ width: "100%", padding: "0.75rem 1rem", border: "1px solid #ddd", fontSize: "0.875rem", outline: "none", color: "#111" }} />
+            <input name="email" type="email" required placeholder="tu@correo.com" style={{ width: "100%", padding: "0.75rem 1rem", border: "1px solid #ddd", fontSize: "0.875rem", outline: "none", color: "#111", boxSizing: "border-box" }} />
           </div>
         </div>
 
         <div>
           <label style={{ display: "block", fontSize: "0.75rem", color: "#888", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "0.5rem" }}>Evidencia — fotos o videos</label>
-          <div style={{ border: "2px dashed #ddd", padding: "1.5rem", textAlign: "center", cursor: "pointer" }} onClick={() => document.getElementById("evidence-input").click()}>
+          <div style={{ border: "2px dashed #ddd", padding: "1.5rem", textAlign: "center", cursor: "pointer" }} onClick={() => document.getElementById("evidence-input")?.click()}>
             <input id="evidence-input" type="file" accept="image/*,video/*" multiple style={{ display: "none" }} onChange={handleFiles} />
             <p style={{ fontSize: "0.875rem", color: "#888" }}>Clic para subir fotos o videos como evidencia</p>
             <p style={{ fontSize: "0.75rem", color: "#C9A84C", marginTop: "0.25rem" }}>{files.length} archivo(s) seleccionado(s)</p>
@@ -115,7 +123,7 @@ export default function BuyerDisputesPage() {
           {previews.length > 0 && (
             <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "0.5rem", marginTop: "0.75rem" }}>
               {previews.map((p, i) => (
-                <img key={i} src={p} style={{ width: "100%", aspectRatio: "1", objectFit: "cover", border: "1px solid #eee" }} />
+                <img key={i} src={p} alt="" style={{ width: "100%", aspectRatio: "1", objectFit: "cover", border: "1px solid #eee" }} />
               ))}
             </div>
           )}

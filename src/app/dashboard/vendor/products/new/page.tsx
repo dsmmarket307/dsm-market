@@ -16,30 +16,30 @@ export default function NewProductPage() {
   const router = useRouter()
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
-  const [images, setImages] = useState([])
-  const [previews, setPreviews] = useState([])
+  const [images, setImages] = useState<File[]>([])
+  const [previews, setPreviews] = useState<string[]>([])
 
-  function handleImages(e) {
-    const files = Array.from(e.target.files ?? [])
+  function handleImages(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = Array.from(e.target.files ?? []) as File[]
     if (files.length + images.length > 10) {
       setError("Maximo 10 fotos")
       return
     }
     setImages((prev) => [...prev, ...files])
-    setPreviews((prev) => [...prev, ...files.map((f) => URL.createObjectURL(f))])
+    setPreviews((prev) => [...prev, ...files.map((f: File) => URL.createObjectURL(f))])
   }
 
-  function removeImage(i) {
+  function removeImage(i: number) {
     setImages((prev) => prev.filter((_, j) => j !== i))
     setPreviews((prev) => prev.filter((_, j) => j !== i))
   }
 
-  async function handleSubmit(e) {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
     setError("")
     setLoading(true)
     const formData = new FormData(e.currentTarget)
-    images.forEach((img) => formData.append("images", img))
+    images.forEach((img: File) => formData.append("images", img))
     const result = await createProduct(formData)
     if (result?.error) {
       setError(result.error)
@@ -65,22 +65,22 @@ export default function NewProductPage() {
       <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
         <div>
           <label style={{ display: "block", fontSize: "0.75rem", color: "#888", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "0.5rem" }}>Nombre del producto *</label>
-          <input name="name" type="text" required placeholder="Nombre del producto" style={{ width: "100%", padding: "0.75rem 1rem", border: "1px solid #ddd", fontSize: "0.875rem", outline: "none", color: "#111" }} />
+          <input name="name" type="text" required placeholder="Nombre del producto" style={{ width: "100%", padding: "0.75rem 1rem", border: "1px solid #ddd", fontSize: "0.875rem", outline: "none", color: "#111", boxSizing: "border-box" }} />
         </div>
 
         <div>
           <label style={{ display: "block", fontSize: "0.75rem", color: "#888", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "0.5rem" }}>Descripcion</label>
-          <textarea name="description" rows={4} placeholder="Describe tu producto..." style={{ width: "100%", padding: "0.75rem 1rem", border: "1px solid #ddd", fontSize: "0.875rem", outline: "none", color: "#111", resize: "vertical" }} />
+          <textarea name="description" rows={4} placeholder="Describe tu producto..." style={{ width: "100%", padding: "0.75rem 1rem", border: "1px solid #ddd", fontSize: "0.875rem", outline: "none", color: "#111", resize: "vertical", boxSizing: "border-box", fontFamily: "sans-serif" }} />
         </div>
 
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
           <div>
             <label style={{ display: "block", fontSize: "0.75rem", color: "#888", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "0.5rem" }}>Precio (COP) *</label>
-            <input name="price" type="number" required min="0" step="100" placeholder="0" style={{ width: "100%", padding: "0.75rem 1rem", border: "1px solid #ddd", fontSize: "0.875rem", outline: "none", color: "#111" }} />
+            <input name="price" type="number" required min="0" step="100" placeholder="0" style={{ width: "100%", padding: "0.75rem 1rem", border: "1px solid #ddd", fontSize: "0.875rem", outline: "none", color: "#111", boxSizing: "border-box" }} />
           </div>
           <div>
             <label style={{ display: "block", fontSize: "0.75rem", color: "#888", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "0.5rem" }}>Categoria *</label>
-            <select name="category" required style={{ width: "100%", padding: "0.75rem 1rem", border: "1px solid #ddd", fontSize: "0.875rem", outline: "none", color: "#111", background: "#fff" }}>
+            <select name="category" required style={{ width: "100%", padding: "0.75rem 1rem", border: "1px solid #ddd", fontSize: "0.875rem", outline: "none", color: "#111", background: "#fff", boxSizing: "border-box" }}>
               <option value="">Seleccionar...</option>
               {categories.map((cat) => <option key={cat} value={cat}>{cat}</option>)}
             </select>
@@ -103,7 +103,7 @@ export default function NewProductPage() {
 
         <div>
           <label style={{ display: "block", fontSize: "0.75rem", color: "#888", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "0.5rem" }}>Fotos del producto (maximo 10)</label>
-          <div style={{ border: "2px dashed #ddd", padding: "2rem", textAlign: "center", cursor: "pointer" }} onClick={() => document.getElementById("img-input").click()}>
+          <div style={{ border: "2px dashed #ddd", padding: "2rem", textAlign: "center", cursor: "pointer" }} onClick={() => document.getElementById("img-input")?.click()}>
             <input id="img-input" type="file" accept="image/*" multiple style={{ display: "none" }} onChange={handleImages} />
             <p style={{ fontSize: "0.875rem", color: "#888", marginBottom: "0.25rem" }}>Clic para subir fotos</p>
             <p style={{ fontSize: "0.75rem", color: "#C9A84C" }}>{images.length}/10 fotos seleccionadas</p>
@@ -112,7 +112,7 @@ export default function NewProductPage() {
             <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: "0.5rem", marginTop: "0.75rem" }}>
               {previews.map((preview, i) => (
                 <div key={i} style={{ position: "relative" }}>
-                  <img src={preview} style={{ width: "100%", aspectRatio: "1", objectFit: "cover", border: "1px solid #eee" }} />
+                  <img src={preview} alt="" style={{ width: "100%", aspectRatio: "1", objectFit: "cover", border: "1px solid #eee" }} />
                   <button type="button" onClick={() => removeImage(i)} style={{ position: "absolute", top: "4px", right: "4px", width: "20px", height: "20px", background: "#E05252", color: "#fff", border: "none", cursor: "pointer", fontSize: "0.75rem", display: "flex", alignItems: "center", justifyContent: "center" }}>x</button>
                 </div>
               ))}
