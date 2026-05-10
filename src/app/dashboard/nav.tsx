@@ -7,13 +7,16 @@ export default function DashboardNav({ role, name, email }: any) {
     { href: "/dashboard/admin/vendors", label: "Vendedores" },
     { href: "/dashboard/admin/products", label: "Productos" },
     { href: "/dashboard/admin/orders", label: "Ordenes y Pagos" },
+    { href: "/dashboard/admin/disputes", label: "Disputas" },
   ] : role === "seller" ? [
     { href: "/dashboard/vendor", label: "Inicio" },
     { href: "/dashboard/vendor/orders", label: "Mis Ordenes" },
     { href: "/dashboard/vendor/products/new", label: "Nuevo producto" },
+    { href: "/dashboard/vendor/disputes", label: "Disputas" },
   ] : [
     { href: "/dashboard/buyer", label: "Inicio" },
     { href: "/dashboard/buyer/products", label: "Tienda" },
+    { href: "/dashboard/buyer/disputes", label: "Abrir disputa" },
   ]
   return (
     <aside style={{ width: "220px", background: "#fff", borderRight: "1px solid #eee", display: "flex", flexDirection: "column", minHeight: "100vh", position: "sticky", top: 0 }}>
