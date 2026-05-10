@@ -49,16 +49,18 @@ export default async function AdminVendorsPage() {
         ))}
       </div>
 
-      <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+      <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
         {!vendors || vendors.length === 0 ? (
           <p style={{ color: "#888", textAlign: "center", padding: "2rem" }}>No hay vendedores registrados.</p>
         ) : (
           vendors.map((vendor: any) => (
-            <div key={vendor.id} style={{ border: "1px solid #eee", padding: "1.25rem", background: "#fff" }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+            <div key={vendor.id} style={{ border: "1px solid #eee", background: "#fff", borderRadius: "4px", overflow: "hidden" }}>
+
+              {/* Info principal */}
+              <div style={{ padding: "1.25rem", display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: "1rem" }}>
                 <div style={{ flex: 1 }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "0.5rem" }}>
-                    <div style={{ width: "40px", height: "40px", background: "#FBF5E6", border: "1px solid #C9A84C", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "0.75rem" }}>
+                    <div style={{ width: "40px", height: "40px", background: "#FBF5E6", border: "1px solid #C9A84C", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, borderRadius: "50%" }}>
                       <span style={{ color: "#C9A84C", fontWeight: 700 }}>{vendor.name?.charAt(0)?.toUpperCase() ?? "V"}</span>
                     </div>
                     <div>
@@ -67,19 +69,19 @@ export default async function AdminVendorsPage() {
                     </div>
                   </div>
 
-                  {vendor.phone && <p style={{ fontSize: "0.8rem", color: "#555", marginBottom: "0.25rem" }}>Tel: {vendor.phone}</p>}
-                  {vendor.city && <p style={{ fontSize: "0.8rem", color: "#555", marginBottom: "0.25rem" }}>Ciudad: {vendor.city}</p>}
-                  {vendor.store_name && <p style={{ fontSize: "0.8rem", color: "#555", marginBottom: "0.25rem" }}>Tienda: {vendor.store_name}</p>}
-
-                  <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginTop: "0.5rem" }}>
-                    <span style={{ fontSize: "0.75rem", padding: "0.2rem 0.75rem", background: vendor.seller_status === "approved" ? "#e8f5e9" : vendor.seller_status === "rejected" ? "#fdecea" : "#fff8e1", color: vendor.seller_status === "approved" ? "#2e7d32" : vendor.seller_status === "rejected" ? "#c62828" : "#f57f17", border: `1px solid ${vendor.seller_status === "approved" ? "#4CAF7D" : vendor.seller_status === "rejected" ? "#E05252" : "#C9A84C"}` }}>
+                  <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap", marginBottom: "0.5rem" }}>
+                    <span style={{ fontSize: "0.75rem", padding: "0.2rem 0.75rem", background: vendor.seller_status === "approved" ? "#e8f5e9" : vendor.seller_status === "rejected" ? "#fdecea" : "#fff8e1", color: vendor.seller_status === "approved" ? "#2e7d32" : vendor.seller_status === "rejected" ? "#c62828" : "#f57f17", border: `1px solid ${vendor.seller_status === "approved" ? "#4CAF7D" : vendor.seller_status === "rejected" ? "#E05252" : "#C9A84C"}`, borderRadius: "999px" }}>
                       {vendor.seller_status === "approved" ? "Aprobado" : vendor.seller_status === "rejected" ? "Rechazado" : "Pendiente"}
                     </span>
-                    {vendor.blocked && <span style={{ fontSize: "0.75rem", padding: "0.2rem 0.75rem", background: "#fdecea", color: "#c62828", border: "1px solid #E05252" }}>Bloqueado</span>}
+                    {vendor.politicas_aceptadas && (
+                      <span style={{ fontSize: "0.75rem", padding: "0.2rem 0.75rem", background: "#e8f5e9", color: "#2e7d32", border: "1px solid #4CAF7D", borderRadius: "999px" }}>
+                        Politicas aceptadas
+                      </span>
+                    )}
                   </div>
                 </div>
 
-                <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem", marginLeft: "1rem" }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
                   {vendor.seller_status === "pending" && (
                     <>
                       <form action={async () => { "use server"; await approveVendor(vendor.id) }}>
@@ -110,6 +112,49 @@ export default async function AdminVendorsPage() {
                   )}
                 </div>
               </div>
+
+              {/* Datos de contacto */}
+              <div style={{ padding: "1rem 1.25rem", background: "#fafafa", borderTop: "1px solid #f0f0f0", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: "0.75rem" }}>
+                <div>
+                  <p style={{ fontSize: "0.6rem", textTransform: "uppercase", letterSpacing: "1px", color: "#aaa", marginBottom: "0.25rem" }}>Celular</p>
+                  <p style={{ fontSize: "0.875rem", color: "#111" }}>{vendor.celular ?? vendor.phone ?? "No registrado"}</p>
+                </div>
+                <div>
+                  <p style={{ fontSize: "0.6rem", textTransform: "uppercase", letterSpacing: "1px", color: "#aaa", marginBottom: "0.25rem" }}>Cedula</p>
+                  <p style={{ fontSize: "0.875rem", color: "#111" }}>{vendor.cedula ?? "No registrada"}</p>
+                </div>
+                <div>
+                  <p style={{ fontSize: "0.6rem", textTransform: "uppercase", letterSpacing: "1px", color: "#aaa", marginBottom: "0.25rem" }}>Ciudad</p>
+                  <p style={{ fontSize: "0.875rem", color: "#111" }}>{vendor.ciudad ?? vendor.city ?? "No registrada"}</p>
+                </div>
+                <div>
+                  <p style={{ fontSize: "0.6rem", textTransform: "uppercase", letterSpacing: "1px", color: "#aaa", marginBottom: "0.25rem" }}>Direccion</p>
+                  <p style={{ fontSize: "0.875rem", color: "#111" }}>{vendor.direccion ?? "No registrada"}</p>
+                </div>
+              </div>
+
+              {/* Datos bancarios */}
+              <div style={{ padding: "1rem 1.25rem", background: "#fffbeb", borderTop: "1px solid #fef3c7", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: "0.75rem" }}>
+                <div>
+                  <p style={{ fontSize: "0.6rem", textTransform: "uppercase", letterSpacing: "1px", color: "#92400e", marginBottom: "0.25rem" }}>Banco</p>
+                  <p style={{ fontSize: "0.875rem", color: "#111", fontWeight: 500 }}>{vendor.banco ?? "No registrado"}</p>
+                </div>
+                <div>
+                  <p style={{ fontSize: "0.6rem", textTransform: "uppercase", letterSpacing: "1px", color: "#92400e", marginBottom: "0.25rem" }}>Tipo de cuenta</p>
+                  <p style={{ fontSize: "0.875rem", color: "#111", fontWeight: 500, textTransform: "capitalize" }}>{vendor.tipo_cuenta ?? "No registrado"}</p>
+                </div>
+                <div>
+                  <p style={{ fontSize: "0.6rem", textTransform: "uppercase", letterSpacing: "1px", color: "#92400e", marginBottom: "0.25rem" }}>Numero de cuenta</p>
+                  <p style={{ fontSize: "0.875rem", color: "#111", fontWeight: 500 }}>{vendor.numero_cuenta ?? "No registrado"}</p>
+                </div>
+                {vendor.documento_url && (
+                  <div>
+                    <p style={{ fontSize: "0.6rem", textTransform: "uppercase", letterSpacing: "1px", color: "#92400e", marginBottom: "0.25rem" }}>Documento</p>
+                    <a href={vendor.documento_url} target="_blank" style={{ fontSize: "0.875rem", color: "#C9A84C", fontWeight: 600, textDecoration: "none" }}>Ver documento</a>
+                  </div>
+                )}
+              </div>
+
             </div>
           ))
         )}
