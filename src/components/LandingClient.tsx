@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation'
 
 export default function LandingClient({ products, images, banners }: any) {
   const router = useRouter()
-  console.log('banners recibidos:', banners)
   const [search, setSearch] = useState('')
   const [currentBanner, setCurrentBanner] = useState(0)
   const [selectedCategory, setSelectedCategory] = useState('')
@@ -61,7 +60,7 @@ export default function LandingClient({ products, images, banners }: any) {
             <div key={banner.id} style={{ position: 'absolute', inset: 0, transition: 'opacity 0.8s ease', opacity: i === currentBanner ? 1 : 0 }}>
               {banner.image_url ? (
                 <div style={{ position: 'relative', width: '100%', height: '100%' }}>
-                 <img src={banner.image_url} alt={banner.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  <img src={banner.image_url} alt={banner.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                   <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to right, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.2) 50%, transparent 100%)' }} />
                   <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'flex-start', justifyContent: 'center', padding: 'clamp(1.5rem, 6vw, 5rem)' }}>
                     <p style={{ color: '#C9A84C', fontSize: '0.65rem', letterSpacing: '4px', textTransform: 'uppercase', marginBottom: '0.75rem' }}>DMS Market</p>
@@ -123,7 +122,6 @@ export default function LandingClient({ products, images, banners }: any) {
           </h2>
           <a href="/auth/login" style={{ fontSize: '0.8rem', color: '#C9A84C', textDecoration: 'none', fontWeight: 500 }}>Ver todos</a>
         </div>
-
         {filtered.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '4rem 2rem' }}>
             <p style={{ color: '#888', marginBottom: '1rem' }}>No se encontraron productos.</p>
@@ -134,9 +132,7 @@ export default function LandingClient({ products, images, banners }: any) {
             {filtered.map((product: any) => {
               const img = images.filter((i: any) => i.product_id === product.id)[0]?.url
               return (
-                <div
-                  key={product.id}
-                  onClick={() => handleProductClick(product.id)}
+                <div key={product.id} onClick={() => handleProductClick(product.id)}
                   style={{ color: '#111', border: '1px solid #f0f0f0', display: 'flex', flexDirection: 'column', background: '#fff', borderRadius: '8px', cursor: 'pointer', overflow: 'hidden', transition: 'all 0.2s', boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}
                   onMouseEnter={e => { e.currentTarget.style.boxShadow = '0 8px 24px rgba(0,0,0,0.10)'; e.currentTarget.style.transform = 'translateY(-2px)' }}
                   onMouseLeave={e => { e.currentTarget.style.boxShadow = '0 1px 4px rgba(0,0,0,0.04)'; e.currentTarget.style.transform = 'translateY(0)' }}
@@ -202,16 +198,33 @@ export default function LandingClient({ products, images, banners }: any) {
         </div>
       </section>
 
-      {/* CTA VENDEDORES */}
-      <section style={{ background: 'linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%)', padding: 'clamp(3rem, 6vw, 5rem) clamp(1rem, 4vw, 2rem)', textAlign: 'center' }}>
-        <p style={{ color: '#C9A84C', fontSize: '0.65rem', letterSpacing: '4px', textTransform: 'uppercase', marginBottom: '1rem' }}>Cupos limitados</p>
-        <h2 style={{ fontSize: 'clamp(1.5rem, 4vw, 2.5rem)', fontWeight: 300, color: '#fff', marginBottom: '1rem' }}>Vende en DMS Market</h2>
-        <p style={{ fontSize: 'clamp(0.8rem, 2vw, 0.95rem)', color: 'rgba(255,255,255,0.5)', marginBottom: '2rem', maxWidth: '500px', margin: '0 auto 2rem' }}>
-          Solo 5% de comision. Sin mensualidades. Sin costos ocultos.
-        </p>
-        <a href="/auth/register" style={{ display: 'inline-block', background: '#C9A84C', color: '#fff', padding: '1rem 2.5rem', textDecoration: 'none', fontSize: '0.8rem', fontWeight: 700, letterSpacing: '2px', textTransform: 'uppercase' }}>
-          Quiero ser vendedor
-        </a>
+      {/* CTA VENDEDORES Y SERVICIOS */}
+      <section style={{ background: 'linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%)', padding: 'clamp(3rem, 6vw, 5rem) clamp(1rem, 4vw, 2rem)' }}>
+        <div style={{ maxWidth: '1100px', margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '2rem' }}>
+
+          <div style={{ textAlign: 'center', padding: '2rem', border: '1px solid rgba(201,168,76,0.3)', borderRadius: '4px' }}>
+            <p style={{ color: '#C9A84C', fontSize: '0.65rem', letterSpacing: '4px', textTransform: 'uppercase', marginBottom: '1rem' }}>Para vendedores</p>
+            <h2 style={{ fontSize: 'clamp(1.25rem, 3vw, 1.75rem)', fontWeight: 300, color: '#fff', marginBottom: '1rem' }}>Vende productos en DSM</h2>
+            <p style={{ fontSize: 'clamp(0.8rem, 2vw, 0.875rem)', color: 'rgba(255,255,255,0.5)', marginBottom: '2rem', lineHeight: 1.7 }}>
+              Solo 5% de comision por venta. Sin mensualidades. Pagos protegidos con escrow.
+            </p>
+            <a href="/auth/register" style={{ display: 'inline-block', background: '#C9A84C', color: '#fff', padding: '0.875rem 2rem', textDecoration: 'none', fontSize: '0.75rem', fontWeight: 700, letterSpacing: '2px', textTransform: 'uppercase' }}>
+              Quiero ser vendedor
+            </a>
+          </div>
+
+          <div style={{ textAlign: 'center', padding: '2rem', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '4px' }}>
+            <p style={{ color: '#aaa', fontSize: '0.65rem', letterSpacing: '4px', textTransform: 'uppercase', marginBottom: '1rem' }}>Servicios Profesionales</p>
+            <h2 style={{ fontSize: 'clamp(1.25rem, 3vw, 1.75rem)', fontWeight: 300, color: '#fff', marginBottom: '1rem' }}>Ofreces un servicio?</h2>
+            <p style={{ fontSize: 'clamp(0.8rem, 2vw, 0.875rem)', color: 'rgba(255,255,255,0.5)', marginBottom: '2rem', lineHeight: 1.7 }}>
+              Publica gratis tu servicio de diseno, plomeria, clases, reparaciones y mas. 3 meses gratis.
+            </p>
+            <a href="/auth/register-provider" style={{ display: 'inline-block', background: 'transparent', color: '#fff', padding: '0.875rem 2rem', textDecoration: 'none', fontSize: '0.75rem', fontWeight: 700, letterSpacing: '2px', textTransform: 'uppercase', border: '1px solid rgba(255,255,255,0.4)' }}>
+              Publicar mi servicio gratis
+            </a>
+          </div>
+
+        </div>
       </section>
 
       {/* FOOTER */}
