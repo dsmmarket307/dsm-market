@@ -26,6 +26,10 @@ export default function RegisterProviderPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [step, setStep] = useState(1)
+  const [serviceImage, setServiceImage] = useState<File | null>(null)
+  const [servicePreview, setServicePreview] = useState<string | null>(null)
+  const [avatarImage, setAvatarImage] = useState<File | null>(null)
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null)
   const [form, setForm] = useState({
     name: '',
     email: '',
@@ -44,16 +48,24 @@ export default function RegisterProviderPage() {
     setForm(prev => ({ ...prev, [key]: value }))
   }
 
+  function handleServiceImage(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setServiceImage(file)
+    setServicePreview(URL.createObjectURL(file))
+  }
+
+  function handleAvatarImage(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setAvatarImage(file)
+    setAvatarPreview(URL.createObjectURL(file))
+  }
+
   async function handleStep1(e: React.FormEvent) {
     e.preventDefault()
-    if (form.password !== form.confirmPassword) {
-      setError('Las contrasenas no coinciden')
-      return
-    }
-    if (form.password.length < 6) {
-      setError('La contrasena debe tener minimo 6 caracteres')
-      return
-    }
+    if (form.password !== form.confirmPassword) { setError('Las contrasenas no coinciden'); return }
+    if (form.password.length < 6) { setError('La contrasena debe tener minimo 6 caracteres'); return }
     setError('')
     setStep(2)
   }
@@ -66,20 +78,42 @@ export default function RegisterProviderPage() {
     const { data, error: signUpError } = await supabase.auth.signUp({
       email: form.email,
       password: form.password,
-      options: {
-        data: { name: form.name, role: 'provider' },
-      },
+      options: { data: { name: form.name, role: 'provider' } },
     })
 
     if (signUpError) { setError(signUpError.message); setLoading(false); return }
 
     if (data.user) {
+      let serviceImageUrl = null
+      let avatarUrl = null
+
+      if (serviceImage) {
+        const ext = serviceImage.name.split('.').pop()
+        const fileName = data.user.id + '-servicio.' + ext
+        const { error: uploadError } = await supabase.storage.from('servicios').upload(fileName, serviceImage, { upsert: true })
+        if (!uploadError) {
+          const { data: urlData } = supabase.storage.from('servicios').getPublicUrl(fileName)
+          serviceImageUrl = urlData.publicUrl
+        }
+      }
+
+      if (avatarImage) {
+        const ext = avatarImage.name.split('.').pop()
+        const fileName = data.user.id + '-avatar.' + ext
+        const { error: uploadError } = await supabase.storage.from('avatares').upload(fileName, avatarImage, { upsert: true })
+        if (!uploadError) {
+          const { data: urlData } = supabase.storage.from('avatares').getPublicUrl(fileName)
+          avatarUrl = urlData.publicUrl
+        }
+      }
+
       await supabase.from('profiles').insert({
         id: data.user.id,
         name: form.name,
         role: 'provider',
         celular: form.phone,
         ciudad: form.city,
+        avatar_url: avatarUrl,
       })
 
       await supabase.from('services').insert({
@@ -93,7 +127,9 @@ export default function RegisterProviderPage() {
         whatsapp: form.whatsapp || form.phone,
         status: 'pending',
         plan: 'free',
-        plan_expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+        plan_expires_at: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString(),
+        service_image_url: serviceImageUrl,
+        avatar_url: avatarUrl,
       })
     }
 
@@ -145,9 +181,9 @@ export default function RegisterProviderPage() {
         </div>
 
         <div style={{ marginBottom: '1.5rem', padding: '1rem', background: '#fffbeb', border: '1px solid #C9A84C', borderLeft: '4px solid #C9A84C' }}>
-          <p style={{ fontSize: '0.8rem', color: '#92400e', fontWeight: 600, marginBottom: '0.25rem' }}>1 mes GRATIS</p>
+          <p style={{ fontSize: '0.8rem', color: '#92400e', fontWeight: 600, marginBottom: '0.25rem' }}>3 meses GRATIS</p>
           <p style={{ fontSize: '0.75rem', color: '#b45309', lineHeight: 1.6 }}>
-            Publica tu servicio gratis durante 30 dias. A partir del segundo mes elige tu plan.
+            Publica tu servicio gratis durante 90 dias. A partir del cuarto mes elige tu plan.
           </p>
         </div>
 
@@ -183,6 +219,27 @@ export default function RegisterProviderPage() {
                 onFocus={e => { e.target.style.borderColor = '#C9A84C'; e.target.style.background = '#fff' }}
                 onBlur={e => { e.target.style.borderColor = '#ddd'; e.target.style.background = '#fafafa' }} />
             </div>
+
+            {/* Foto de perfil */}
+            <div>
+              <label style={labelStyle}>Tu foto de perfil (opcional)</label>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                <div style={{ width: '72px', height: '72px', borderRadius: '50%', background: '#f5f5f5', border: '2px dashed #ddd', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, cursor: 'pointer' }}
+                  onClick={() => document.getElementById('avatar-input')?.click()}>
+                  {avatarPreview ? (
+                    <img src={avatarPreview} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  ) : (
+                    <span style={{ fontSize: '1.5rem', color: '#ccc' }}>+</span>
+                  )}
+                </div>
+                <div>
+                  <p style={{ fontSize: '0.8rem', color: '#555', marginBottom: '0.25rem' }}>Sube tu foto para generar confianza</p>
+                  <p style={{ fontSize: '0.75rem', color: '#aaa' }}>JPG o PNG — max 2MB</p>
+                </div>
+                <input id="avatar-input" type="file" accept="image/*" style={{ display: 'none' }} onChange={handleAvatarImage} />
+              </div>
+            </div>
+
             <button type="submit" style={{ width: '100%', padding: '1rem', background: '#C9A84C', color: '#fff', border: 'none', fontSize: '0.75rem', fontWeight: 700, letterSpacing: '2px', textTransform: 'uppercase', cursor: 'pointer' }}>
               Continuar
             </button>
@@ -197,7 +254,7 @@ export default function RegisterProviderPage() {
           <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
             <div>
               <label style={labelStyle}>Nombre de tu negocio o servicio *</label>
-              <input value={form.business_name} onChange={e => handleChange('business_name', e.target.value)} required placeholder="Ej: Diseño web profesional" style={inputStyle}
+              <input value={form.business_name} onChange={e => handleChange('business_name', e.target.value)} required placeholder="Ej: Diseno web profesional" style={inputStyle}
                 onFocus={e => { e.target.style.borderColor = '#C9A84C'; e.target.style.background = '#fff' }}
                 onBlur={e => { e.target.style.borderColor = '#ddd'; e.target.style.background = '#fafafa' }} />
             </div>
@@ -222,6 +279,25 @@ export default function RegisterProviderPage() {
                 onFocus={e => { e.target.style.borderColor = '#C9A84C'; e.target.style.background = '#fff' }}
                 onBlur={e => { e.target.style.borderColor = '#ddd'; e.target.style.background = '#fafafa' }} />
             </div>
+
+            {/* Foto del servicio */}
+            <div>
+              <label style={labelStyle}>Foto del servicio (opcional)</label>
+              <div style={{ border: '2px dashed #ddd', padding: '1.5rem', textAlign: 'center', cursor: 'pointer', background: '#fafafa', borderRadius: '4px' }}
+                onClick={() => document.getElementById('service-image-input')?.click()}>
+                <input id="service-image-input" type="file" accept="image/*" style={{ display: 'none' }} onChange={handleServiceImage} />
+                {servicePreview ? (
+                  <img src={servicePreview} alt="Servicio" style={{ maxWidth: '100%', maxHeight: '200px', objectFit: 'contain', borderRadius: '4px' }} />
+                ) : (
+                  <>
+                    <p style={{ fontSize: '0.875rem', color: '#888', marginBottom: '0.25rem' }}>Sube una foto de tu trabajo o servicio</p>
+                    <p style={{ fontSize: '0.75rem', color: '#C9A84C' }}>JPG o PNG — max 5MB</p>
+                  </>
+                )}
+              </div>
+              <p style={{ fontSize: '0.75rem', color: '#aaa', marginTop: '0.5rem' }}>Una buena foto aumenta la confianza del cliente.</p>
+            </div>
+
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
               <div>
                 <label style={labelStyle}>Ciudad *</label>
