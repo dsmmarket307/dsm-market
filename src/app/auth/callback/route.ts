@@ -14,18 +14,27 @@ export async function GET(request: NextRequest) {
     if (!error && data.user) {
       const { data: existingProfile } = await supabase
         .from('profiles')
-        .select('id')
+        .select('id, role')
         .eq('id', data.user.id)
         .single()
 
       if (!existingProfile) {
         const meta = data.user.user_metadata
+        const role = (meta?.role as string) ?? 'buyer'
         await supabase.from('profiles').insert({
           id: data.user.id,
           name: meta?.name ?? data.user.email?.split('@')[0] ?? 'Usuario',
-          role: (meta?.role as string) ?? 'buyer',
+          role,
         })
+        if (role === 'seller') return NextResponse.redirect(`${origin}/dashboard/vendor`)
+        if (role === 'provider') return NextResponse.redirect(`${origin}/dashboard/provider`)
+        return NextResponse.redirect(`${origin}/dashboard`)
       }
+
+      const role = existingProfile.role
+      if (role === 'seller') return NextResponse.redirect(`${origin}/dashboard/vendor`)
+      if (role === 'provider') return NextResponse.redirect(`${origin}/dashboard/provider`)
+      if (role === 'admin') return NextResponse.redirect(`${origin}/dashboard/admin`)
 
       return NextResponse.redirect(`${origin}${next}`)
     }

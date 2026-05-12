@@ -131,10 +131,21 @@ export default function RegisterProviderPage() {
         service_image_url: serviceImageUrl,
         avatar_url: avatarUrl,
       })
-    }
 
-    router.push('/auth/provider-success')
-    setLoading(false)
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email: form.email,
+        password: form.password,
+      })
+
+      if (signInError) {
+        setError(signInError.message)
+        setLoading(false)
+        return
+      }
+
+      router.push('/auth/provider-success')
+      setLoading(false)
+    }
   }
 
   const inputStyle: React.CSSProperties = {
@@ -220,7 +231,6 @@ export default function RegisterProviderPage() {
                 onBlur={e => { e.target.style.borderColor = '#ddd'; e.target.style.background = '#fafafa' }} />
             </div>
 
-            {/* Foto de perfil */}
             <div>
               <label style={labelStyle}>Tu foto de perfil (opcional)</label>
               <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
@@ -280,7 +290,6 @@ export default function RegisterProviderPage() {
                 onBlur={e => { e.target.style.borderColor = '#ddd'; e.target.style.background = '#fafafa' }} />
             </div>
 
-            {/* Foto del servicio */}
             <div>
               <label style={labelStyle}>Foto del servicio (opcional)</label>
               <div style={{ border: '2px dashed #ddd', padding: '1.5rem', textAlign: 'center', cursor: 'pointer', background: '#fafafa', borderRadius: '4px' }}

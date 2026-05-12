@@ -45,6 +45,10 @@ export async function register(formData: FormData) {
     redirect('/dashboard/vendor/verificacion')
   }
 
+  if (role === 'provider') {
+    redirect('/dashboard/provider')
+  }
+
   redirect(redirectTo || '/dashboard')
 }
 
@@ -61,7 +65,18 @@ export async function login(formData: FormData) {
     return { error: error.message }
   }
 
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', (await supabase.auth.getUser()).data.user?.id ?? '')
+    .single()
+
   revalidatePath('/', 'layout')
+
+  if (profile?.role === 'seller') redirect('/dashboard/vendor')
+  if (profile?.role === 'provider') redirect('/dashboard/provider')
+  if (profile?.role === 'admin') redirect('/dashboard/admin')
+
   redirect(redirectTo || '/dashboard')
 }
 
