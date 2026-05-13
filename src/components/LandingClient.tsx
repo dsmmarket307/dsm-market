@@ -48,6 +48,7 @@ export default function LandingClient({ products, images, banners }: any) {
           </button>
         </div>
         <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+          <a href="/servicios" style={{ fontSize: '0.8rem', color: '#555', textDecoration: 'none', padding: '0.5rem 0.75rem' }}>Servicios</a>
           <a href="/auth/login" style={{ fontSize: '0.8rem', color: '#555', textDecoration: 'none', padding: '0.5rem 0.75rem' }}>Ingresar</a>
           <a href="/auth/register" style={{ fontSize: '0.8rem', background: '#C9A84C', color: '#fff', padding: '0.5rem 1rem', textDecoration: 'none', borderRadius: '4px', fontWeight: 600 }}>Registrarse</a>
         </div>

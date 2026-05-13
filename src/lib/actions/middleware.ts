@@ -25,10 +25,7 @@ export async function middleware(request: NextRequest) {
     }
   )
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
+  const { data: { user } } = await supabase.auth.getUser()
   const { pathname } = request.nextUrl
 
   const publicRoutes = [
@@ -37,6 +34,13 @@ export async function middleware(request: NextRequest) {
     '/auth/forgot-password',
     '/auth/reset-password',
     '/auth/callback',
+    '/auth/register-provider',
+    '/auth/provider-success',
+    '/servicios',
+    '/checkout',
+    '/producto',
+    '/politicas',
+    '/dashboard/vendor/verificacion',
   ]
 
   const isPublicRoute = publicRoutes.some((route) =>
@@ -51,9 +55,7 @@ export async function middleware(request: NextRequest) {
   }
 
   if (user && isPublicRoute && pathname !== '/auth/callback') {
-    const url = request.nextUrl.clone()
-    url.pathname = '/dashboard'
-    return NextResponse.redirect(url)
+    return supabaseResponse
   }
 
   return supabaseResponse

@@ -12,6 +12,7 @@ export default function ProviderDashboardPage() {
 
   useEffect(() => {
     async function load() {
+      await supabase.auth.getSession()
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) { router.push('/auth/login'); return }
 
@@ -123,9 +124,11 @@ export default function ProviderDashboardPage() {
                 <p style={{ fontSize: '0.7rem', color: '#C9A84C', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: 600, marginBottom: '0.25rem' }}>{service.category}</p>
                 <h2 style={{ fontSize: '1.25rem', fontWeight: 700, color: '#111' }}>{service.business_name}</h2>
               </div>
-              <a href="/dashboard/provider/edit" style={{ fontSize: '0.8rem', background: '#C9A84C', color: '#fff', padding: '0.5rem 1.25rem', textDecoration: 'none', borderRadius: '999px', fontWeight: 600 }}>
+              <button
+                onClick={() => router.push('/dashboard/provider/edit')}
+                style={{ fontSize: '0.8rem', background: '#C9A84C', color: '#fff', padding: '0.5rem 1.25rem', border: 'none', borderRadius: '999px', fontWeight: 600, cursor: 'pointer' }}>
                 Editar servicio
-              </a>
+              </button>
             </div>
             <p style={{ fontSize: '0.875rem', color: '#555', lineHeight: 1.7, marginBottom: '1rem' }}>{service.description}</p>
             <div style={{ display: 'flex', gap: '1.5rem', flexWrap: 'wrap' }}>

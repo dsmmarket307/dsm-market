@@ -19,6 +19,7 @@ export default async function AdminDashboard() {
   const { data: pendingVendors } = await admin.from("profiles").select("*").eq("role", "seller").eq("seller_status", "pending")
   const { data: pendingProducts } = await admin.from("products").select("*").eq("status", "pending")
   const { data: allOrders } = await admin.from("orders").select("*")
+  const { data: pendingServices } = await admin.from("services").select("*").eq("status", "pending")
 
   const totalRevenue = allOrders?.reduce((sum: number, o: any) => sum + Number(o.platform_fee), 0) ?? 0
 
@@ -30,7 +31,7 @@ export default async function AdminDashboard() {
         <h1 style={{ fontSize: "1.75rem", fontWeight: 700, color: "#111" }}>Administrador</h1>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "1rem", marginBottom: "2.5rem" }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "1rem", marginBottom: "2.5rem" }}>
         <div style={{ border: "1px solid #eee", padding: "1.5rem" }}>
           <p style={{ fontSize: "0.75rem", color: "#888", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "0.5rem" }}>Vendedores pendientes</p>
           <p style={{ fontSize: "2rem", fontWeight: 700, color: "#C9A84C" }}>{pendingVendors?.length ?? 0}</p>
@@ -40,12 +41,16 @@ export default async function AdminDashboard() {
           <p style={{ fontSize: "2rem", fontWeight: 700, color: "#C9A84C" }}>{pendingProducts?.length ?? 0}</p>
         </div>
         <div style={{ border: "1px solid #eee", padding: "1.5rem" }}>
+          <p style={{ fontSize: "0.75rem", color: "#888", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "0.5rem" }}>Servicios pendientes</p>
+          <p style={{ fontSize: "2rem", fontWeight: 700, color: "#C9A84C" }}>{pendingServices?.length ?? 0}</p>
+        </div>
+        <div style={{ border: "1px solid #eee", padding: "1.5rem" }}>
           <p style={{ fontSize: "0.75rem", color: "#888", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "0.5rem" }}>Comisiones ganadas</p>
           <p style={{ fontSize: "2rem", fontWeight: 700, color: "#4CAF7D" }}>${totalRevenue.toLocaleString("es-CO")}</p>
         </div>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "1rem" }}>
         <Link href="/dashboard/admin/vendors" style={{ textDecoration: "none", border: "1px solid #eee", padding: "1.5rem", display: "block" }}>
           <div style={{ width: "32px", height: "3px", background: "#C9A84C", marginBottom: "1rem" }} />
           <p style={{ fontSize: "1.125rem", fontWeight: 600, color: "#111", marginBottom: "0.375rem" }}>Vendedores</p>
@@ -58,6 +63,13 @@ export default async function AdminDashboard() {
           <p style={{ fontSize: "1.125rem", fontWeight: 600, color: "#111", marginBottom: "0.375rem" }}>Productos</p>
           <p style={{ fontSize: "0.8rem", color: "#888" }}>Aprobar o rechazar productos de vendedores</p>
           <p style={{ marginTop: "1rem", fontSize: "0.8rem", color: "#C9A84C", fontWeight: 600 }}>Ver productos →</p>
+        </Link>
+
+        <Link href="/dashboard/admin/services" style={{ textDecoration: "none", border: "1px solid #eee", padding: "1.5rem", display: "block" }}>
+          <div style={{ width: "32px", height: "3px", background: "#C9A84C", marginBottom: "1rem" }} />
+          <p style={{ fontSize: "1.125rem", fontWeight: 600, color: "#111", marginBottom: "0.375rem" }}>Servicios</p>
+          <p style={{ fontSize: "0.8rem", color: "#888" }}>Aprobar o rechazar servicios de proveedores</p>
+          <p style={{ marginTop: "1rem", fontSize: "0.8rem", color: "#C9A84C", fontWeight: 600 }}>Ver servicios →</p>
         </Link>
       </div>
     </div>
