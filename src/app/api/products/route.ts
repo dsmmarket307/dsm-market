@@ -9,7 +9,7 @@ export async function GET() {
 
   const { data: products } = await admin
     .from("products")
-    .select("id, name, price, original_price, category, condition, stock")
+    .select("id, name, price, original_price, category, condition, stock, badge, oferta_mes, rating")
     .eq("status", "approved")
     .order("created_at", { ascending: false })
 

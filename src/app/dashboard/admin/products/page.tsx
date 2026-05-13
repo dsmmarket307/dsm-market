@@ -11,6 +11,7 @@ export default function AdminProductsPage() {
   const [images, setImages] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [procesando, setProcesando] = useState<string | null>(null)
+  const [vendidosEdit, setVendidosEdit] = useState<Record<string, string>>({})
 
   useEffect(() => {
     async function load() {
@@ -21,7 +22,7 @@ export default function AdminProductsPage() {
 
       const { data: prods } = await supabase
         .from('products')
-        .select('id, name, description, price, category, status, seller_id, created_at, badge, oferta_mes')
+        .select('id, name, description, price, category, status, seller_id, created_at, badge, oferta_mes, rating, vendidos')
         .order('created_at', { ascending: false })
 
       const ids = prods?.map((p: any) => p.id) ?? []
@@ -31,6 +32,9 @@ export default function AdminProductsPage() {
 
       setProducts(prods ?? [])
       setImages(imgs ?? [])
+      const initialVendidos: Record<string, string> = {}
+      prods?.forEach((p: any) => { initialVendidos[p.id] = String(p.vendidos ?? 0) })
+      setVendidosEdit(initialVendidos)
       setLoading(false)
     }
     load()
@@ -41,6 +45,32 @@ export default function AdminProductsPage() {
     await supabase.from('products').update(fields).eq('id', id)
     setProducts(prev => prev.map(p => p.id === id ? { ...p, ...fields } : p))
     setProcesando(null)
+  }
+
+  async function saveVendidos(id: string) {
+    const val = parseInt(vendidosEdit[id] ?? '0')
+    if (isNaN(val)) return
+    await updateProduct(id, { vendidos: val })
+  }
+
+  function StarSelector({ product }: { product: any }) {
+    return (
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', paddingTop: '0.75rem' }}>
+        <span style={{ fontSize: '0.7rem', color: '#888' }}>Estrellas:</span>
+        <div style={{ display: 'flex', gap: '2px' }}>
+          {[1,2,3,4,5].map(star => (
+            <button key={star} disabled={procesando === product.id}
+              onClick={() => updateProduct(product.id, { rating: star })}
+              style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '2px' }}>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill={star <= (product.rating ?? 4) ? '#C9A84C' : '#e5e5e5'}>
+                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+              </svg>
+            </button>
+          ))}
+        </div>
+        <span style={{ fontSize: '0.7rem', color: '#C9A84C', fontWeight: 700 }}>{product.rating ?? 4}.0</span>
+      </div>
+    )
   }
 
   if (loading) return (
@@ -106,8 +136,7 @@ export default function AdminProductsPage() {
 
                   <p style={{ fontSize: '1.125rem', fontWeight: 700, color: '#111', marginBottom: '0.75rem' }}>${Number(product.price).toLocaleString('es-CO')} COP</p>
 
-                  {/* BOTONES ESTADO */}
-                  <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '0.75rem' }}>
+                  <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '0.5rem' }}>
                     {product.status !== 'approved' && (
                       <button disabled={procesando === product.id} onClick={() => updateProduct(product.id, { status: 'approved' })}
                         style={{ padding: '0.4rem 1rem', background: '#4CAF7D', color: '#fff', border: 'none', cursor: 'pointer', fontSize: '0.75rem', fontWeight: 600, borderRadius: '999px' }}>
@@ -122,26 +151,48 @@ export default function AdminProductsPage() {
                     )}
                   </div>
 
-                  {/* BADGES Y OFERTAS */}
                   <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', paddingTop: '0.75rem', borderTop: '1px solid #f0f0f0' }}>
-                    <button
-                      disabled={procesando === product.id}
+                    <button disabled={procesando === product.id}
                       onClick={() => updateProduct(product.id, { badge: product.badge === 'Lo más vendido' ? null : 'Lo más vendido' })}
                       style={{ padding: '0.35rem 0.875rem', background: product.badge === 'Lo más vendido' ? '#C9A84C' : '#fff', color: product.badge === 'Lo más vendido' ? '#fff' : '#C9A84C', border: '1px solid #C9A84C', cursor: 'pointer', fontSize: '0.7rem', fontWeight: 600, borderRadius: '999px' }}>
                       {product.badge === 'Lo más vendido' ? '✓ Lo más vendido' : '+ Lo más vendido'}
                     </button>
-                    <button
-                      disabled={procesando === product.id}
+                    <button disabled={procesando === product.id}
                       onClick={() => updateProduct(product.id, { badge: product.badge === 'Oferta' ? null : 'Oferta' })}
                       style={{ padding: '0.35rem 0.875rem', background: product.badge === 'Oferta' ? '#EF4444' : '#fff', color: product.badge === 'Oferta' ? '#fff' : '#EF4444', border: '1px solid #EF4444', cursor: 'pointer', fontSize: '0.7rem', fontWeight: 600, borderRadius: '999px' }}>
                       {product.badge === 'Oferta' ? '✓ Oferta' : '+ Oferta'}
                     </button>
-                    <button
-                      disabled={procesando === product.id}
+                    <button disabled={procesando === product.id}
                       onClick={() => updateProduct(product.id, { oferta_mes: !product.oferta_mes })}
                       style={{ padding: '0.35rem 0.875rem', background: product.oferta_mes ? '#7C3AED' : '#fff', color: product.oferta_mes ? '#fff' : '#7C3AED', border: '1px solid #7C3AED', cursor: 'pointer', fontSize: '0.7rem', fontWeight: 600, borderRadius: '999px' }}>
                       {product.oferta_mes ? '✓ Oferta del mes' : '+ Oferta del mes'}
                     </button>
+                  </div>
+
+                  <StarSelector product={product} />
+
+                  {/* VENDIDOS */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.75rem', paddingTop: '0.75rem', borderTop: '1px solid #f0f0f0' }}>
+                    <span style={{ fontSize: '0.7rem', color: '#888' }}>Vendidos:</span>
+                    <input
+                      type="number"
+                      min="0"
+                      value={vendidosEdit[product.id] ?? '0'}
+                      onChange={e => setVendidosEdit(prev => ({ ...prev, [product.id]: e.target.value }))}
+                      style={{ width: '80px', padding: '0.3rem 0.5rem', border: '1px solid #ddd', borderRadius: '6px', fontSize: '0.8rem', outline: 'none' }}
+                    />
+                    <button onClick={() => saveVendidos(product.id)} disabled={procesando === product.id}
+                      style={{ padding: '0.3rem 0.75rem', background: '#111', color: '#fff', border: 'none', borderRadius: '999px', fontSize: '0.7rem', cursor: 'pointer', fontWeight: 600 }}>
+                      Guardar
+                    </button>
+                    <span style={{ fontSize: '0.7rem', color: '#aaa' }}>actual: {product.vendidos ?? 0}</span>
+                  </div>
+
+                  {/* VER RESEÑAS */}
+                  <div style={{ marginTop: '0.75rem', paddingTop: '0.75rem', borderTop: '1px solid #f0f0f0' }}>
+                    <a href={`/producto/${product.id}`} target="_blank" style={{ fontSize: '0.7rem', color: '#C9A84C', textDecoration: 'none', fontWeight: 600 }}>
+                      Ver producto y eliminar reseñas →
+                    </a>
                   </div>
                 </div>
               </div>

@@ -9,19 +9,17 @@ function Stars({ rating, interactive, onRate }: any) {
   return (
     <div style={{ display: "flex", gap: "2px" }}>
       {[1,2,3,4,5].map((s) => (
-        <span
-          key={s}
+        <span key={s}
           style={{ color: s <= (hover || rating) ? "#C9A84C" : "#ddd", fontSize: "1.25rem", cursor: interactive ? "pointer" : "default" }}
           onMouseEnter={() => interactive && setHover(s)}
           onMouseLeave={() => interactive && setHover(0)}
-          onClick={() => interactive && onRate && onRate(s)}
-        >★</span>
+          onClick={() => interactive && onRate && onRate(s)}>★</span>
       ))}
     </div>
   )
 }
 
-export default function ProductDetail({ product, images, reviews, avgRating, user }: any) {
+export default function ProductDetail({ product, images, reviews: initialReviews, avgRating, user }: any) {
   const router = useRouter()
   const supabase = createClient()
   const [selectedImage, setSelectedImage] = useState(0)
@@ -34,37 +32,26 @@ export default function ProductDetail({ product, images, reviews, avgRating, use
   const [reviewError, setReviewError] = useState("")
   const [reviewSuccess, setReviewSuccess] = useState(false)
   const [cartMsg, setCartMsg] = useState("")
+  const [reviews, setReviews] = useState(initialReviews)
+  const isAdmin = user?.user_metadata?.role === 'admin'
 
   function handleBuy() {
     sessionStorage.setItem('checkout_item', JSON.stringify({
-      id: product.id,
-      name: product.name,
-      price: Number(product.price),
-      quantity: quantity,
-      image: images[0]?.url ?? null,
+      id: product.id, name: product.name, price: Number(product.price),
+      quantity, image: images[0]?.url ?? null,
     }))
     router.push('/checkout')
   }
 
   async function handleAddToCart() {
     if (!user) { router.push("/auth/login"); return }
-    const { data: existing } = await supabase
-      .from("carts")
-      .select("quantity")
-      .eq("buyer_id", user.id)
-      .eq("product_id", product.id)
-      .single()
-
+    const { data: existing } = await supabase.from("carts").select("quantity")
+      .eq("buyer_id", user.id).eq("product_id", product.id).single()
     if (existing) {
-      await supabase
-        .from("carts")
-        .update({ quantity: existing.quantity + quantity })
-        .eq("buyer_id", user.id)
-        .eq("product_id", product.id)
+      await supabase.from("carts").update({ quantity: existing.quantity + quantity })
+        .eq("buyer_id", user.id).eq("product_id", product.id)
     } else {
-      await supabase
-        .from("carts")
-        .insert({ buyer_id: user.id, product_id: product.id, quantity })
+      await supabase.from("carts").insert({ buyer_id: user.id, product_id: product.id, quantity })
     }
     setCartMsg("✓ Agregado al carrito")
     setTimeout(() => setCartMsg(""), 3000)
@@ -83,10 +70,7 @@ export default function ProductDetail({ product, images, reviews, avgRating, use
       formData.append("comment", comment)
       formData.append("reviewer_name", reviewerName)
       if (reviewPhoto) formData.append("photo", reviewPhoto)
-      const res = await fetch("/api/reviews", {
-        method: "POST",
-        body: formData,
-      })
+      const res = await fetch("/api/reviews", { method: "POST", body: formData })
       const data = await res.json()
       if (data.error) { setReviewError(data.error); setSubmitting(false) }
       else { setReviewSuccess(true); setSubmitting(false) }
@@ -96,11 +80,22 @@ export default function ProductDetail({ product, images, reviews, avgRating, use
     }
   }
 
+  async function handleDeleteReview(id: string) {
+    const res = await fetch("/api/reviews", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id })
+    })
+    const data = await res.json()
+    if (data.success) setReviews((prev: any[]) => prev.filter((r: any) => r.id !== id))
+  }
+
   const discount = product.original_price && Number(product.original_price) > Number(product.price)
-    ? Math.round((1 - Number(product.price) / Number(product.original_price)) * 100)
-    : 0
+    ? Math.round((1 - Number(product.price) / Number(product.original_price)) * 100) : 0
 
   const maxStock = product.stock ?? 10
+  const productRating = product.rating ?? avgRating ?? 4
+  const vendidos = product.vendidos ?? 0
 
   return (
     <div style={{ background: "#fff", minHeight: "100vh", fontFamily: "sans-serif" }}>
@@ -124,13 +119,19 @@ export default function ProductDetail({ product, images, reviews, avgRating, use
 
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "3rem", marginBottom: "3rem" }}>
 
+          {/* IMAGENES */}
           <div>
-            <div style={{ aspectRatio: "1", background: "#f9f9f9", border: "1px solid #eee", overflow: "hidden", marginBottom: "0.75rem", borderRadius: "12px" }}>
+            <div style={{ position: "relative", aspectRatio: "1", background: "#f9f9f9", border: "1px solid #eee", overflow: "hidden", marginBottom: "0.75rem", borderRadius: "12px" }}>
               {images.length > 0 ? (
                 <img src={images[selectedImage]?.url} alt={product.name} style={{ width: "100%", height: "100%", objectFit: "contain", padding: "1rem" }} />
               ) : (
                 <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}>
                   <p style={{ color: "#bbb" }}>Sin imagen</p>
+                </div>
+              )}
+              {product.badge && (
+                <div style={{ position: "absolute", top: "0.75rem", left: "0.75rem", background: product.badge === "Lo más vendido" ? "#C9A84C" : "#EF4444", color: "#fff", fontSize: "0.7rem", fontWeight: 700, padding: "0.3rem 0.75rem", borderRadius: "999px" }}>
+                  {product.badge}
                 </div>
               )}
             </div>
@@ -145,6 +146,7 @@ export default function ProductDetail({ product, images, reviews, avgRating, use
             )}
           </div>
 
+          {/* INFO */}
           <div>
             <div style={{ display: "flex", gap: "0.5rem", marginBottom: "0.75rem", flexWrap: "wrap" }}>
               <span style={{ fontSize: "0.7rem", color: "#C9A84C", textTransform: "uppercase", letterSpacing: "0.1em", fontWeight: 600 }}>{product.category}</span>
@@ -154,10 +156,16 @@ export default function ProductDetail({ product, images, reviews, avgRating, use
 
             <h1 style={{ fontSize: "1.5rem", fontWeight: 600, color: "#111", marginBottom: "1rem", lineHeight: 1.3 }}>{product.name}</h1>
 
-            <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "1rem" }}>
-              <Stars rating={avgRating} />
+            <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "0.5rem" }}>
+              <Stars rating={productRating} />
               <span style={{ fontSize: "0.8rem", color: "#888" }}>({reviews.length} reseñas)</span>
             </div>
+
+            {vendidos > 0 && (
+              <p style={{ fontSize: "0.8rem", color: "#555", marginBottom: "1rem", fontWeight: 500 }}>
+                +{vendidos.toLocaleString("es-CO")} vendidos
+              </p>
+            )}
 
             <div style={{ marginBottom: "1.25rem" }}>
               {product.original_price && Number(product.original_price) > Number(product.price) && (
@@ -174,7 +182,6 @@ export default function ProductDetail({ product, images, reviews, avgRating, use
               <p style={{ fontSize: "0.8rem", color: "#4CAF7D", marginBottom: "1rem" }}>● {product.stock} unidades disponibles</p>
             )}
 
-            {/* CANTIDAD */}
             <div style={{ display: "flex", alignItems: "center", gap: "1rem", marginBottom: "1.25rem" }}>
               <p style={{ fontSize: "0.8rem", color: "#888" }}>Cantidad:</p>
               <div style={{ display: "flex", alignItems: "center", border: "1px solid #ddd", borderRadius: "999px", overflow: "hidden" }}>
@@ -203,7 +210,6 @@ export default function ProductDetail({ product, images, reviews, avgRating, use
               </div>
             </div>
 
-            {/* BOTONES */}
             {user ? (
               <>
                 <button onClick={handleBuy} style={{ display: "block", width: "100%", background: "linear-gradient(135deg, #C9A84C 0%, #e8c96a 100%)", color: "#fff", padding: "1rem", textAlign: "center", border: "none", fontSize: "1rem", textTransform: "uppercase", fontWeight: 700, borderRadius: "999px", marginBottom: "0.75rem", cursor: "pointer", boxShadow: "0 4px 20px rgba(201,168,76,0.4)", letterSpacing: "0.06em" }}>
@@ -223,29 +229,18 @@ export default function ProductDetail({ product, images, reviews, avgRating, use
               </button>
             )}
 
-            {/* ICONOS MÉTODOS DE PAGO */}
             <div style={{ marginBottom: "1rem" }}>
               <p style={{ fontSize: "0.68rem", color: "#aaa", textAlign: "center", marginBottom: "0.5rem", textTransform: "uppercase", letterSpacing: "0.05em" }}>Medios de pago aceptados</p>
               <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: "0.5rem", flexWrap: "wrap" }}>
-                <div style={{ background: "#1a1f71", borderRadius: "6px", padding: "4px 10px" }}>
-                  <span style={{ color: "#fff", fontSize: "0.75rem", fontWeight: 800, letterSpacing: "0.05em" }}>VISA</span>
-                </div>
+                <div style={{ background: "#1a1f71", borderRadius: "6px", padding: "4px 10px" }}><span style={{ color: "#fff", fontSize: "0.75rem", fontWeight: 800, letterSpacing: "0.05em" }}>VISA</span></div>
                 <div style={{ background: "#fff", border: "1px solid #eee", borderRadius: "6px", padding: "4px 8px", display: "flex", alignItems: "center" }}>
                   <div style={{ width: "16px", height: "16px", background: "#EB001B", borderRadius: "50%" }} />
                   <div style={{ width: "16px", height: "16px", background: "#F79E1B", borderRadius: "50%", marginLeft: "-6px" }} />
                 </div>
-                <div style={{ background: "#009639", borderRadius: "6px", padding: "4px 10px" }}>
-                  <span style={{ color: "#fff", fontSize: "0.72rem", fontWeight: 800 }}>PSE</span>
-                </div>
-                <div style={{ background: "#FFD100", borderRadius: "6px", padding: "4px 10px" }}>
-                  <span style={{ color: "#000", fontSize: "0.72rem", fontWeight: 800 }}>efecty</span>
-                </div>
-                <div style={{ background: "#6b0fa3", borderRadius: "6px", padding: "4px 10px" }}>
-                  <span style={{ color: "#fff", fontSize: "0.72rem", fontWeight: 800 }}>Nequi</span>
-                </div>
-                <div style={{ background: "#CE0000", borderRadius: "6px", padding: "4px 10px" }}>
-                  <span style={{ color: "#fff", fontSize: "0.72rem", fontWeight: 800 }}>Daviplata</span>
-                </div>
+                <div style={{ background: "#009639", borderRadius: "6px", padding: "4px 10px" }}><span style={{ color: "#fff", fontSize: "0.72rem", fontWeight: 800 }}>PSE</span></div>
+                <div style={{ background: "#FFD100", borderRadius: "6px", padding: "4px 10px" }}><span style={{ color: "#000", fontSize: "0.72rem", fontWeight: 800 }}>efecty</span></div>
+                <div style={{ background: "#6b0fa3", borderRadius: "6px", padding: "4px 10px" }}><span style={{ color: "#fff", fontSize: "0.72rem", fontWeight: 800 }}>Nequi</span></div>
+                <div style={{ background: "#CE0000", borderRadius: "6px", padding: "4px 10px" }}><span style={{ color: "#fff", fontSize: "0.72rem", fontWeight: 800 }}>Daviplata</span></div>
               </div>
             </div>
 
@@ -279,9 +274,7 @@ export default function ProductDetail({ product, images, reviews, avgRating, use
                 <div style={{ marginBottom: "1rem" }}>
                   <label style={{ display: "block", fontSize: "0.75rem", color: "#888", marginBottom: "0.5rem" }}>Foto del producto (opcional)</label>
                   <input type="file" accept="image/*" onChange={(e) => setReviewPhoto(e.target.files?.[0] ?? null)} style={{ fontSize: "0.8rem", color: "#555" }} />
-                  {reviewPhoto && (
-                    <img src={URL.createObjectURL(reviewPhoto)} alt="preview" style={{ marginTop: "0.5rem", width: "80px", height: "80px", objectFit: "cover", borderRadius: "6px", border: "1px solid #eee" }} />
-                  )}
+                  {reviewPhoto && <img src={URL.createObjectURL(reviewPhoto)} alt="preview" style={{ marginTop: "0.5rem", width: "80px", height: "80px", objectFit: "cover", borderRadius: "6px", border: "1px solid #eee" }} />}
                 </div>
                 {reviewError && <p style={{ color: "#E05252", fontSize: "0.8rem", marginBottom: "0.75rem" }}>{reviewError}</p>}
                 <button type="submit" disabled={submitting} style={{ padding: "0.75rem 1.5rem", background: "#C9A84C", color: "#fff", border: "none", cursor: "pointer", fontSize: "0.875rem", fontWeight: 600, borderRadius: "999px" }}>
@@ -310,12 +303,18 @@ export default function ProductDetail({ product, images, reviews, avgRating, use
                       </p>
                       <Stars rating={review.rating} />
                     </div>
-                    <p style={{ fontSize: "0.75rem", color: "#888" }}>{new Date(review.created_at).toLocaleDateString("es-CO")}</p>
+                    <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+                      <p style={{ fontSize: "0.75rem", color: "#888" }}>{new Date(review.created_at).toLocaleDateString("es-CO")}</p>
+                      {isAdmin && (
+                        <button onClick={() => handleDeleteReview(review.id)}
+                          style={{ background: "none", border: "1px solid #EF4444", color: "#EF4444", fontSize: "0.7rem", padding: "0.2rem 0.6rem", borderRadius: "999px", cursor: "pointer" }}>
+                          Eliminar
+                        </button>
+                      )}
+                    </div>
                   </div>
                   {review.comment && <p style={{ fontSize: "0.875rem", color: "#555", marginTop: "0.5rem" }}>{review.comment}</p>}
-                  {review.photo_url && (
-                    <img src={review.photo_url} alt="foto reseña" style={{ marginTop: "0.75rem", width: "100px", height: "100px", objectFit: "cover", borderRadius: "8px", border: "1px solid #eee" }} />
-                  )}
+                  {review.photo_url && <img src={review.photo_url} alt="foto reseña" style={{ marginTop: "0.75rem", width: "100px", height: "100px", objectFit: "cover", borderRadius: "8px", border: "1px solid #eee" }} />}
                 </div>
               ))}
             </div>

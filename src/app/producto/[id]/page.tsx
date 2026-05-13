@@ -16,7 +16,7 @@ export default async function ProductoPage({ params }: any) {
 
   const { data: product } = await admin
     .from("products")
-    .select("*")
+    .select("*, badge, rating, vendidos")
     .eq("id", id)
     .eq("status", "approved")
     .single()

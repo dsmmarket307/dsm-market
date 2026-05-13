@@ -20,10 +20,13 @@ const priceRanges = [
 
 function Stars({ rating }: { rating: number }) {
   return (
-    <div style={{ display: "flex", gap: "2px" }}>
+    <div style={{ display: "flex", gap: "2px", marginBottom: "0.5rem" }}>
       {[1,2,3,4,5].map((s) => (
-        <span key={s} style={{ color: s <= rating ? "#C9A84C" : "#ddd", fontSize: "0.875rem" }}>★</span>
+        <svg key={s} width="12" height="12" viewBox="0 0 24 24" fill={s <= rating ? "#C9A84C" : "#e5e5e5"}>
+          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+        </svg>
       ))}
+      <span style={{ fontSize: "0.65rem", color: "#aaa", marginLeft: "2px" }}>({rating}.0)</span>
     </div>
   )
 }
@@ -32,7 +35,6 @@ export default function BuyerProductsPage() {
   const router = useRouter()
   const [products, setProducts] = useState<any[]>([])
   const [images, setImages] = useState<any[]>([])
-  const [reviews, setReviews] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState("")
   const [category, setCategory] = useState("Todas")
@@ -44,7 +46,6 @@ export default function BuyerProductsPage() {
       .then((data) => {
         setProducts(data.products ?? [])
         setImages(data.images ?? [])
-        setReviews(data.reviews ?? [])
         setLoading(false)
       })
       .catch(() => setLoading(false))
@@ -65,33 +66,23 @@ export default function BuyerProductsPage() {
     return images.filter((i) => i.product_id === productId)[0]?.url
   }
 
-  function getProductRating(productId: string) {
-    const productReviews = reviews.filter((r) => r.product_id === productId)
-    if (productReviews.length === 0) return { avg: 0, count: 0 }
-    const avg = productReviews.reduce((sum: number, r: any) => sum + r.rating, 0) / productReviews.length
-    return { avg: Math.round(avg), count: productReviews.length }
-  }
-
   return (
     <div style={{ background: "#fff", minHeight: "100vh", fontFamily: "sans-serif" }}>
 
+      {/* BUSCADOR Y FILTROS — SIN TOCAR */}
       <div style={{ padding: "1.5rem 2rem", borderBottom: "1px solid #eee", background: "#fff" }}>
         <div style={{ maxWidth: "1200px", margin: "0 auto", display: "flex", gap: "1rem", alignItems: "center", flexWrap: "wrap" }}>
           <div style={{ flex: 1, minWidth: "200px", display: "flex" }}>
-            <input
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Buscar productos..."
-              style={{ flex: 1, padding: "0.625rem 1rem", border: "1px solid #ddd", borderRight: "none", fontSize: "0.875rem", outline: "none" }}
-            />
+            <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Buscar productos..."
+              style={{ flex: 1, padding: "0.625rem 1rem", border: "1px solid #ddd", borderRight: "none", fontSize: "0.875rem", outline: "none" }} />
             <div style={{ padding: "0.625rem 1rem", background: "#C9A84C", color: "#fff", fontSize: "0.875rem" }}>Buscar</div>
           </div>
-
-          <select value={category} onChange={(e) => setCategory(e.target.value)} style={{ padding: "0.625rem 1rem", border: "1px solid #ddd", fontSize: "0.875rem", outline: "none", color: "#111", background: "#fff", minWidth: "160px" }}>
+          <select value={category} onChange={(e) => setCategory(e.target.value)}
+            style={{ padding: "0.625rem 1rem", border: "1px solid #ddd", fontSize: "0.875rem", outline: "none", color: "#111", background: "#fff", minWidth: "160px" }}>
             {categories.map((c) => <option key={c} value={c}>{c}</option>)}
           </select>
-
-          <select value={priceRange} onChange={(e) => setPriceRange(Number(e.target.value))} style={{ padding: "0.625rem 1rem", border: "1px solid #ddd", fontSize: "0.875rem", outline: "none", color: "#111", background: "#fff", minWidth: "200px" }}>
+          <select value={priceRange} onChange={(e) => setPriceRange(Number(e.target.value))}
+            style={{ padding: "0.625rem 1rem", border: "1px solid #ddd", fontSize: "0.875rem", outline: "none", color: "#111", background: "#fff", minWidth: "200px" }}>
             {priceRanges.map((r, i) => <option key={i} value={i}>{r.label}</option>)}
           </select>
         </div>
@@ -114,51 +105,64 @@ export default function BuyerProductsPage() {
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: "1.25rem" }}>
             {filtered.map((product) => {
               const img = getProductImage(product.id)
-              const { avg, count } = getProductRating(product.id)
+              const rating = product.rating ?? 4
               return (
-                <div key={product.id} style={{ border: "1px solid #eee", background: "#fff", cursor: "pointer", transition: "box-shadow 0.2s" }}
-                  onMouseEnter={(e) => e.currentTarget.style.boxShadow = "0 4px 20px rgba(0,0,0,0.1)"}
-                  onMouseLeave={(e) => e.currentTarget.style.boxShadow = "none"}
-                  onClick={() => router.push("/producto/" + product.id)}
-                >
-                  <div style={{ position: "relative", paddingBottom: "100%", background: "#f9f9f9", overflow: "hidden" }}>
+                <div key={product.id}
+                  style={{ border: "1px solid #f0f0f0", background: "#fff", cursor: "pointer", transition: "all 0.2s", borderRadius: "12px", overflow: "hidden", boxShadow: "0 1px 4px rgba(0,0,0,0.04)", display: "flex", flexDirection: "column" }}
+                  onMouseEnter={(e) => { e.currentTarget.style.boxShadow = "0 8px 24px rgba(0,0,0,0.10)"; e.currentTarget.style.transform = "translateY(-2px)" }}
+                  onMouseLeave={(e) => { e.currentTarget.style.boxShadow = "0 1px 4px rgba(0,0,0,0.04)"; e.currentTarget.style.transform = "translateY(0)" }}
+                  onClick={() => router.push("/producto/" + product.id)}>
+
+                  {/* IMAGEN */}
+                  <div style={{ position: "relative", paddingBottom: "100%", background: "#f8f8f8", overflow: "hidden" }}>
                     {img ? (
-                      <img src={img} alt={product.name} style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", objectFit: "contain", padding: "0.75rem" }} />
+                      <img src={img} alt={product.name} style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", objectFit: "cover" }} />
                     ) : (
                       <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                        <p style={{ fontSize: "0.75rem", color: "#bbb" }}>Sin imagen</p>
+                        <p style={{ fontSize: "0.75rem", color: "#ccc" }}>Sin imagen</p>
                       </div>
                     )}
-                    {product.condition === "used" && (
-                      <span style={{ position: "absolute", top: "8px", left: "8px", fontSize: "0.65rem", background: "#555", color: "#fff", padding: "0.2rem 0.5rem" }}>Usado</span>
+
+                    {/* BADGE */}
+                    {product.badge && (
+                      <div style={{
+                        position: "absolute", top: "0.6rem", left: "0.6rem",
+                        background: product.badge === "Lo más vendido" ? "#C9A84C" : "#EF4444",
+                        color: "#fff", fontSize: "0.6rem", fontWeight: 700,
+                        padding: "0.25rem 0.6rem", borderRadius: "999px", letterSpacing: "0.5px"
+                      }}>
+                        {product.badge}
+                      </div>
                     )}
+
+                    {/* DESCUENTO */}
                     {product.original_price && Number(product.original_price) > Number(product.price) && (
-                      <span style={{ position: "absolute", top: "8px", right: "8px", fontSize: "0.65rem", background: "#E05252", color: "#fff", padding: "0.2rem 0.5rem" }}>
+                      <div style={{ position: "absolute", top: "0.6rem", right: "0.6rem", background: "#EF4444", color: "#fff", fontSize: "0.6rem", fontWeight: 700, padding: "0.25rem 0.6rem", borderRadius: "999px" }}>
                         -{Math.round((1 - Number(product.price) / Number(product.original_price)) * 100)}%
-                      </span>
+                      </div>
+                    )}
+
+                    {/* USADO */}
+                    {product.condition === "used" && (
+                      <div style={{ position: "absolute", bottom: "0.6rem", left: "0.6rem", background: "rgba(0,0,0,0.6)", color: "#fff", fontSize: "0.6rem", padding: "0.2rem 0.5rem", borderRadius: "999px" }}>Usado</div>
                     )}
                   </div>
 
-                  <div style={{ padding: "0.875rem" }}>
-                    <p style={{ fontSize: "0.65rem", color: "#C9A84C", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "0.25rem", fontWeight: 600 }}>{product.category}</p>
-                    <p style={{ fontSize: "0.875rem", color: "#111", marginBottom: "0.5rem", overflow: "hidden", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", minHeight: "2.5rem", fontWeight: 500 }}>{product.name}</p>
+                  {/* CONTENIDO */}
+                  <div style={{ padding: "0.875rem", display: "flex", flexDirection: "column", flex: 1 }}>
+                    <p style={{ fontSize: "0.6rem", color: "#C9A84C", textTransform: "uppercase", marginBottom: "0.25rem", fontWeight: 700, letterSpacing: "1px" }}>{product.category}</p>
+                    <p style={{ fontSize: "0.875rem", color: "#111", marginBottom: "0.5rem", overflow: "hidden", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", minHeight: "2.5rem", fontWeight: 500, lineHeight: 1.4 }}>{product.name}</p>
 
-                    <div style={{ marginBottom: "0.5rem" }}>
-                      {product.original_price && Number(product.original_price) > Number(product.price) && (
-                        <p style={{ fontSize: "0.75rem", color: "#bbb", textDecoration: "line-through" }}>${Number(product.original_price).toLocaleString("es-CO")}</p>
-                      )}
-                      <p style={{ fontSize: "1.125rem", fontWeight: 700, color: "#111" }}>${Number(product.price).toLocaleString("es-CO")}</p>
-                    </div>
+                    {product.original_price && Number(product.original_price) > Number(product.price) && (
+                      <p style={{ fontSize: "0.75rem", color: "#bbb", textDecoration: "line-through" }}>${Number(product.original_price).toLocaleString("es-CO")}</p>
+                    )}
+                    <p style={{ fontSize: "1.125rem", fontWeight: 700, color: "#111", marginBottom: "0.25rem" }}>${Number(product.price).toLocaleString("es-CO")}</p>
 
-                    <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.75rem" }}>
-                      <Stars rating={avg} />
-                      <span style={{ fontSize: "0.7rem", color: "#888" }}>({count})</span>
-                    </div>
+                    <Stars rating={rating} />
 
                     <button
                       onClick={(e) => { e.stopPropagation(); router.push("/producto/" + product.id) }}
-                      style={{ width: "100%", padding: "0.625rem", background: "#C9A84C", color: "#fff", border: "none", cursor: "pointer", fontSize: "0.8rem", fontWeight: 600, textTransform: "uppercase", borderRadius: "999px", letterSpacing: "0.05em" }}
-                    >
+                      style={{ width: "100%", padding: "0.625rem", background: "#C9A84C", color: "#fff", border: "none", cursor: "pointer", fontSize: "0.8rem", fontWeight: 700, textTransform: "uppercase", borderRadius: "999px", letterSpacing: "0.05em", marginTop: "auto" }}>
                       Comprar ahora
                     </button>
                   </div>
