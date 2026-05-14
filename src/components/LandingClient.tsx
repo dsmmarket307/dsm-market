@@ -32,15 +32,16 @@ export default function LandingClient({ products, images, banners }: any) {
     router.push(`/auth/register?redirect=/producto/detalle%3Fid%3D${productId}`)
   }
 
-  function StarRating() {
+  function StarRating({ rating }: { rating?: number }) {
+    const r = rating ?? 4
     return (
       <div style={{ display: 'flex', gap: '2px', marginBottom: '0.5rem' }}>
         {[1,2,3,4,5].map(s => (
-          <svg key={s} width="12" height="12" viewBox="0 0 24 24" fill={s <= 4 ? '#C9A84C' : '#e5e5e5'}>
+          <svg key={s} width="12" height="12" viewBox="0 0 24 24" fill={s <= r ? '#C9A84C' : '#e5e5e5'}>
             <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
           </svg>
         ))}
-        <span style={{ fontSize: '0.65rem', color: '#aaa', marginLeft: '2px' }}>(4.0)</span>
+        <span style={{ fontSize: '0.65rem', color: '#aaa', marginLeft: '2px' }}>({r}.0)</span>
       </div>
     )
   }
@@ -61,13 +62,13 @@ export default function LandingClient({ products, images, banners }: any) {
             </div>
           )}
           {showBadge && product.badge && (
-            <div style={{
-              position: 'absolute', top: '0.6rem', left: '0.6rem',
-              background: product.badge === 'Lo más vendido' ? '#C9A84C' : '#EF4444',
-              color: '#fff', fontSize: '0.6rem', fontWeight: 700,
-              padding: '0.25rem 0.6rem', borderRadius: '999px', letterSpacing: '0.5px'
-            }}>
+            <div style={{ position: 'absolute', top: '0.6rem', left: '0.6rem', background: product.badge === 'Lo más vendido' ? '#C9A84C' : '#EF4444', color: '#fff', fontSize: '0.6rem', fontWeight: 700, padding: '0.25rem 0.6rem', borderRadius: '999px', letterSpacing: '0.5px' }}>
               {product.badge}
+            </div>
+          )}
+          {product.envio_gratis && (
+            <div style={{ position: 'absolute', bottom: '0.6rem', left: '0.6rem', background: '#16a34a', color: '#fff', fontSize: '0.6rem', fontWeight: 700, padding: '0.25rem 0.6rem', borderRadius: '999px', letterSpacing: '0.5px' }}>
+              Envio gratis
             </div>
           )}
         </div>
@@ -75,7 +76,7 @@ export default function LandingClient({ products, images, banners }: any) {
           <p style={{ fontSize: '0.6rem', color: '#C9A84C', textTransform: 'uppercase', marginBottom: '0.25rem', fontWeight: 700, letterSpacing: '1px' }}>{product.category}</p>
           <p style={{ fontSize: 'clamp(0.75rem, 2vw, 0.875rem)', marginBottom: '0.5rem', overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', minHeight: '2.5rem', color: '#222', lineHeight: 1.4 }}>{product.name}</p>
           <p style={{ fontSize: 'clamp(0.875rem, 2.5vw, 1rem)', fontWeight: 700, color: '#111', marginBottom: '0.25rem' }}>${Number(product.price).toLocaleString('es-CO')}</p>
-          <StarRating />
+          <StarRating rating={product.rating} />
           <div style={{ background: '#C9A84C', color: '#fff', padding: '0.5rem', textAlign: 'center', fontSize: '0.7rem', fontWeight: 700, letterSpacing: '1px', textTransform: 'uppercase', borderRadius: '999px', marginTop: 'auto' }}>
             Comprar ahora
           </div>
@@ -87,7 +88,7 @@ export default function LandingClient({ products, images, banners }: any) {
   return (
     <div style={{ background: '#fff', minHeight: '100vh', fontFamily: 'sans-serif', color: '#111' }}>
 
-      {/* NAVBAR — SIN TOCAR */}
+      {/* NAVBAR */}
       <nav style={{ borderBottom: '1px solid #f0f0f0', padding: '0 clamp(1rem, 4vw, 2rem)', height: '64px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 0, background: '#fff', zIndex: 50, boxShadow: '0 2px 12px rgba(0,0,0,0.04)' }}>
         <span style={{ fontSize: 'clamp(1.1rem, 3vw, 1.5rem)', fontWeight: 700, color: '#C9A84C', letterSpacing: '1px' }}>DMS Market</span>
         <div style={{ flex: 1, maxWidth: '480px', margin: '0 clamp(0.5rem, 2vw, 2rem)', display: 'flex', boxShadow: '0 2px 8px rgba(0,0,0,0.06)', borderRadius: '4px', overflow: 'hidden' }}>
@@ -102,7 +103,7 @@ export default function LandingClient({ products, images, banners }: any) {
         </div>
       </nav>
 
-      {/* BANNER CARRUSEL — SIN TOCAR */}
+      {/* BANNER CARRUSEL */}
       {banners.length > 0 && (
         <div style={{ position: 'relative', width: '100%', height: 'clamp(220px, 40vw, 480px)', overflow: 'hidden' }}>
           {banners.map((banner: any, i: number) => (
@@ -138,7 +139,7 @@ export default function LandingClient({ products, images, banners }: any) {
         </div>
       )}
 
-      {/* CATEGORIAS — SIN TOCAR */}
+      {/* CATEGORIAS */}
       {categories.length > 0 && (
         <div style={{ borderBottom: '1px solid #f0f0f0', padding: '1rem clamp(1rem, 4vw, 2rem)', overflowX: 'auto' }}>
           <div style={{ display: 'flex', gap: '0.5rem', minWidth: 'max-content' }}>
@@ -202,7 +203,7 @@ export default function LandingClient({ products, images, banners }: any) {
         </section>
       )}
 
-      {/* COMO FUNCIONA — SIN TOCAR */}
+      {/* COMO FUNCIONA */}
       <section style={{ background: '#fafafa', padding: 'clamp(3rem, 6vw, 5rem) clamp(1rem, 4vw, 2rem)', borderTop: '1px solid #f0f0f0' }}>
         <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
           <p style={{ color: '#C9A84C', fontSize: '0.65rem', letterSpacing: '4px', textTransform: 'uppercase', textAlign: 'center', marginBottom: '0.75rem' }}>Simple y seguro</p>
@@ -223,7 +224,7 @@ export default function LandingClient({ products, images, banners }: any) {
         </div>
       </section>
 
-      {/* BENEFICIOS — emojis reemplazados por SVG */}
+      {/* BENEFICIOS */}
       <section style={{ background: '#fff', padding: 'clamp(3rem, 6vw, 5rem) clamp(1rem, 4vw, 2rem)' }}>
         <div style={{ maxWidth: '1100px', margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '2rem' }}>
           {[
@@ -253,7 +254,7 @@ export default function LandingClient({ products, images, banners }: any) {
         </div>
       </section>
 
-      {/* CTA — SIN TOCAR */}
+      {/* CTA */}
       <section style={{ background: 'linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%)', padding: 'clamp(3rem, 6vw, 5rem) clamp(1rem, 4vw, 2rem)' }}>
         <div style={{ maxWidth: '1100px', margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '2rem' }}>
           <div style={{ textAlign: 'center', padding: '2rem', border: '1px solid rgba(201,168,76,0.3)', borderRadius: '4px' }}>
@@ -271,7 +272,7 @@ export default function LandingClient({ products, images, banners }: any) {
         </div>
       </section>
 
-      {/* FOOTER con logo SIC */}
+      {/* FOOTER */}
       <footer style={{ borderTop: '1px solid #f0f0f0', padding: 'clamp(1.5rem, 3vw, 2.5rem) clamp(1rem, 4vw, 2rem)', background: '#fff' }}>
         <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1.5rem', marginBottom: '1.5rem' }}>

@@ -18,6 +18,7 @@ export default function NewProductPage() {
   const [loading, setLoading] = useState(false)
   const [images, setImages] = useState<File[]>([])
   const [previews, setPreviews] = useState<string[]>([])
+  const [envioGratis, setEnvioGratis] = useState(false)
 
   function handleImages(e: React.ChangeEvent<HTMLInputElement>) {
     const files = Array.from(e.target.files ?? [])
@@ -36,6 +37,7 @@ export default function NewProductPage() {
     setError("")
     setLoading(true)
     const formData = new FormData(e.currentTarget)
+    formData.set('envio_gratis', String(envioGratis))
     images.forEach((img) => formData.append("images", img))
     const result = await createProduct(formData)
     if (result?.error) { setError(result.error); setLoading(false) }
@@ -102,6 +104,25 @@ export default function NewProductPage() {
           </div>
         </div>
 
+        {/* ENVIO GRATIS */}
+        <div style={{ border: `2px solid ${envioGratis ? '#16a34a' : '#ddd'}`, borderRadius: '8px', padding: '1rem 1.25rem', background: envioGratis ? '#f0fdf4' : '#fff', transition: 'all 0.2s', cursor: 'pointer' }}
+          onClick={() => setEnvioGratis(!envioGratis)}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={envioGratis ? '#16a34a' : '#888'} strokeWidth="2">
+                <path d="M1 3h15v13H1z"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/>
+              </svg>
+              <div>
+                <p style={{ fontSize: '0.875rem', fontWeight: 700, color: envioGratis ? '#16a34a' : '#111' }}>Envío gratis</p>
+                <p style={{ fontSize: '0.75rem', color: '#888' }}>El cliente no paga envío — tú asumes el costo con Interrapidísimo</p>
+              </div>
+            </div>
+            <div style={{ width: '44px', height: '24px', borderRadius: '999px', background: envioGratis ? '#16a34a' : '#ddd', position: 'relative', transition: 'all 0.2s', flexShrink: 0 }}>
+              <div style={{ position: 'absolute', top: '2px', left: envioGratis ? '22px' : '2px', width: '20px', height: '20px', borderRadius: '50%', background: '#fff', transition: 'all 0.2s', boxShadow: '0 1px 4px rgba(0,0,0,0.2)' }} />
+            </div>
+          </div>
+        </div>
+
         <div>
           <label style={{ display: "block", fontSize: "0.75rem", color: "#888", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "0.5rem" }}>Fotos del producto (maximo 10)</label>
           <div style={{ border: "2px dashed #ddd", padding: "2rem", textAlign: "center", cursor: "pointer" }} onClick={() => document.getElementById("img-input")?.click()}>
@@ -122,10 +143,10 @@ export default function NewProductPage() {
         </div>
 
         <div style={{ display: "flex", gap: "1rem", paddingTop: "0.5rem" }}>
-          <button type="submit" disabled={loading} style={{ flex: 1, padding: "1rem", background: "#C9A84C", color: "#fff", border: "none", cursor: loading ? "not-allowed" : "pointer", fontSize: "0.875rem", textTransform: "uppercase", fontWeight: 600, opacity: loading ? 0.7 : 1 }}>
+          <button type="submit" disabled={loading} style={{ flex: 1, padding: "1rem", background: "#C9A84C", color: "#fff", border: "none", cursor: loading ? "not-allowed" : "pointer", fontSize: "0.875rem", textTransform: "uppercase", fontWeight: 600, opacity: loading ? 0.7 : 1, borderRadius: "999px" }}>
             {loading ? "Publicando..." : "Publicar producto"}
           </button>
-          <button type="button" onClick={() => router.back()} style={{ flex: 1, padding: "1rem", background: "#fff", color: "#888", border: "1px solid #ddd", cursor: "pointer", fontSize: "0.875rem" }}>
+          <button type="button" onClick={() => router.back()} style={{ flex: 1, padding: "1rem", background: "#fff", color: "#888", border: "1px solid #ddd", cursor: "pointer", fontSize: "0.875rem", borderRadius: "999px" }}>
             Cancelar
           </button>
         </div>
