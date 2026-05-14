@@ -45,7 +45,7 @@ export default async function VendorOrdersPage() {
         <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
           {orders.map((order: any) => {
             const total = Number(order.total_price ?? 0)
-            const { dsmFee, mpBase, mpIva, mpFijo, mpTotal, neto } = calcComisiones(total)
+            const { dsmFee, mpTotal, neto } = calcComisiones(total)
             return (
               <div key={order.id} style={{ border: "1px solid #eee", padding: "1.25rem" }}>
 
@@ -59,6 +59,21 @@ export default async function VendorOrdersPage() {
                     {order.status === "released" ? "Pago liberado" : order.status === "delivered" ? "Entregado" : order.status === "shipped" ? "Enviado" : order.status === "paid" ? "Pago recibido" : "Pendiente"}
                   </span>
                 </div>
+
+                {(order.buyer_name || order.buyer_address) && (
+                  <div style={{ background: "#f0f7ff", border: "1px solid #c8dcf0", borderRadius: "6px", padding: "1rem", marginBottom: "1rem" }}>
+                    <p style={{ fontSize: "0.7rem", letterSpacing: "2px", textTransform: "uppercase", color: "#888", marginBottom: "0.75rem" }}>Datos de envio del comprador</p>
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.5rem", fontSize: "0.82rem" }}>
+                      {order.buyer_name && <div><span style={{ color: "#888" }}>Nombre: </span><strong>{order.buyer_name}</strong></div>}
+                      {order.buyer_phone && <div><span style={{ color: "#888" }}>Telefono: </span><strong>{order.buyer_phone}</strong></div>}
+                      {order.buyer_address && <div style={{ gridColumn: "1/-1" }}><span style={{ color: "#888" }}>Direccion: </span><strong>{order.buyer_address}</strong></div>}
+                      {order.buyer_city && <div><span style={{ color: "#888" }}>Ciudad: </span><strong>{order.buyer_city}</strong></div>}
+                      {order.buyer_department && <div><span style={{ color: "#888" }}>Departamento: </span><strong>{order.buyer_department}</strong></div>}
+                      {order.buyer_transportadora && <div><span style={{ color: "#888" }}>Transportadora elegida: </span><strong>{order.buyer_transportadora}</strong></div>}
+                      {order.buyer_notes && <div style={{ gridColumn: "1/-1" }}><span style={{ color: "#888" }}>Notas: </span><strong>{order.buyer_notes}</strong></div>}
+                    </div>
+                  </div>
+                )}
 
                 <div style={{ background: "#fffbf0", border: "1px solid #f0e4b0", borderRadius: "6px", padding: "1rem", marginBottom: "1rem" }}>
                   <p style={{ fontSize: "0.7rem", letterSpacing: "2px", textTransform: "uppercase", color: "#888", marginBottom: "0.75rem" }}>Desglose de comisiones</p>

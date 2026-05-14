@@ -16,7 +16,7 @@ function getAdmin() {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
-    const { items, shipping_cost = 0, buyer_id } = body
+    const { items, shipping_cost = 0, buyer_id, shipping_address } = body
 
     if (!items || items.length === 0) {
       return NextResponse.json({ error: 'No hay productos' }, { status: 400 })
@@ -67,6 +67,13 @@ export async function POST(req: NextRequest) {
         status: 'pending',
         payment_method: 'mercadopago',
         payment_status: 'pending',
+        buyer_name: shipping_address?.nombre || null,
+        buyer_phone: shipping_address?.telefono || null,
+        buyer_address: shipping_address?.direccion || null,
+        buyer_city: shipping_address?.ciudad || null,
+        buyer_department: shipping_address?.departamento || null,
+        buyer_notes: shipping_address?.notas || null,
+        buyer_transportadora: shipping_address?.transportadora || null,
       })
     } catch (dbError) {
       console.error('Error creando orden:', dbError)
