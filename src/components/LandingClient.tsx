@@ -75,6 +75,9 @@ export default function LandingClient({ products, images, banners }: any) {
         <div style={{ padding: 'clamp(0.5rem, 2vw, 0.875rem)', display: 'flex', flexDirection: 'column', flex: 1 }}>
           <p style={{ fontSize: '0.6rem', color: '#C9A84C', textTransform: 'uppercase', marginBottom: '0.25rem', fontWeight: 700, letterSpacing: '1px' }}>{product.category}</p>
           <p style={{ fontSize: 'clamp(0.75rem, 2vw, 0.875rem)', marginBottom: '0.5rem', overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', minHeight: '2.5rem', color: '#222', lineHeight: 1.4 }}>{product.name}</p>
+          {product.original_price && Number(product.original_price) > Number(product.price) && (
+            <p style={{ fontSize: '0.75rem', color: '#bbb', textDecoration: 'line-through', marginBottom: '0.1rem' }}>${Number(product.original_price).toLocaleString('es-CO')}</p>
+          )}
           <p style={{ fontSize: 'clamp(0.875rem, 2.5vw, 1rem)', fontWeight: 700, color: '#111', marginBottom: '0.25rem' }}>${Number(product.price).toLocaleString('es-CO')}</p>
           <StarRating rating={product.rating} />
           <div style={{ background: '#C9A84C', color: '#fff', padding: '0.5rem', textAlign: 'center', fontSize: '0.7rem', fontWeight: 700, letterSpacing: '1px', textTransform: 'uppercase', borderRadius: '999px', marginTop: 'auto' }}>
@@ -228,22 +231,10 @@ export default function LandingClient({ products, images, banners }: any) {
       <section style={{ background: '#fff', padding: 'clamp(3rem, 6vw, 5rem) clamp(1rem, 4vw, 2rem)' }}>
         <div style={{ maxWidth: '1100px', margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '2rem' }}>
           {[
-            {
-              icon: <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#C9A84C" strokeWidth="1.5"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>,
-              title: 'Pagos seguros', desc: 'Sistema escrow que protege tu dinero hasta confirmar la entrega.'
-            },
-            {
-              icon: <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#C9A84C" strokeWidth="1.5"><path d="M9 12l2 2 4-4"/><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20z"/></svg>,
-              title: 'Vendedores verificados', desc: 'Todos los vendedores pasan por verificacion de identidad.'
-            },
-            {
-              icon: <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#C9A84C" strokeWidth="1.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>,
-              title: 'Envio flexible', desc: 'El vendedor elige la transportadora. Tu pagas solo el envio real.'
-            },
-            {
-              icon: <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#C9A84C" strokeWidth="1.5"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>,
-              title: '100% colombiano', desc: 'Plataforma hecha en Colombia para colombianos.'
-            },
+            { icon: <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#C9A84C" strokeWidth="1.5"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>, title: 'Pagos seguros', desc: 'Sistema escrow que protege tu dinero hasta confirmar la entrega.' },
+            { icon: <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#C9A84C" strokeWidth="1.5"><path d="M9 12l2 2 4-4"/><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20z"/></svg>, title: 'Vendedores verificados', desc: 'Todos los vendedores pasan por verificacion de identidad.' },
+            { icon: <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#C9A84C" strokeWidth="1.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>, title: 'Envio flexible', desc: 'El vendedor elige la transportadora. Tu pagas solo el envio real.' },
+            { icon: <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#C9A84C" strokeWidth="1.5"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>, title: '100% colombiano', desc: 'Plataforma hecha en Colombia para colombianos.' },
           ].map(item => (
             <div key={item.title} style={{ textAlign: 'center', padding: '1.5rem 1rem' }}>
               <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1rem' }}>{item.icon}</div>

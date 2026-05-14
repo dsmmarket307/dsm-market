@@ -15,7 +15,7 @@ export default async function HomePage() {
 
   const { data: allProducts } = await admin
     .from("products")
-    .select("id, name, price, category, badge, oferta_mes")
+    .select("id, name, price, original_price, category, badge, oferta_mes, envio_gratis, rating")
     .eq("status", "approved")
     .order("created_at", { ascending: false })
 
