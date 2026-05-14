@@ -61,7 +61,7 @@ export default async function VendorOrdersPage() {
                 </div>
 
                 {(order.buyer_name || order.buyer_address) && (
-                  <div style={{ background: "#f0f7ff", border: "1px solid #c8dcf0", borderRadius: "6px", padding: "1rem", marginBottom: "1rem" }}>
+                  <div style={{ background: "#fff", border: "1px solid #C9A84C", borderRadius: "6px", padding: "1rem", marginBottom: "1rem" }}>
                     <p style={{ fontSize: "0.7rem", letterSpacing: "2px", textTransform: "uppercase", color: "#888", marginBottom: "0.75rem" }}>Datos de envio del comprador</p>
                     <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.5rem", fontSize: "0.82rem" }}>
                       {order.buyer_name && <div><span style={{ color: "#888" }}>Nombre: </span><strong>{order.buyer_name}</strong></div>}
@@ -142,3 +142,4 @@ export default async function VendorOrdersPage() {
     </div>
   )
 }
+
