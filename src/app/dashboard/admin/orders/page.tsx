@@ -1,7 +1,7 @@
 ﻿import { createClient } from "@/lib/supabase/server"
 import { createClient as createAdmin } from "@supabase/supabase-js"
 import { redirect } from "next/navigation"
-import { releasePayout } from "@/lib/actions/orders"
+import { releasePayout, deleteOrder } from "@/lib/actions/orders"
 
 export default async function AdminOrdersPage() {
   const supabase = await createClient()
@@ -16,10 +16,7 @@ export default async function AdminOrdersPage() {
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   )
 
-  const { data: orders } = await admin
-    .from("orders")
-    .select("*")
-    .order("created_at", { ascending: false })
+  const { data: orders } = await admin.from("orders").select("*").order("created_at", { ascending: false })
 
   const totalRevenue = orders?.reduce((sum: number, o: any) => sum + Number(o.platform_fee ?? 0), 0) ?? 0
   const pendingRelease = orders?.filter((o: any) => o.status === "delivered" && !o.payout_released_at) ?? []
@@ -88,6 +85,11 @@ export default async function AdminOrdersPage() {
                   {order.payout_released_at && (
                     <p style={{ fontSize: "0.75rem", color: "#4CAF7D" }}>Liberado: {new Date(order.payout_released_at).toLocaleDateString("es-CO")}</p>
                   )}
+                  <form action={async () => { "use server"; await deleteOrder(order.id) }}>
+                    <button type="submit" style={{ padding: "0.5rem 1rem", background: "#fff", color: "#dc2626", border: "1px solid #fecaca", cursor: "pointer", fontSize: "0.8rem", fontWeight: 600 }}>
+                      Eliminar orden
+                    </button>
+                  </form>
                 </div>
               </div>
             </div>
