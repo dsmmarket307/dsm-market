@@ -1,11 +1,10 @@
 ﻿'use client'
-import { useEffect, useState } from 'react'
+import { useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 
-export default function SuccessPage() {
+function SuccessContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const [updated, setUpdated] = useState(false)
 
   useEffect(() => {
     async function updateOrder() {
@@ -21,7 +20,6 @@ export default function SuccessPage() {
           console.error(e)
         }
       }
-      setUpdated(true)
       setTimeout(() => router.push('/dashboard/buyer'), 5000)
     }
     updateOrder()
@@ -41,5 +39,13 @@ export default function SuccessPage() {
         <p style={{ fontSize: '0.75rem', color: '#aaa' }}>Redirigiendo en 5 segundos...</p>
       </div>
     </div>
+  )
+}
+
+export default function SuccessPage() {
+  return (
+    <Suspense fallback={<div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><p style={{ color: '#C9A84C' }}>Cargando...</p></div>}>
+      <SuccessContent />
+    </Suspense>
   )
 }
