@@ -16,7 +16,7 @@ function getAdmin() {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
-    const { items, shipping_cost = 0 } = body
+    const { items, shipping_cost = 0, buyer_id } = body
 
     if (!items || items.length === 0) {
       return NextResponse.json({ error: 'No hay productos' }, { status: 400 })
@@ -51,20 +51,21 @@ export async function POST(req: NextRequest) {
       const item = items[0]
       const { data: product } = await admin
         .from('products')
-        .select('id, seller_id, price')
+        .select('id, seller_id')
         .eq('id', item.id)
         .single()
 
       await admin.from('orders').insert({
         preference_id: result.id,
         product_id: item.id,
+        buyer_id: buyer_id || null,
+        seller_id: product?.seller_id || null,
         quantity: item.quantity,
         total_price: subtotal,
         platform_fee,
         seller_earnings: subtotal - platform_fee,
         status: 'pending',
         payment_method: 'mercadopago',
-        seller_id: product?.seller_id || null,
         payment_status: 'pending',
       })
     } catch (dbError) {

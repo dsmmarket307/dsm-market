@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
@@ -16,7 +16,7 @@ const ZONAS: Record<string, { rango: string; zona: string }> = {
   'manizales': { rango: '$12,000 - $18,000', zona: 'Zonal' },
   'armenia': { rango: '$12,000 - $18,000', zona: 'Zonal' },
   'ibague': { rango: '$12,000 - $18,000', zona: 'Zonal' },
-  'ibagué': { rango: '$12,000 - $18,000', zona: 'Zonal' },
+  'ibaguë': { rango: '$12,000 - $18,000', zona: 'Zonal' },
   'cartagena': { rango: '$12,000 - $18,000', zona: 'Zonal' },
   'cucuta': { rango: '$12,000 - $18,000', zona: 'Zonal' },
   'cúcuta': { rango: '$12,000 - $18,000', zona: 'Zonal' },
@@ -29,7 +29,7 @@ const ZONAS: Record<string, { rango: string; zona: string }> = {
   'soacha': { rango: '$12,000 - $18,000', zona: 'Zonal' },
   'pasto': { rango: '$15,000 - $22,000', zona: 'Territorial' },
   'monteria': { rango: '$15,000 - $22,000', zona: 'Territorial' },
-  'montería': { rango: '$15,000 - $22,000', zona: 'Territorial' },
+  'monterÿa': { rango: '$15,000 - $22,000', zona: 'Territorial' },
   'popayan': { rango: '$15,000 - $22,000', zona: 'Territorial' },
   'popayán': { rango: '$15,000 - $22,000', zona: 'Territorial' },
   'sincelejo': { rango: '$15,000 - $22,000', zona: 'Territorial' },
@@ -68,6 +68,7 @@ export default function CheckoutPage() {
   const [processing, setProcessing] = useState(false)
   const [transportadora, setTransportadora] = useState('')
   const [fleteInfo, setFleteInfo] = useState<{ rango: string; zona: string } | null>(null)
+  const [userId, setUserId] = useState<string | null>(null)
   const [address, setAddress] = useState({
     nombre: '',
     telefono: '',
@@ -81,6 +82,7 @@ export default function CheckoutPage() {
     async function load() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) { router.push('/auth/login'); return }
+      setUserId(user.id)
       const stored = sessionStorage.getItem('checkout_item')
       if (!stored) { router.push('/dashboard/buyer/products'); return }
       setItem(JSON.parse(stored))
@@ -123,6 +125,7 @@ export default function CheckoutPage() {
           }],
           shipping_cost: 0,
           shipping_address: { ...address, transportadora },
+          buyer_id: userId,
         }),
       })
       const data = await res.json()
