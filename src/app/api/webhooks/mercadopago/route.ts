@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
       headers: { Authorization: `Bearer ${process.env.MP_ACCESS_TOKEN}` },
     })
 
-    if (!mpRes.ok) return NextResponse.json({ error: 'Error MP' }, { status: 500 })
+    if (!mpRes.ok) return NextResponse.json({ ok: true }, { status: 200 })
 
     const payment = await mpRes.json()
     if (payment.status !== 'approved') return NextResponse.json({ ok: true })
