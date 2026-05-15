@@ -10,24 +10,6 @@ const categories = [
   'Delivery y mandados', 'Marketing y publicidad', 'Otros',
 ]
 
-const bannerSlides = [
-  {
-    title: 'Encuentra el experto que necesitas',
-    subtitle: 'Conectamos clientes con profesionales en toda Colombia.',
-    bg: 'linear-gradient(135deg, #0a0a0a 0%, #1c1c1c 100%)',
-  },
-  {
-    title: 'Servicios profesionales verificados',
-    subtitle: 'Todos nuestros proveedores pasan por un proceso de verificacion.',
-    bg: 'linear-gradient(135deg, #1a0a00 0%, #2c1500 100%)',
-  },
-  {
-    title: '3 meses gratis para proveedores',
-    subtitle: 'Publica tu servicio gratis y llega a miles de clientes.',
-    bg: 'linear-gradient(135deg, #0a0a1a 0%, #15152c 100%)',
-  },
-]
-
 export default function ServiciosPage() {
   const supabase = createClient()
   const [services, setServices] = useState<any[]>([])
@@ -37,11 +19,13 @@ export default function ServiciosPage() {
   const [profile, setProfile] = useState<any>(null)
   const [selectedCategory, setSelectedCategory] = useState('Todos')
   const [currentSlide, setCurrentSlide] = useState(0)
+  const [banners, setBanners] = useState<any[]>([])
 
   useEffect(() => {
-    const t = setInterval(() => setCurrentSlide(p => (p + 1) % bannerSlides.length), 4500)
+    if (banners.length <= 1) return
+    const t = setInterval(() => setCurrentSlide(p => (p + 1) % banners.length), 4500)
     return () => clearInterval(t)
-  }, [])
+  }, [banners.length])
 
   useEffect(() => {
     async function load() {
@@ -51,6 +35,13 @@ export default function ServiciosPage() {
         const { data: prof } = await supabase.from('profiles').select('role').eq('id', user.id).single()
         setProfile(prof)
       }
+      const { data: bannersData } = await supabase
+        .from('banners')
+        .select('id, title, subtitle, image_url, link, active, position')
+        .eq('active', true)
+        .order('position', { ascending: true })
+      setBanners(bannersData ?? [])
+
       const { data } = await supabase
         .from('services')
         .select('*')
@@ -107,14 +98,29 @@ export default function ServiciosPage() {
       </nav>
 
       {/* CARRUSEL */}
-      <div style={{ position: 'relative', width: '100%', height: 'clamp(280px, 45vw, 500px)', overflow: 'hidden' }}>
-        {bannerSlides.map((slide, i) => (
-          <div key={i} style={{ position: 'absolute', inset: 0, background: slide.bg, transition: 'opacity 0.8s ease', opacity: i === currentSlide ? 1 : 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 'clamp(1.5rem, 6vw, 5rem)', textAlign: 'center' }}>
-            <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(circle at 50% 50%, rgba(201,168,76,0.1) 0%, transparent 70%)' }} />
+      <div style={{ position: 'relative', width: '100%', height: 'clamp(280px, 45vw, 500px)', overflow: 'hidden', background: '#111' }}>
+        {banners.map((banner, i) => (
+          <div key={banner.id} style={{
+            position: 'absolute', inset: 0,
+            transition: 'opacity 0.8s ease',
+            opacity: i === currentSlide ? 1 : 0,
+            display: 'flex', flexDirection: 'column',
+            alignItems: 'center', justifyContent: 'center',
+            padding: 'clamp(1.5rem, 6vw, 5rem)', textAlign: 'center',
+            overflow: 'hidden',
+          }}>
+            {banner.image_url && (
+              <img src={banner.image_url} alt={banner.title} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
+            )}
+            <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.3) 50%, transparent 100%)' }} />
             <div style={{ position: 'relative', zIndex: 1 }}>
               <p style={{ color: '#C9A84C', fontSize: '0.65rem', letterSpacing: '4px', textTransform: 'uppercase', marginBottom: '1rem', fontWeight: 600 }}>DMS Market — Servicios</p>
-              <h1 style={{ color: '#fff', fontSize: 'clamp(1.5rem, 4vw, 3rem)', fontWeight: 700, marginBottom: '1rem', lineHeight: 1.2, maxWidth: '700px' }}>{slide.title}</h1>
-              <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: 'clamp(0.875rem, 2vw, 1.05rem)', maxWidth: '480px', margin: '0 auto 2rem', lineHeight: 1.7 }}>{slide.subtitle}</p>
+              {banner.title && (
+                <h1 style={{ color: '#fff', fontSize: 'clamp(1.5rem, 4vw, 3rem)', fontWeight: 700, marginBottom: '1rem', lineHeight: 1.2, maxWidth: '700px' }}>{banner.title}</h1>
+              )}
+              {banner.subtitle && (
+                <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: 'clamp(0.875rem, 2vw, 1.05rem)', maxWidth: '480px', margin: '0 auto 2rem', lineHeight: 1.7 }}>{banner.subtitle}</p>
+              )}
               <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
                 <button onClick={handlePublicar} style={{ background: '#C9A84C', color: '#fff', padding: '0.875rem 2rem', border: 'none', fontSize: '0.85rem', fontWeight: 700, letterSpacing: '1px', borderRadius: '999px', cursor: 'pointer', boxShadow: '0 4px 20px rgba(201,168,76,0.4)' }}>
                   Publica tu servicio gratis
@@ -127,16 +133,20 @@ export default function ServiciosPage() {
           </div>
         ))}
 
-        {/* Indicadores */}
+        {banners.length === 0 && (
+          <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(135deg, #0a0a0a, #1c1c1c)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <p style={{ color: '#C9A84C', fontSize: '0.85rem' }}>Cargando banners...</p>
+          </div>
+        )}
+
         <div style={{ position: 'absolute', bottom: '1.25rem', left: '50%', transform: 'translateX(-50%)', display: 'flex', gap: '0.5rem', zIndex: 10 }}>
-          {bannerSlides.map((_, i) => (
+          {banners.map((_, i) => (
             <button key={i} onClick={() => setCurrentSlide(i)} style={{ width: i === currentSlide ? '28px' : '8px', height: '8px', borderRadius: '4px', background: i === currentSlide ? '#C9A84C' : 'rgba(255,255,255,0.4)', border: 'none', cursor: 'pointer', transition: 'all 0.3s' }} />
           ))}
         </div>
 
-        {/* Flechas */}
-        <button onClick={() => setCurrentSlide(p => (p - 1 + bannerSlides.length) % bannerSlides.length)} style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', background: 'rgba(0,0,0,0.35)', color: '#fff', border: 'none', width: '40px', height: '40px', borderRadius: '50%', cursor: 'pointer', fontSize: '1.4rem', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10 }}>&#8249;</button>
-        <button onClick={() => setCurrentSlide(p => (p + 1) % bannerSlides.length)} style={{ position: 'absolute', right: '1rem', top: '50%', transform: 'translateY(-50%)', background: 'rgba(0,0,0,0.35)', color: '#fff', border: 'none', width: '40px', height: '40px', borderRadius: '50%', cursor: 'pointer', fontSize: '1.4rem', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10 }}>&#8250;</button>
+        <button onClick={() => setCurrentSlide(p => (p - 1 + banners.length) % banners.length)} style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', background: 'rgba(0,0,0,0.35)', color: '#fff', border: 'none', width: '40px', height: '40px', borderRadius: '50%', cursor: 'pointer', fontSize: '1.4rem', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10 }}>&#8249;</button>
+        <button onClick={() => setCurrentSlide(p => (p + 1) % banners.length)} style={{ position: 'absolute', right: '1rem', top: '50%', transform: 'translateY(-50%)', background: 'rgba(0,0,0,0.35)', color: '#fff', border: 'none', width: '40px', height: '40px', borderRadius: '50%', cursor: 'pointer', fontSize: '1.4rem', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10 }}>&#8250;</button>
       </div>
 
       {/* STATS */}
@@ -192,7 +202,6 @@ export default function ServiciosPage() {
                 onMouseEnter={e => { e.currentTarget.style.boxShadow = '0 12px 40px rgba(0,0,0,0.12)'; e.currentTarget.style.transform = 'translateY(-4px)' }}
                 onMouseLeave={e => { e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.06)'; e.currentTarget.style.transform = 'translateY(0)' }}>
 
-                {/* IMAGEN SERVICIO */}
                 <div style={{ position: 'relative', paddingBottom: '60%', background: '#f8f8f8', overflow: 'hidden' }}>
                   {service.service_image_url ? (
                     <img src={service.service_image_url} alt={service.business_name} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
@@ -205,8 +214,6 @@ export default function ServiciosPage() {
                 </div>
 
                 <div style={{ padding: '1.25rem' }}>
-
-                  {/* PERFIL PROVEEDOR */}
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.875rem' }}>
                     <div style={{ width: '52px', height: '52px', borderRadius: '50%', background: 'linear-gradient(135deg, #C9A84C, #e8c96d)', overflow: 'hidden', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', border: '3px solid #fff', boxShadow: '0 2px 8px rgba(0,0,0,0.15)' }}>
                       {service.avatar_url ? (
@@ -224,7 +231,6 @@ export default function ServiciosPage() {
                     </div>
                   </div>
 
-                  {/* EXPERIENCIA */}
                   {service.experience && (
                     <div style={{ background: '#f8f8f8', borderRadius: '6px', padding: '0.4rem 0.75rem', marginBottom: '0.75rem', display: 'inline-block' }}>
                       <p style={{ fontSize: '0.7rem', color: '#555', fontWeight: 500 }}>
@@ -233,10 +239,8 @@ export default function ServiciosPage() {
                     </div>
                   )}
 
-                  {/* DESCRIPCION */}
                   <p style={{ fontSize: '0.83rem', color: '#555', lineHeight: 1.7, marginBottom: '1rem', overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical' }}>{service.description}</p>
 
-                  {/* PRECIO */}
                   {service.price && (
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', marginBottom: '1rem', paddingTop: '0.75rem', borderTop: '1px solid #f5f5f5' }}>
                       <span style={{ fontSize: '0.7rem', color: '#aaa' }}>Desde</span>
@@ -244,7 +248,6 @@ export default function ServiciosPage() {
                     </div>
                   )}
 
-                  {/* BOTON WHATSAPP */}
                   <a href={`https://wa.me/57${(service.whatsapp || service.phone)?.replace(/\D/g, '')}?text=Hola,%20vi%20tu%20servicio%20en%20DMS%20Market%20y%20me%20interesa%20${encodeURIComponent(service.business_name)}`}
                     target="_blank" rel="noopener noreferrer"
                     style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', width: '100%', padding: '0.8rem', background: '#25D366', color: '#fff', textDecoration: 'none', fontSize: '0.82rem', fontWeight: 700, borderRadius: '999px', boxSizing: 'border-box', boxShadow: '0 2px 8px rgba(37,211,102,0.35)' }}>
