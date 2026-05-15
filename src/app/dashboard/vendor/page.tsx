@@ -38,7 +38,7 @@ export default async function VendorDashboard() {
 
   const { data: orders } = await admin
     .from("orders")
-    .select("id, status, total, seller_amount, created_at, guia_url")
+    .select("*")
     .eq("seller_id", user.id)
     .order("created_at", { ascending: false })
 
@@ -271,4 +271,5 @@ export default async function VendorDashboard() {
     </div>
   )
 }
+
 
