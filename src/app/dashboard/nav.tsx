@@ -13,6 +13,7 @@ export default function DashboardNav({ role, name, email }: any) {
     { href: "/dashboard/admin/products", label: "Productos" },
     { href: "/dashboard/admin/orders", label: "Ordenes y Pagos" },
     { href: "/dashboard/admin/disputes", label: "Disputas" },
+{ href: "/crm", label: "CRM Dropi" },
   ] : role === "seller" ? [
     { href: "/dashboard/vendor", label: "Inicio" },
     { href: "/dashboard/vendor/orders", label: "Mis Ordenes" },
