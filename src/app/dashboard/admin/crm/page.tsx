@@ -1,7 +1,6 @@
-﻿import { createClient } from "@/lib/supabase/server"
+import { createClient } from "@/lib/supabase/server"
 import { createClient as createAdmin } from "@supabase/supabase-js"
 import { redirect } from "next/navigation"
-import Link from "next/link"
 
 export default async function CRMDropiPage() {
   const supabase = await createClient()
@@ -27,11 +26,9 @@ export default async function CRMDropiPage() {
 
   return (
     <div style={{ padding: "2rem", maxWidth: "1100px", margin: "0 auto", background: "#fff", minHeight: "100vh" }}>
-      <div style={{ marginBottom: "2rem", paddingBottom: "1rem", borderBottom: "2px solid #C9A84C", display: "flex", alignItems: "flex-end", justifyContent: "space-between" }}>
-        <div>
-          <p style={{ fontSize: "0.7rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "#C9A84C", marginBottom: "0.25rem" }}>Centro de control</p>
-          <h1 style={{ fontSize: "1.75rem", fontWeight: 700, color: "#111", margin: 0 }}>CRM Dropi</h1>
-        </div>
+      <div style={{ marginBottom: "2rem", paddingBottom: "1rem", borderBottom: "2px solid #C9A84C" }}>
+        <p style={{ fontSize: "0.7rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "#C9A84C", marginBottom: "0.25rem" }}>Centro de control</p>
+        <h1 style={{ fontSize: "1.75rem", fontWeight: 700, color: "#111", margin: 0 }}>CRM Dropi</h1>
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "1rem", marginBottom: "2.5rem" }}>
