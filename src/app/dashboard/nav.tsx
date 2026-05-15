@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 import { useState } from "react"
 import { logout } from "@/lib/actions/auth"
 
@@ -13,7 +13,6 @@ export default function DashboardNav({ role, name, email }: any) {
     { href: "/dashboard/admin/products", label: "Productos" },
     { href: "/dashboard/admin/orders", label: "Ordenes y Pagos" },
     { href: "/dashboard/admin/disputes", label: "Disputas" },
-    { href: "/dashboard/admin/crm", label: "CRM Dropi" },
   ] : role === "seller" ? [
     { href: "/dashboard/vendor", label: "Inicio" },
     { href: "/dashboard/vendor/orders", label: "Mis Ordenes" },
@@ -30,15 +29,15 @@ export default function DashboardNav({ role, name, email }: any) {
 
   return (
     <>
-      {/* MOBILE � barra superior */}
+      {/* MOBILE — barra superior */}
       <div style={{ display: 'none', position: 'fixed', top: 0, left: 0, right: 0, height: '56px', background: '#fff', borderBottom: '2px solid #C9A84C', zIndex: 100, alignItems: 'center', justifyContent: 'space-between', padding: '0 1rem' }} className="mobile-nav">
         <span style={{ fontSize: '1.1rem', fontWeight: 700, color: '#C9A84C' }}>DMS Market</span>
         <button onClick={() => setOpen(!open)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.5rem', color: '#C9A84C', padding: '0.5rem' }}>
-          {open ? '?' : '?'}
+          {open ? '✕' : '☰'}
         </button>
       </div>
 
-      {/* MOBILE � menu desplegable */}
+      {/* MOBILE — menu desplegable */}
       {open && (
         <div style={{ position: 'fixed', top: '56px', left: 0, right: 0, bottom: 0, background: '#fff', zIndex: 99, overflowY: 'auto', display: 'none' }} className="mobile-menu">
           <div style={{ padding: '1rem 1.5rem', borderBottom: '1px solid #eee', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
@@ -68,7 +67,7 @@ export default function DashboardNav({ role, name, email }: any) {
         </div>
       )}
 
-      {/* DESKTOP � sidebar */}
+      {/* DESKTOP — sidebar */}
       <aside style={{ width: '220px', background: '#fff', borderRight: '1px solid #eee', display: 'flex', flexDirection: 'column', minHeight: '100vh', position: 'sticky', top: 0, flexShrink: 0 }} className="desktop-nav">
         <div style={{ padding: '1.5rem', borderBottom: '2px solid #C9A84C' }}>
           <p style={{ fontSize: '1.25rem', fontWeight: 700, color: '#C9A84C' }}>DMS Market</p>
