@@ -36,7 +36,7 @@ export default function ServiciosPage() {
         setProfile(prof)
       }
       const { data: bannersData } = await supabase
-        .from('banners')
+        .from('banners_servicios')
         .select('id, title, subtitle, image_url, link, active, position')
         .eq('active', true)
         .order('position', { ascending: true })
