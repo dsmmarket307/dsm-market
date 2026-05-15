@@ -37,11 +37,34 @@ export async function middleware(request: NextRequest) {
     '/checkout',
     '/producto',
     '/politicas',
+    '/servicios',
     '/dashboard/vendor/verificacion',
   ]
 
   const isPublicRoute = publicRoutes.some(route => pathname.startsWith(route))
 
+  // Protección CRM — solo admin
+  if (pathname.startsWith('/crm')) {
+    if (!user) {
+      const url = request.nextUrl.clone()
+      url.pathname = '/auth/login'
+      url.searchParams.set('redirectTo', pathname)
+      return NextResponse.redirect(url)
+    }
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single()
+    if (profile?.role !== 'admin') {
+      const url = request.nextUrl.clone()
+      url.pathname = '/'
+      return NextResponse.redirect(url)
+    }
+    return supabaseResponse
+  }
+
+  // Protección rutas privadas
   if (!user && !isPublicRoute && pathname !== '/') {
     const url = request.nextUrl.clone()
     url.pathname = '/auth/login'
