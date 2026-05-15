@@ -51,11 +51,11 @@ export default async function VendorDashboard() {
   const pending = products?.filter(p => p.status === "pending").length ?? 0
   const rejected = products?.filter(p => p.status === "rejected").length ?? 0
   const isApproved = profile?.seller_status === "approved"
-  const totalVentas = orders?.filter(o => o.status !== 'cancelled').reduce((acc, o) => acc + Number(o.seller_amount), 0) ?? 0
+  const totalVentas = orders?.filter(o => o.status !== 'cancelled').reduce((acc, o) => acc + Number(o.seller_earnings), 0) ?? 0
   const ordenesPendientes = orders?.filter(o => o.status === 'paid' || o.status === 'processing').length ?? 0
   const saldoPendiente = payouts?.filter(p => p.status === 'held').reduce((acc, p) => acc + Number(p.amount), 0) ?? 0
   const totalOrdenes = orders?.length ?? 0
-  const ordenesNecesitanGuia = orders?.filter(o => o.status === 'paid' && !o.guia_url).length ?? 0
+  const ordenesNecesitanGuia = orders?.filter(o => o.status === 'paid' && !o.tracking_number).length ?? 0
 
   const statusLabel: Record<string, string> = {
     pending_payment: 'Pago pendiente',
@@ -185,18 +185,18 @@ export default async function VendorDashboard() {
                         </span>
                       </td>
                       <td style={{ padding: '0.75rem 1rem' }}>
-                        {order.status === 'paid' && !order.guia_url ? (
+                        {order.status === 'paid' && !order.tracking_number ? (
                           <Link href="/dashboard/vendor/ordenes"
                             style={{ fontSize: '0.65rem', padding: '0.2rem 0.6rem', borderRadius: '999px', fontWeight: 600, background: '#fff5f5', color: '#dc2626', textDecoration: 'none', border: '1px solid #fecaca' }}>
                             Subir guia
                           </Link>
-                        ) : order.guia_url ? (
+                        ) : order.tracking_number ? (
                           <span style={{ fontSize: '0.65rem', padding: '0.2rem 0.6rem', borderRadius: '999px', fontWeight: 600, background: '#e8f5e9', color: '#2e7d32' }}>Subida</span>
                         ) : (
                           <span style={{ fontSize: '0.65rem', color: '#ccc' }}>-</span>
                         )}
                       </td>
-                      <td style={{ padding: '0.75rem 1rem', color: '#1D9E75', fontWeight: 600, whiteSpace: 'nowrap' }}>${Number(order.seller_amount).toLocaleString('es-CO')}</td>
+                      <td style={{ padding: '0.75rem 1rem', color: '#1D9E75', fontWeight: 600, whiteSpace: 'nowrap' }}>${Number(order.seller_earnings).toLocaleString('es-CO')}</td>
                       <td style={{ padding: '0.75rem 1rem', color: '#888', whiteSpace: 'nowrap' }}>{new Date(order.created_at).toLocaleDateString('es-CO')}</td>
                     </tr>
                   ))}
