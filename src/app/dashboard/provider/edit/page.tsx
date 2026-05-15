@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
@@ -114,7 +114,7 @@ export default function EditProviderPage() {
         whatsapp: form.whatsapp,
         service_image_url: serviceImageUrl,
         avatar_url: avatarUrl,
-        status: 'pending',
+        
       })
       .eq('id', serviceId)
 
@@ -149,7 +149,7 @@ export default function EditProviderPage() {
       <nav style={{ borderBottom: '2px solid #C9A84C', padding: '0 2rem', height: '64px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#fff', position: 'sticky', top: 0, zIndex: 50 }}>
         <a href="/" style={{ fontSize: '1.25rem', fontWeight: 700, color: '#C9A84C', textDecoration: 'none' }}>DMS Market</a>
         <button onClick={() => router.push('/dashboard/provider')} style={{ fontSize: '0.8rem', color: '#888', background: 'none', border: '1px solid #ddd', padding: '0.4rem 0.875rem', borderRadius: '999px', cursor: 'pointer' }}>
-          ← Volver al panel
+          â† Volver al panel
         </button>
       </nav>
 
@@ -168,7 +168,7 @@ export default function EditProviderPage() {
 
         {success && (
           <div style={{ marginBottom: '1.5rem', padding: '0.875rem', background: '#f0fdf4', border: '1px solid #bbf7d0', color: '#16a34a', fontSize: '0.875rem' }}>
-            ¡Guardado! Redirigiendo...
+            Â¡Guardado! Redirigiendo...
           </div>
         )}
 
