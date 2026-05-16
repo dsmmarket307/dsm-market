@@ -44,7 +44,7 @@ export default function ProductDetail({ product, images, reviews: initialReviews
   }
 
   async function handleAddToCart() {
-    if (!user) { router.push("/auth/login"); return }
+    if (!user) { router.push("/auth/login?redirect=/checkout"); return }
     const { data: existing } = await supabase.from("carts").select("quantity")
       .eq("buyer_id", user.id).eq("product_id", product.id).single()
     if (existing) {
@@ -224,7 +224,7 @@ export default function ProductDetail({ product, images, reviews: initialReviews
                 </p>
               </>
             ) : (
-              <button onClick={() => router.push("/auth/login")} style={{ display: "block", width: "100%", background: "linear-gradient(135deg, #C9A84C 0%, #e8c96a 100%)", color: "#fff", padding: "1rem", textAlign: "center", border: "none", fontSize: "1rem", textTransform: "uppercase", fontWeight: 700, borderRadius: "999px", marginBottom: "0.75rem", cursor: "pointer", boxShadow: "0 4px 20px rgba(201,168,76,0.4)", letterSpacing: "0.06em" }}>
+              <button onClick={() => router.push("/auth/login?redirect=/checkout")} style={{ display: "block", width: "100%", background: "linear-gradient(135deg, #C9A84C 0%, #e8c96a 100%)", color: "#fff", padding: "1rem", textAlign: "center", border: "none", fontSize: "1rem", textTransform: "uppercase", fontWeight: 700, borderRadius: "999px", marginBottom: "0.75rem", cursor: "pointer", boxShadow: "0 4px 20px rgba(201,168,76,0.4)", letterSpacing: "0.06em" }}>
                 Ingresar para comprar
               </button>
             )}
@@ -329,3 +329,4 @@ export default function ProductDetail({ product, images, reviews: initialReviews
     </div>
   )
 }
+

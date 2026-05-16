@@ -20,7 +20,7 @@ function SuccessContent() {
           console.error(e)
         }
       }
-      setTimeout(() => router.push('/dashboard/buyer'), 5000)
+      setTimeout(() => router.push('/dashboard/buyer/products'), 5000)
     }
     updateOrder()
   }, [])
@@ -49,3 +49,4 @@ export default function SuccessPage() {
     </Suspense>
   )
 }
+
