@@ -1,4 +1,4 @@
-export default function AuthLayout({
+﻿export default function AuthLayout({
   children,
 }: {
   children: React.ReactNode
@@ -9,7 +9,7 @@ export default function AuthLayout({
       {/* Panel izquierdo decorativo */}
       <div
         className="hidden lg:flex lg:w-[45%] flex-col justify-between p-12 relative overflow-hidden"
-        style={{ background: '#fff', borderRight: '1px solid #f0f0f0' }}
+        style={{ background: '#0B0B0B', borderRight: '1px solid rgba(212,175,55,0.15)' }}
       >
         <div
           className="absolute top-0 right-0 w-px h-full opacity-20"
@@ -39,10 +39,10 @@ export default function AuthLayout({
 
         {/* Logo */}
         <div>
-          <p className="font-display text-5xl font-light tracking-widest" style={{ color: '#C9A84C' }}>
+          <p className="font-display text-5xl font-light tracking-widest" style={{ color: '#D4AF37' }}>
             DMS
           </p>
-          <p className="text-xs tracking-[0.3em] uppercase mt-1" style={{ color: '#999' }}>
+          <p className="text-xs tracking-[0.3em] uppercase mt-1" style={{ color: '#aaa' }}>
             Market
           </p>
         </div>
@@ -51,15 +51,15 @@ export default function AuthLayout({
         <div>
           <div className="mb-8">
             <div className="w-8 h-px mb-6" style={{ background: '#C9A84C' }} />
-            <p className="font-display text-3xl font-light leading-relaxed" style={{ color: '#111' }}>
+            <p className="font-display text-3xl font-light leading-relaxed" style={{ color: '#fff' }}>
               La plataforma donde
               <br />
-              <em style={{ color: '#C9A84C' }}>el comercio</em> se
+              <em style={{ color: '#D4AF37' }}>el comercio</em> se
               <br />
               vuelve arte.
             </p>
           </div>
-          <p className="text-sm leading-relaxed" style={{ color: '#888' }}>
+          <p className="text-sm leading-relaxed" style={{ color: '#aaa' }}>
             Conectamos compradores y vendedores con la precision y elegancia que su negocio merece.
           </p>
 
@@ -75,7 +75,7 @@ export default function AuthLayout({
 
         {/* Footer */}
         <div>
-          <p className="text-xs tracking-[0.2em] uppercase" style={{ color: '#bbb' }}>
+          <p className="text-xs tracking-[0.2em] uppercase" style={{ color: '#666' }}>
             2025 DMS Market
           </p>
         </div>
@@ -84,14 +84,14 @@ export default function AuthLayout({
       {/* Panel derecho - formulario */}
       <div
         className="flex-1 flex items-center justify-center px-6 py-12"
-        style={{ background: '#fff' }}
+        style={{ background: '#0f0f0f' }}
       >
         <div className="w-full max-w-[420px]">
           <div className="lg:hidden text-center mb-10">
-            <p className="font-display text-4xl font-light tracking-widest" style={{ color: '#C9A84C' }}>
+            <p className="font-display text-4xl font-light tracking-widest" style={{ color: '#D4AF37' }}>
               DMS
             </p>
-            <p className="text-xs tracking-[0.3em] uppercase mt-1" style={{ color: '#999' }}>
+            <p className="text-xs tracking-[0.3em] uppercase mt-1" style={{ color: '#aaa' }}>
               Market
             </p>
           </div>
