@@ -13,7 +13,8 @@ export default function CRMLayout({ children }: { children: React.ReactNode }) {
             { href: '/crm', label: 'Dashboard', icon: '▦' },
             { href: '/crm/pedidos', label: 'Pedidos', icon: '◈' },
             { href: '/crm/productos', label: 'Productos Dropi', icon: '◉' },
-            { href: '/crm/ganancias', label: 'Ganancias', icon: '◎' },
+           { href: '/crm/ganancias', label: 'Ganancias', icon: '◎' },
+{ href: '/crm/importar', label: 'Importar Dropi', icon: '↓' },
           ].map(item => (
             <a key={item.href} href={item.href} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.75rem 1.25rem', color: 'rgba(255,255,255,0.6)', textDecoration: 'none', fontSize: '0.85rem' }}>
               <span style={{ fontSize: '1rem' }}>{item.icon}</span>
