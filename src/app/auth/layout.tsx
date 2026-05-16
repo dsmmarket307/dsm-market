@@ -33,8 +33,7 @@
         </div>
 
         <div>
-          <p className="font-display text-5xl font-light tracking-widest" style={{ color: '#D4AF37' }}>DMS</p>
-          <p className="text-xs tracking-[0.3em] uppercase mt-1" style={{ color: '#666' }}>Market</p>
+          <img src="https://awbepztacmvurjylfoas.supabase.co/storage/v1/object/public/assets/ChatGPT_Image_3_may_2026__21_13_12-removebg-preview.png" alt="DMS Market" style={{ width: "160px", objectFit: "contain" }} />
         </div>
 
         <div>
@@ -70,8 +69,7 @@
       <div className="flex-1 flex items-center justify-center px-6 py-12" style={{ background: '#0f0f0f' }}>
         <div className="w-full max-w-[420px]">
           <div className="lg:hidden text-center mb-10">
-            <p className="font-display text-4xl font-light tracking-widest" style={{ color: '#D4AF37' }}>DMS</p>
-            <p className="text-xs tracking-[0.3em] uppercase mt-1" style={{ color: '#666' }}>Market</p>
+            <img src="https://awbepztacmvurjylfoas.supabase.co/storage/v1/object/public/assets/ChatGPT_Image_3_may_2026__21_13_12-removebg-preview.png" alt="DMS Market" style={{ width: "120px", objectFit: "contain" }} />
           </div>
           {children}
         </div>
@@ -80,3 +78,5 @@
     </div>
   )
 }
+
+
