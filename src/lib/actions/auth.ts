@@ -77,6 +77,7 @@ export async function login(formData: FormData) {
   if (profile?.role === 'provider') redirect('/dashboard/provider')
   if (profile?.role === 'admin') redirect('/dashboard/admin')
   if (profile?.role === 'buyer') redirect('/dashboard/buyer')
+  if (profile?.role === 'buyer') redirect('/dashboard/buyer')
 
   redirect(redirectTo || '/dashboard')
 }
@@ -123,3 +124,4 @@ export async function resetPassword(formData: FormData) {
   revalidatePath('/', 'layout')
   redirect('/dashboard')
 }
+
