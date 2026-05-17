@@ -11,7 +11,7 @@ export default async function DashboardLayout({ children }: any) {
   const name = user.user_metadata?.name ?? user.email?.split("@")[0] ?? ""
 
   return (
-    <div style={{ background: "#f5f5f5", minHeight: "100vh", display: "flex", fontFamily: "sans-serif" }}>
+    <div style={{ background: "#0f0f0f", minHeight: "100vh", display: "flex", fontFamily: "sans-serif" }}>
       <DashboardNav role={role} name={name} email={user.email ?? ""} />
       <main style={{ flex: 1, overflow: "auto" }}>
         {children}
@@ -19,3 +19,4 @@ export default async function DashboardLayout({ children }: any) {
     </div>
   )
 }
+
