@@ -1,10 +1,10 @@
-'use client'
+﻿'use client'
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 
-export default function ProductDetail({ product, images, reviews, avgRating, user }: any) {
+export default function ProductDetail({ product, images, reviews, avgRating, user, seller }: any) {
   const [currentImage, setCurrentImage] = useState(0)
   const [quantity, setQuantity] = useState(1)
   const [adding, setAdding] = useState(false)
@@ -104,15 +104,15 @@ export default function ProductDetail({ product, images, reviews, avgRating, use
                   </svg>
                 ))}
               </div>
-              <span style={{ fontSize: '0.8rem', color: '#888' }}>({reviews.length} reseñas)</span>
-              {product.vendidos > 0 && <span style={{ fontSize: '0.8rem', color: '#888' }}>· {product.vendidos} vendidos</span>}
+              <span style={{ fontSize: '0.8rem', color: '#888' }}>({reviews.length} reseÃ±as)</span>
+              {product.vendidos > 0 && <span style={{ fontSize: '0.8rem', color: '#888' }}>Â· {product.vendidos} vendidos</span>}
             </div>
 
             {/* PRECIO */}
             <div style={{ marginBottom: '1.5rem' }}>
               {formattedOriginal && <p style={{ fontSize: '0.9rem', color: '#bbb', textDecoration: 'line-through', marginBottom: '0.25rem' }}>{formattedOriginal}</p>}
               <p style={{ fontSize: 'clamp(1.75rem, 4vw, 2.5rem)', fontWeight: 800, color: '#111', lineHeight: 1 }}>{formattedPrice}</p>
-              <p style={{ fontSize: '0.75rem', color: '#888', marginTop: '0.25rem' }}>COP · Precio final</p>
+              <p style={{ fontSize: '0.75rem', color: '#888', marginTop: '0.25rem' }}>COP Â· Precio final</p>
             </div>
 
             <p style={{ fontSize: '0.9rem', color: '#555', lineHeight: 1.7, marginBottom: '1.5rem' }}>{product.description}</p>
@@ -122,7 +122,7 @@ export default function ProductDetail({ product, images, reviews, avgRating, use
               <span style={{ fontSize: '0.85rem', color: '#555', fontWeight: 500 }}>Cantidad</span>
               <div style={{ display: 'flex', alignItems: 'center', border: '1px solid #ddd', borderRadius: '8px', overflow: 'hidden' }}>
                 <button onClick={() => setQuantity(q => Math.max(1, q - 1))}
-                  style={{ width: '40px', height: '40px', background: '#f8f8f8', border: 'none', cursor: 'pointer', fontSize: '1.1rem', color: '#333', borderRight: '1px solid #ddd' }}>−</button>
+                  style={{ width: '40px', height: '40px', background: '#f8f8f8', border: 'none', cursor: 'pointer', fontSize: '1.1rem', color: '#333', borderRight: '1px solid #ddd' }}>âˆ’</button>
                 <span style={{ width: '48px', textAlign: 'center', fontSize: '0.95rem', fontWeight: 600, color: '#111' }}>{quantity}</span>
                 <button onClick={() => setQuantity(q => q + 1)}
                   style={{ width: '40px', height: '40px', background: '#f8f8f8', border: 'none', cursor: 'pointer', fontSize: '1.1rem', color: '#333', borderLeft: '1px solid #ddd' }}>+</button>
@@ -174,7 +174,7 @@ export default function ProductDetail({ product, images, reviews, avgRating, use
     </div>
     <a href={`/tienda/${seller.id}`}
       style={{ padding: "8px 16px", background: "#0B0B0B", color: "#D4AF37", textDecoration: "none", borderRadius: "8px", fontSize: "0.8rem", fontWeight: 700, whiteSpace: "nowrap", border: "1px solid rgba(212,175,55,.3)" }}>
-      Ver tienda completa →
+      Ver tienda completa â†’
     </a>
   </div>
 )}
@@ -187,10 +187,10 @@ export default function ProductDetail({ product, images, reviews, avgRating, use
           </div>
         </div>
 
-        {/* RESEÑAS */}
+        {/* RESEÃ‘AS */}
         {reviews.length > 0 && (
           <div style={{ marginTop: '4rem', borderTop: '1px solid #eee', paddingTop: '2rem' }}>
-            <h2 style={{ fontSize: '1.25rem', fontWeight: 700, color: '#111', marginBottom: '1.5rem' }}>Reseñas ({reviews.length})</h2>
+            <h2 style={{ fontSize: '1.25rem', fontWeight: 700, color: '#111', marginBottom: '1.5rem' }}>ReseÃ±as ({reviews.length})</h2>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               {reviews.map((review: any) => (
                 <div key={review.id} style={{ padding: '1.25rem', border: '1px solid #eee', borderRadius: '12px' }}>
