@@ -35,7 +35,7 @@ export default async function BuyerDashboard() {
     <div style={{ minHeight: "100vh", background: "#0f0f0f", display: "flex", fontFamily: "'Inter', sans-serif" }}>
 
       {/* SIDEBAR */}
-      <div style={{ width: "240px", background: "#0B0B0B", borderRight: "1px solid rgba(212,175,55,0.1)", display: "flex", flexDirection: "column", padding: "1.5rem 0", position: "fixed", top: 0, left: 0, height: "100vh" }}>
+      <div style={{ width: "240px", background: "#0B0B0B", borderRight: "1px solid rgba(212,175,55,0.1)", display: "flex", flexDirection: "column", padding: "1.5rem 0", position: "sticky", top: 0, height: "100vh", flexShrink: 0 }}>
         <div style={{ padding: "0 1.5rem", marginBottom: "2rem" }}>
           <img src={logoUrl} alt="DMS Market" style={{ width: "120px", objectFit: "contain" }} />
         </div>
@@ -74,7 +74,7 @@ export default async function BuyerDashboard() {
       </div>
 
       {/* CONTENIDO PRINCIPAL */}
-      <div style={{ marginLeft: "240px", flex: 1, padding: "2rem" }}>
+      <div style={{ flex: 1, minWidth: 0, padding: "1rem", overflowX: "hidden" }}>
 
         {/* HEADER */}
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "2rem" }}>
@@ -155,3 +155,4 @@ export default async function BuyerDashboard() {
     </div>
   )
 }
+
