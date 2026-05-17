@@ -13,10 +13,6 @@ export default async function DashboardPage() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect("/auth/login")
-  if (role === "seller") redirect("/dashboard/vendor")
-  if (role === "admin") redirect("/dashboard/admin")
-  if (role === "buyer") redirect("/dashboard/buyer")
-  if (role === "provider") redirect("/dashboard/provider")
 
   const admin = createAdmin(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
   const { data: profile } = await admin.from("profiles").select("*").eq("id", user.id).single()
@@ -52,4 +48,3 @@ export default async function DashboardPage() {
     </div>
   )
 }
-
