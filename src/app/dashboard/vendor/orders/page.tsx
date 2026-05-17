@@ -76,9 +76,9 @@ export default async function VendorOrdersPage() {
                 <div key={order.id} className="vo-card">
                   <div className="vo-card-top">
                     <div>
-                      <p style={{ fontSize: 12, color: "#aaa", marginBottom: 4, fontFamily: "'Poppins',sans-serif" }}>Orden #{order.id?.slice(0,8).toUpperCase()}</p>
-                      <p style={{ fontSize: "1.25rem", fontWeight: 700, color: "#111", margin: "0 0 4px", fontFamily: "'Poppins',sans-serif" }}>${total.toLocaleString("es-CO")}</p>
-                      <p style={{ fontSize: 12, color: "#aaa", fontFamily: "'Poppins',sans-serif" }}>{new Date(order.created_at).toLocaleDateString("es-CO")}</p>
+                      <p style={{ fontSize: 12, color: "#888888", marginBottom: 4, fontFamily: "'Poppins',sans-serif" }}>Orden #{order.id?.slice(0,8).toUpperCase()}</p>
+                      <p style={{ fontSize: "1.25rem", fontWeight: 700, color: "#ffffff", margin: "0 0 4px", fontFamily: "'Poppins',sans-serif" }}>${total.toLocaleString("es-CO")}</p>
+                      <p style={{ fontSize: 12, color: "#888888", fontFamily: "'Poppins',sans-serif" }}>{new Date(order.created_at).toLocaleDateString("es-CO")}</p>
                     </div>
                     <span className="vo-badge" style={{ background: statusColor.bg, color: statusColor.color }}>{statusText}</span>
                   </div>
@@ -94,18 +94,18 @@ export default async function VendorOrdersPage() {
                       {order.buyer_department && <div><span className="vo-label">Departamento: </span><span className="vo-value">{order.buyer_department}</span></div>}
                       {order.buyer_transportadora && <div style={{ gridColumn: "1/-1" }}><span className="vo-label">Transportadora: </span><span className="vo-value">{order.buyer_transportadora}</span></div>}
                       {order.buyer_notes   && <div style={{ gridColumn: "1/-1" }}><span className="vo-label">Notas: </span><span className="vo-value">{order.buyer_notes}</span></div>}
-                      {!order.buyer_name && !order.buyer_address && <div style={{ gridColumn: "1/-1", color: "#aaa", fontSize: 13, fontStyle: "italic" }}>Sin datos de envio registrados</div>}
+                      {!order.buyer_name && !order.buyer_address && <div style={{ gridColumn: "1/-1", color: "#888888", fontSize: 13, fontStyle: "italic" }}>Sin datos de envio registrados</div>}
                     </div>
                   </div>
 
                   {/* COMISIONES */}
                   <div className="vo-section" style={{ background: "#fafafa" }}>
                     <p className="vo-section-title" style={{ color: "#888" }}>Desglose de comisiones</p>
-                    <div className="vo-fee-row"><span style={{ color: "#555" }}>Valor del producto</span><span style={{ fontWeight: 600, color: "#111" }}>${total.toLocaleString("es-CO")}</span></div>
+                    <div className="vo-fee-row"><span style={{ color: "#cccccc" }}>Valor del producto</span><span style={{ fontWeight: 600, color: "#ffffff" }}>${total.toLocaleString("es-CO")}</span></div>
                     <div className="vo-fee-row"><span style={{ color: "#ef4444" }}>Comision DSM (5%)</span><span style={{ color: "#ef4444" }}>- ${dsmFee.toLocaleString("es-CO")}</span></div>
                     <div className="vo-fee-row"><span style={{ color: "#ef4444" }}>Comision MP (3.29% + IVA + $952)</span><span style={{ color: "#ef4444" }}>- ${mpTotal.toLocaleString("es-CO")}</span></div>
                     <div className="vo-fee-row" style={{ borderTop: "1px solid rgba(212,175,55,.1)", marginTop: 6, paddingTop: 8 }}>
-                      <span style={{ fontWeight: 700, color: "#111" }}>Lo que recibes</span>
+                      <span style={{ fontWeight: 700, color: "#ffffff" }}>Lo que recibes</span>
                       <span style={{ fontWeight: 700, color: "#1D9E75", fontSize: 16 }}>${neto.toLocaleString("es-CO")}</span>
                     </div>
                   </div>
@@ -113,8 +113,8 @@ export default async function VendorOrdersPage() {
                   {/* GUIA ACTUAL */}
                   {order.tracking_number && (
                     <div className="vo-section">
-                      <p style={{ fontSize: 13, color: "#555", fontFamily: "'Poppins',sans-serif" }}>Transportadora: <strong style={{ color: "#111" }}>{order.shipping_company}</strong></p>
-                      <p style={{ fontSize: 13, color: "#555", fontFamily: "'Poppins',sans-serif" }}>Guia: <strong style={{ color: "#111" }}>{order.tracking_number}</strong></p>
+                      <p style={{ fontSize: 13, color: "#cccccc", fontFamily: "'Poppins',sans-serif" }}>Transportadora: <strong style={{ color: "#ffffff" }}>{order.shipping_company}</strong></p>
+                      <p style={{ fontSize: 13, color: "#cccccc", fontFamily: "'Poppins',sans-serif" }}>Guia: <strong style={{ color: "#ffffff" }}>{order.tracking_number}</strong></p>
                     </div>
                   )}
 
@@ -152,4 +152,5 @@ export default async function VendorOrdersPage() {
     </>
   )
 }
+
 
