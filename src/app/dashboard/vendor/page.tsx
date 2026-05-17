@@ -42,7 +42,7 @@ export default async function VendorDashboard() {
 
   const css = `
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
-    .vd-root{background:#F5F5F5;min-height:100vh;font-family:'Poppins',sans-serif;}
+    .vd-root{background:#0f0f0f;min-height:100vh;font-family:'Poppins',sans-serif;}
     .vd-inner{max-width:1000px;margin:0 auto;padding:2rem;}
     .vd-header{background:#0B0B0B;border-radius:16px;padding:1.75rem 2rem;margin-bottom:1.5rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;border:1px solid rgba(212,175,55,.12);}
     .vd-header-title{font-size:1.5rem;font-weight:700;color:#fff;margin:0;}
@@ -56,16 +56,16 @@ export default async function VendorDashboard() {
     .vd-alert-red{background:#151515;border:1px solid rgba(220,38,38,.3);border-left:3px solid #dc2626;border-radius:12px;padding:1.25rem 1.5rem;margin-bottom:1.25rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;}
     .vd-alert-yellow{background:#151515;border:1px solid rgba(212,175,55,.25);border-left:3px solid #D4AF37;border-radius:12px;padding:1.25rem 1.5rem;margin-bottom:1.25rem;}
     .vd-metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:1.25rem;}
-    .vd-metric{background:#fff;border-radius:14px;padding:1.25rem;border:1px solid rgba(0,0,0,.06);box-shadow:0 2px 8px rgba(0,0,0,.04);}
+    .vd-metric{background:#151515;border-radius:14px;padding:1.25rem;border:1px solid rgba(0,0,0,.06);box-shadow:0 2px 8px rgba(0,0,0,.04);}
     .vd-metric-label{font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:#888;margin-bottom:8px;font-family:'Poppins',sans-serif;}
     .vd-metric-value{font-size:1.6rem;font-weight:700;font-family:'Poppins',sans-serif;}
-    .vd-card{background:#fff;border-radius:16px;overflow:hidden;border:1px solid rgba(0,0,0,.06);box-shadow:0 2px 8px rgba(0,0,0,.04);margin-bottom:1.25rem;}
-    .vd-card-header{padding:1rem 1.5rem;border-bottom:1px solid rgba(0,0,0,.06);display:flex;align-items:center;justify-content:space-between;}
+    .vd-card{background:#151515;border-radius:16px;overflow:hidden;border:1px solid rgba(255,255,255,.06);margin-bottom:1.25rem;}
+    .vd-card-header{padding:1rem 1.5rem;border-bottom:1px solid rgba(255,255,255,.06);display:flex;align-items:center;justify-content:space-between;}
     .vd-card-title{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#888;font-family:'Poppins',sans-serif;}
     .vd-table{width:100%;border-collapse:collapse;font-size:13px;}
-    .vd-table th{padding:10px 16px;text-align:left;font-size:10px;letter-spacing:1px;text-transform:uppercase;color:#888;border-bottom:1px solid rgba(0,0,0,.06);font-family:'Poppins',sans-serif;white-space:nowrap;}
-    .vd-table td{padding:12px 16px;border-bottom:1px solid rgba(0,0,0,.04);font-family:'Poppins',sans-serif;}
-    .vd-product-row{display:flex;align-items:center;gap:16px;padding:1rem 1.5rem;border-bottom:1px solid rgba(0,0,0,.04);}
+    .vd-table th{padding:10px 16px;text-align:left;font-size:10px;letter-spacing:1px;text-transform:uppercase;color:#888;border-bottom:1px solid rgba(255,255,255,.06);font-family:'Poppins',sans-serif;white-space:nowrap;}
+    .vd-table td{padding:12px 16px;border-bottom:1px solid rgba(255,255,255,.04);color:#ccc;font-family:'Poppins',sans-serif;}
+    .vd-product-row{display:flex;align-items:center;gap:16px;padding:1rem 1.5rem;border-bottom:1px solid rgba(255,255,255,.04);}
     .vd-product-row:last-child{border-bottom:none;}
     .vd-badge{font-size:10px;padding:3px 10px;border-radius:999px;font-weight:600;font-family:'Poppins',sans-serif;white-space:nowrap;}
   `
