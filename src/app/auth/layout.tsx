@@ -66,7 +66,7 @@
         </div>
       </div>
 
-      <div className="flex-1 flex items-center justify-center px-6 py-12" style={{ background: '#0f0f0f' }}>
+      <div className="flex-1 flex items-center justify-center px-6 py-12 min-h-screen" style={{ background: '#0f0f0f' }}>
         <div className="w-full max-w-[420px]">
           <div className="lg:hidden text-center mb-10">
             <img src="https://awbepztacmvurjylfoas.supabase.co/storage/v1/object/public/assets/ChatGPT_Image_3_may_2026__21_13_12-removebg-preview.png" alt="DMS Market" style={{ width: "120px", objectFit: "contain" }} />
@@ -78,5 +78,6 @@
     </div>
   )
 }
+
 
 
