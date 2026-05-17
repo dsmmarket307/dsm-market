@@ -39,6 +39,7 @@ export default function DashboardNav({ role, name, email }: any) {
     { href: "/dashboard/vendor/orders",          label: "Mis Ordenes",    icon: "orders" },
     { href: "/dashboard/vendor/products/new",    label: "Nuevo producto", icon: "newproduct" },
     { href: "/dashboard/vendor/disputes",        label: "Disputas",       icon: "dispute" },
+    { href: "/dashboard/vendor/mi-tienda",         label: "Mi Tienda",        icon: "store" },
   ] : role === "provider" ? [
     { href: "/dashboard/provider",         label: "Inicio",      icon: "home" },
     { href: "/dashboard/provider/servicio",label: "Mi servicio", icon: "provider" },
