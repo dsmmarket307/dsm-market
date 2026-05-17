@@ -49,6 +49,7 @@ export async function register(formData: FormData) {
     redirect('/dashboard/provider')
   }
 
+  if (profile?.role === 'buyer') redirect('/dashboard/buyer')
   redirect(redirectTo || '/dashboard')
 }
 
@@ -79,6 +80,7 @@ export async function login(formData: FormData) {
   if (profile?.role === 'buyer') redirect('/dashboard/buyer')
   if (profile?.role === 'buyer') redirect('/dashboard/buyer')
 
+  if (profile?.role === 'buyer') redirect('/dashboard/buyer')
   redirect(redirectTo || '/dashboard')
 }
 
@@ -124,4 +126,5 @@ export async function resetPassword(formData: FormData) {
   revalidatePath('/', 'layout')
   redirect('/dashboard')
 }
+
 
