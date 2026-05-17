@@ -26,6 +26,16 @@ export default function NewProductPage() {
     setPreviews(prev => [...prev, ...files.map(f => URL.createObjectURL(f))])
   }
 
+  function handlePaste(e: React.ClipboardEvent) {
+    const items = Array.from(e.clipboardData?.items ?? [])
+    const imageItems = items.filter(item => item.type.startsWith("image/"))
+    if (imageItems.length === 0) return
+    const files = imageItems.map(item => item.getAsFile()).filter(Boolean) as File[]
+    if (files.length + images.length > 10) { setError("Maximo 10 fotos"); return }
+    setImages(prev => [...prev, ...files])
+    setPreviews(prev => [...prev, ...files.map(f => URL.createObjectURL(f))])
+  }
+
   function removeImage(i: number) {
     setImages(prev => prev.filter((_,j) => j !== i))
     setPreviews(prev => prev.filter((_,j) => j !== i))
@@ -48,20 +58,20 @@ export default function NewProductPage() {
     .np-header{background:#0B0B0B;border-radius:16px;padding:1.75rem 2rem;margin-bottom:1.5rem;border:1px solid rgba(212,175,55,.12);}
     .np-card{background:#151515;border-radius:16px;padding:1.75rem;border:1px solid rgba(212,175,55,.08);box-shadow:0 2px 8px rgba(0,0,0,.04);margin-bottom:1rem;}
     .np-label{display:block;font-size:11px;color:#999999;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px;font-family:'Poppins',sans-serif;}
-    .np-input{width:100%;padding:11px 14px;border:1px solid rgba(255,255,255,.1);border-radius:10px;font-size:14px;outline:none;font-family:'Poppins',sans-serif;color:#ffffff;box-sizing:border-box;transition:border-color .2s;}
+    .np-input{width:100%;padding:11px 14px;border:1px solid rgba(255,255,255,.1);border-radius:10px;font-size:14px;outline:none;font-family:'Poppins',sans-serif;color:#ffffff;background:#0f0f0f;box-sizing:border-box;transition:border-color .2s;}
     .np-input:focus{border-color:#D4AF37;}
     .np-select{width:100%;padding:11px 14px;border:1px solid rgba(255,255,255,.1);border-radius:10px;font-size:14px;outline:none;font-family:'Poppins',sans-serif;color:#ffffff;background:#151515;box-sizing:border-box;}
-    .np-textarea{width:100%;padding:11px 14px;border:1px solid rgba(255,255,255,.1);border-radius:10px;font-size:14px;outline:none;font-family:'Poppins',sans-serif;color:#ffffff;resize:vertical;box-sizing:border-box;}
+    .np-textarea{width:100%;padding:11px 14px;border:1px solid rgba(255,255,255,.1);border-radius:10px;font-size:14px;outline:none;font-family:'Poppins',sans-serif;color:#ffffff;resize:vertical;box-sizing:border-box;background:#0f0f0f;}
     .np-textarea:focus{border-color:#D4AF37;}
     .np-radio{display:flex;align-items:center;gap:8px;cursor:pointer;padding:12px 20px;border:1px solid rgba(255,255,255,.1);border-radius:10px;flex:1;justify-content:center;transition:all .2s;}
     .np-radio:hover{border-color:#D4AF37;}
     .np-btn-gold{flex:1;padding:14px;background:#D4AF37;color:#0B0B0B;border:none;cursor:pointer;font-size:14px;text-transform:uppercase;font-weight:700;border-radius:12px;font-family:'Poppins',sans-serif;transition:background .2s;}
     .np-btn-gold:hover{background:#e8c84a;}
     .np-btn-gold:disabled{opacity:.6;cursor:not-allowed;}
-    .np-btn-cancel{flex:1;padding:14px;background:#151515;color:#999999;border:1px solid rgba(0,0,0,.1);cursor:pointer;font-size:14px;border-radius:12px;font-family:'Poppins',sans-serif;transition:all .2s;}
+    .np-btn-cancel{flex:1;padding:14px;background:#151515;color:#999999;border:1px solid rgba(255,255,255,.08);cursor:pointer;font-size:14px;border-radius:12px;font-family:'Poppins',sans-serif;transition:all .2s;}
     .np-btn-cancel:hover{border-color:#D4AF37;color:#D4AF37;}
-    .np-drop{border:2px dashed rgba(0,0,0,.12);border-radius:12px;padding:2.5rem;text-align:center;cursor:pointer;transition:border-color .2s;}
-    .np-drop:hover{border-color:#D4AF37;}
+    .np-drop{border:2px dashed rgba(212,175,55,.2);border-radius:12px;padding:2.5rem;text-align:center;cursor:pointer;transition:border-color .2s;outline:none;}
+    .np-drop:hover,.np-drop:focus{border-color:#D4AF37;}
   `
 
   return (
@@ -130,38 +140,44 @@ export default function NewProductPage() {
               </div>
             </div>
 
-            <div className="np-card" style={{ border: `1px solid ${envioGratis ? "rgba(22,163,74,.3)" : "rgba(0,0,0,.06)"}`, background: envioGratis ? "rgba(22,163,74,.03)" : "#fff", cursor: "pointer", transition: "all .2s" }} onClick={() => setEnvioGratis(!envioGratis)}>
+            <div className="np-card" style={{ border: `1px solid ${envioGratis ? "rgba(22,163,74,.3)" : "rgba(212,175,55,.08)"}`, background: envioGratis ? "rgba(22,163,74,.05)" : "#151515", cursor: "pointer", transition: "all .2s" }} onClick={() => setEnvioGratis(!envioGratis)}>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
                   <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={envioGratis ? "#16a34a" : "#888"} strokeWidth="1.75">
                     <path d="M1 3h15v13H1z"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/>
                   </svg>
                   <div>
-                    <p style={{ fontSize: 14, fontWeight: 700, color: envioGratis ? "#16a34a" : "#111", fontFamily: "'Poppins',sans-serif" }}>Envio gratis</p>
+                    <p style={{ fontSize: 14, fontWeight: 700, color: envioGratis ? "#16a34a" : "#ffffff", fontFamily: "'Poppins',sans-serif" }}>Envio gratis</p>
                     <p style={{ fontSize: 12, color: "#999999", fontFamily: "'Poppins',sans-serif" }}>El cliente no paga envio — tu asumes el costo con Interrapidisimo</p>
                   </div>
                 </div>
-                <div style={{ width: 44, height: 24, borderRadius: 999, background: envioGratis ? "#16a34a" : "#ddd", position: "relative", transition: "all .2s", flexShrink: 0 }}>
-                  <div style={{ position: "absolute", top: 2, left: envioGratis ? 22 : 2, width: 20, height: 20, borderRadius: "50%", background: "#151515", transition: "all .2s", boxShadow: "0 1px 4px rgba(0,0,0,.2)" }} />
+                <div style={{ width: 44, height: 24, borderRadius: 999, background: envioGratis ? "#16a34a" : "#333", position: "relative", transition: "all .2s", flexShrink: 0 }}>
+                  <div style={{ position: "absolute", top: 2, left: envioGratis ? 22 : 2, width: 20, height: 20, borderRadius: "50%", background: "#fff", transition: "all .2s", boxShadow: "0 1px 4px rgba(0,0,0,.2)" }} />
                 </div>
               </div>
             </div>
 
             <div className="np-card">
               <label className="np-label">Fotos del producto (maximo 10)</label>
-              <div className="np-drop" onClick={() => document.getElementById("img-input")?.click()}>
+              <div
+                className="np-drop"
+                onClick={() => document.getElementById("img-input")?.click()}
+                onPaste={handlePaste}
+                tabIndex={0}
+              >
                 <input id="img-input" type="file" accept="image/*" multiple style={{ display: "none" }} onChange={handleImages} />
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#ccc" strokeWidth="1.25" style={{ marginBottom: 10 }}>
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#666" strokeWidth="1.25" style={{ marginBottom: 10 }}>
                   <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>
                 </svg>
-                <p style={{ fontSize: 14, color: "#999999", fontFamily: "'Poppins',sans-serif" }}>Clic para subir fotos</p>
-                <p style={{ fontSize: 12, color: "#D4AF37", marginTop: 4, fontFamily: "'Poppins',sans-serif" }}>{images.length}/10 fotos</p>
+                <p style={{ fontSize: 14, color: "#999999", fontFamily: "'Poppins',sans-serif", marginBottom: 4 }}>Clic para subir fotos</p>
+                <p style={{ fontSize: 12, color: "#888", fontFamily: "'Poppins',sans-serif", marginBottom: 4 }}>o pega una imagen con Ctrl+V</p>
+                <p style={{ fontSize: 12, color: "#D4AF37", fontFamily: "'Poppins',sans-serif" }}>{images.length}/10 fotos</p>
               </div>
               {previews.length > 0 && (
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(5,1fr)", gap: 8, marginTop: 12 }}>
                   {previews.map((preview, i) => (
                     <div key={i} style={{ position: "relative" }}>
-                      <img src={preview} style={{ width: "100%", aspectRatio: "1", objectFit: "cover", borderRadius: 10, border: "1px solid rgba(0,0,0,.08)" }} alt="" />
+                      <img src={preview} style={{ width: "100%", aspectRatio: "1", objectFit: "cover", borderRadius: 10, border: "1px solid rgba(212,175,55,.1)" }} alt="" />
                       <button type="button" onClick={() => removeImage(i)} style={{ position: "absolute", top: 4, right: 4, width: 22, height: 22, background: "#ef4444", color: "#fff", border: "none", cursor: "pointer", fontSize: 12, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center" }}>x</button>
                     </div>
                   ))}
