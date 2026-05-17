@@ -27,7 +27,7 @@ export default async function TiendaPage({ params }: { params: Promise<{ vendorI
       <nav style={{ padding: "0 clamp(1rem, 4vw, 2.5rem)", height: "68px", display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0, background: "#0B0B0B", zIndex: 50, boxShadow: "0 2px 20px rgba(0,0,0,0.3)" }}>
         <a href="/"><img src="https://awbepztacmvurjylfoas.supabase.co/storage/v1/object/public/assets/ChatGPT_Image_3_may_2026__21_13_12-removebg-preview.png" alt="DMS Market" style={{ height: "52px", width: "auto", objectFit: "contain" }} /></a>
         <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
-          <a href="/catalogo" style={{ fontSize: "0.8rem", color: "#D1D1D1", textDecoration: "none", padding: "0.5rem 0.75rem" }}>Catalogo</a>
+          <a href="/" style={{ fontSize: "0.8rem", color: "#D1D1D1", textDecoration: "none", padding: "0.5rem 0.75rem" }}>Catalogo</a>
           <a href="/auth/login" style={{ fontSize: "0.8rem", background: "#D4AF37", color: "#0B0B0B", padding: "0.6rem 1.25rem", textDecoration: "none", borderRadius: "8px", fontWeight: 700 }}>Ingresar</a>
         </div>
       </nav>
