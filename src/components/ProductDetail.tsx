@@ -36,7 +36,8 @@ export default function ProductDetail({ product, images, reviews: initialReviews
   const isAdmin = user?.user_metadata?.role === 'admin'
 
   function handleBuy() {
-    sessionStorage.setItem('checkout_item', JSON.stringify({ id: product.id, name: product.name, price: Number(product.price), quantity, image: images[0]?.url ?? null }))
+    window.location.href = '/checkout?id=' + product.id + '&qty=' + quantity
+  }))
     window.location.href = '/checkout'
   }
 
@@ -326,6 +327,7 @@ export default function ProductDetail({ product, images, reviews: initialReviews
     </div>
   )
 }
+
 
 
 
