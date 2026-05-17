@@ -278,3 +278,13 @@ export default function CheckoutPage() {
     </div>
   )
 }
+      <footer style={{ background: '#0B0B0B', borderTop: '1px solid rgba(212,175,55,.15)', marginTop: '4rem', padding: 'clamp(2rem, 4vw, 3rem) clamp(1rem, 4vw, 2.5rem)' }}>
+        <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+          <div style={{ borderTop: '1px solid rgba(255,255,255,.06)', paddingTop: '1.5rem', display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem' }}>
+            <p style={{ fontSize: '0.75rem', color: '#444' }}>2025 DMS Market. Colombia. Todos los derechos reservados.</p>
+            <p style={{ fontSize: '0.75rem', color: '#444' }}>Pagos procesados por Mercado Pago</p>
+          </div>
+        </div>
+      </footer>
+  )
+}
