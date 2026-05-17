@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
@@ -140,7 +140,7 @@ export default function RegisterProviderPage() {
     <div style={{ minHeight: '100vh', background: '#0f0f0f', fontFamily: 'sans-serif' }}>
 
       <nav style={{ borderBottom: '1px solid rgba(212,175,55,.12)', padding: '0 2rem', height: '56px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 0, background: '#0B0B0B', zIndex: 50 }}>
-        <a href="/" style={{ color: '#D4AF37', fontWeight: 700, fontSize: '1.1rem', letterSpacing: '2px', textDecoration: 'none' }}>DMS Market</a>
+        
         <Link href="/auth/login" style={{ fontSize: '0.8rem', color: '#999', textDecoration: 'none' }}>Ya tengo cuenta</Link>
       </nav>
 
@@ -148,7 +148,7 @@ export default function RegisterProviderPage() {
 
         <div style={{ marginBottom: '2rem' }}>
           <p style={{ fontSize: '0.65rem', letterSpacing: '3px', textTransform: 'uppercase', color: '#D4AF37', marginBottom: '0.5rem' }}>
-            {step === 1 ? 'Paso 1 de 2 — Cuenta' : 'Paso 2 de 2 — Tu servicio'}
+            {step === 1 ? 'Paso 1 de 2 â€” Cuenta' : 'Paso 2 de 2 â€” Tu servicio'}
           </p>
           <h1 style={{ fontSize: '2rem', fontWeight: 700, color: '#fff', marginBottom: '0.5rem' }}>
             {step === 1 ? 'Publica tu servicio' : 'Datos de tu servicio'}
@@ -202,7 +202,7 @@ export default function RegisterProviderPage() {
                 </div>
                 <div>
                   <p style={{ fontSize: '0.8rem', color: '#cccccc', marginBottom: '0.25rem' }}>Sube tu foto para generar confianza</p>
-                  <p style={{ fontSize: '0.75rem', color: '#666' }}>JPG o PNG — max 2MB</p>
+                  <p style={{ fontSize: '0.75rem', color: '#666' }}>JPG o PNG â€” max 2MB</p>
                 </div>
                 <input id="avatar-input" type="file" accept="image/*" style={{ display: 'none' }} onChange={handleAvatarImage} />
               </div>
@@ -263,7 +263,7 @@ export default function RegisterProviderPage() {
                   ? <img src={servicePreview} alt="Servicio" style={{ maxWidth: '100%', maxHeight: '200px', objectFit: 'contain', borderRadius: '4px' }} />
                   : <>
                       <p style={{ fontSize: '0.875rem', color: '#888', marginBottom: '0.25rem' }}>Sube una foto de tu trabajo o servicio</p>
-                      <p style={{ fontSize: '0.75rem', color: '#D4AF37' }}>JPG o PNG — max 5MB</p>
+                      <p style={{ fontSize: '0.75rem', color: '#D4AF37' }}>JPG o PNG â€” max 5MB</p>
                     </>
                 }
               </div>
