@@ -60,7 +60,7 @@ function ProductContent() {
   async function handleAddToCart() {
     setAdding(true)
     const { data: { user } } = await supabase.auth.getUser()
-    if (!user) { router.push('/auth/login'); return }
+    if (!user) { router.push(`/auth/login?redirect=/producto/detalle?id=${id}`); return }
     await supabase.from('carts').upsert(
       { buyer_id: user.id, product_id: product.id, quantity },
       { onConflict: 'buyer_id,product_id' }
@@ -73,7 +73,7 @@ function ProductContent() {
   async function handleBuyNow() {
     setAdding(true)
     const { data: { user } } = await supabase.auth.getUser()
-    if (!user) { router.push('/auth/login'); return }
+    if (!user) { router.push(`/auth/login?redirect=/producto/detalle?id=${id}`); return }
     const checkoutItem = {
       id: product.id,
       name: product.name,
@@ -91,7 +91,7 @@ function ProductContent() {
     e.preventDefault()
     setSubmittingReview(true)
     const { data: { user } } = await supabase.auth.getUser()
-    if (!user) { router.push('/auth/login'); return }
+    if (!user) { router.push(`/auth/login?redirect=/producto/detalle?id=${id}`); return }
     await supabase.from('reviews').insert({
       product_id: product.id,
       buyer_id: user.id,
@@ -174,13 +174,21 @@ function ProductContent() {
 
             {avgRating && (
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem' }}>
-                <span style={{ color: '#C9A84C', fontSize: '0.875rem' }}>{'★'.repeat(Math.round(Number(avgRating)))}</span>
-                <span style={{ fontSize: '0.75rem', color: '#888' }}>{avgRating} ({reviews.length} resenas)</span>
+                <div style={{ display: 'flex', gap: '2px' }}>
+                  {[1,2,3,4,5].map(s => (
+                    <svg key={s} width="14" height="14" viewBox="0 0 24 24" fill={s <= Math.round(Number(avgRating)) ? '#C9A84C' : '#e5e5e5'}>
+                      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                    </svg>
+                  ))}
+                </div>
+                <span style={{ fontSize: '0.75rem', color: '#888' }}>{avgRating} ({reviews.length} reseñas)</span>
               </div>
             )}
 
             <div style={{ fontSize: 'clamp(1.5rem, 4vw, 2rem)', fontWeight: 700, color: '#111', marginBottom: '0.25rem' }}>{formattedPrice} <span style={{ fontSize: '0.875rem', fontWeight: 400, color: '#888' }}>COP</span></div>
-            <p style={{ fontSize: '0.75rem', color: '#1D9E75', marginBottom: '1rem', fontWeight: 500 }}>Envio a cargo del comprador</p>
+            <p style={{ fontSize: '0.75rem', color: '#1D9E75', marginBottom: '1rem', fontWeight: 500 }}>
+              {product.envio_gratis ? 'Envío gratis' : 'Envío a cargo del comprador'}
+            </p>
 
             <div style={{ background: '#f8f8f8', border: '1px solid #eee', borderRadius: '8px', padding: '1rem', marginBottom: '1rem' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', marginBottom: '0.5rem' }}>
@@ -192,8 +200,8 @@ function ProductContent() {
                 <span style={{ color: '#111', fontWeight: 500 }}>{quantity}</span>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', marginBottom: '0.75rem', paddingBottom: '0.75rem', borderBottom: '1px solid #eee' }}>
-                <span style={{ color: '#666' }}>Envio</span>
-                <span style={{ color: '#C9A84C', fontWeight: 500 }}>A cargo del comprador</span>
+                <span style={{ color: '#666' }}>Envío</span>
+                <span style={{ color: '#C9A84C', fontWeight: 500 }}>{product.envio_gratis ? 'Gratis' : 'A cargo del comprador'}</span>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.9rem' }}>
                 <span style={{ color: '#111', fontWeight: 700 }}>Total</span>
@@ -214,12 +222,12 @@ function ProductContent() {
             {/* Botones */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginBottom: '1rem' }}>
               <button onClick={handleBuyNow} disabled={adding}
-                style={{ width: '100%', padding: '1rem', background: adding ? '#e5e5e5' : '#C9A84C', color: adding ? '#999' : '#fff', border: 'none', fontSize: '0.875rem', fontWeight: 700, letterSpacing: '1px', textTransform: 'uppercase', cursor: adding ? 'not-allowed' : 'pointer', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
+                style={{ width: '100%', padding: '1rem', background: adding ? '#e5e5e5' : '#C9A84C', color: adding ? '#999' : '#fff', border: 'none', fontSize: '0.875rem', fontWeight: 700, letterSpacing: '1px', textTransform: 'uppercase', cursor: adding ? 'not-allowed' : 'pointer', borderRadius: '8px' }}>
                 {adding ? 'Procesando...' : 'COMPRAR AHORA'}
               </button>
               <button onClick={handleAddToCart} disabled={adding}
-                style={{ width: '100%', padding: '1rem', background: '#fff', color: '#C9A84C', border: '2px solid #C9A84C', fontSize: '0.875rem', fontWeight: 700, letterSpacing: '1px', textTransform: 'uppercase', cursor: adding ? 'not-allowed' : 'pointer', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
-                {added ? 'Agregado' : 'AGREGAR AL CARRITO'}
+                style={{ width: '100%', padding: '1rem', background: '#fff', color: '#C9A84C', border: '2px solid #C9A84C', fontSize: '0.875rem', fontWeight: 700, letterSpacing: '1px', textTransform: 'uppercase', cursor: adding ? 'not-allowed' : 'pointer', borderRadius: '8px' }}>
+                {added ? 'Agregado ✓' : 'AGREGAR AL CARRITO'}
               </button>
               {added && (
                 <a href="/carrito" style={{ textAlign: 'center', fontSize: '0.8rem', color: '#C9A84C', textDecoration: 'none', fontWeight: 500 }}>Ver mi carrito</a>
@@ -252,9 +260,7 @@ function ProductContent() {
                 Transportadora preferida
               </label>
               <select value={transportadora} onChange={e => setTransportadora(e.target.value)}
-                style={{ width: '100%', padding: '0.75rem 1rem', border: '1px solid #ddd', fontSize: '0.875rem', color: '#111', outline: 'none', background: '#fafafa', boxSizing: 'border-box', borderRadius: '6px' }}
-                onFocus={e => (e.target.style.borderColor = '#C9A84C')}
-                onBlur={e => (e.target.style.borderColor = '#ddd')}>
+                style={{ width: '100%', padding: '0.75rem 1rem', border: '1px solid #ddd', fontSize: '0.875rem', color: '#111', outline: 'none', background: '#fafafa', boxSizing: 'border-box', borderRadius: '6px' }}>
                 {transportadoras.map(t => <option key={t} value={t}>{t}</option>)}
               </select>
             </div>
@@ -279,19 +285,19 @@ function ProductContent() {
 
         {/* Descripcion */}
         <div style={{ marginTop: '2.5rem', padding: '1.5rem', background: '#fafafa', border: '1px solid #f0f0f0', borderRadius: '8px' }}>
-          <h2 style={{ fontSize: '1rem', fontWeight: 600, color: '#111', marginBottom: '1rem' }}>Descripcion del producto</h2>
+          <h2 style={{ fontSize: '1rem', fontWeight: 600, color: '#111', marginBottom: '1rem' }}>Descripción del producto</h2>
           <p style={{ fontSize: '0.875rem', color: '#555', lineHeight: 1.8 }}>{product.description}</p>
         </div>
 
         {/* RESENAS */}
         <div style={{ marginTop: '2.5rem', borderTop: '1px solid #f0f0f0', paddingTop: '2rem' }}>
           <h2 style={{ fontSize: '1.1rem', fontWeight: 600, color: '#111', marginBottom: '1.5rem' }}>
-            Resenas
+            Reseñas
             {avgRating && <span style={{ fontSize: '0.875rem', color: '#C9A84C', marginLeft: '0.75rem', fontWeight: 400 }}>★ {avgRating}</span>}
           </h2>
 
           <form onSubmit={handleReview} style={{ background: '#fafafa', border: '1px solid #f0f0f0', padding: '1.25rem', borderRadius: '8px', marginBottom: '1.5rem' }}>
-            <p style={{ fontSize: '0.75rem', color: '#888', marginBottom: '0.75rem' }}>Deja tu resena</p>
+            <p style={{ fontSize: '0.75rem', color: '#888', marginBottom: '0.75rem' }}>Deja tu reseña</p>
             <div style={{ display: 'flex', gap: '0.25rem', marginBottom: '0.75rem' }}>
               {[1, 2, 3, 4, 5].map(star => (
                 <button key={star} type="button" onClick={() => setReviewRating(star)}
@@ -301,24 +307,28 @@ function ProductContent() {
               ))}
             </div>
             <textarea value={reviewText} onChange={e => setReviewText(e.target.value)} required rows={3}
-              placeholder="Cuentanos tu experiencia..."
-              style={{ width: '100%', padding: '0.75rem 1rem', border: '1px solid #ddd', fontSize: '0.875rem', color: '#111', outline: 'none', resize: 'vertical', fontFamily: 'sans-serif', boxSizing: 'border-box', marginBottom: '0.75rem', borderRadius: '6px' }}
-              onFocus={e => (e.target.style.borderColor = '#C9A84C')}
-              onBlur={e => (e.target.style.borderColor = '#ddd')} />
+              placeholder="Cuéntanos tu experiencia..."
+              style={{ width: '100%', padding: '0.75rem 1rem', border: '1px solid #ddd', fontSize: '0.875rem', color: '#111', outline: 'none', resize: 'vertical', fontFamily: 'sans-serif', boxSizing: 'border-box', marginBottom: '0.75rem', borderRadius: '6px' }} />
             <button type="submit" disabled={submittingReview}
               style={{ padding: '0.75rem 1.5rem', background: submittingReview ? '#e5e5e5' : '#C9A84C', color: submittingReview ? '#999' : '#fff', border: 'none', fontSize: '0.75rem', fontWeight: 700, letterSpacing: '1px', textTransform: 'uppercase', cursor: submittingReview ? 'not-allowed' : 'pointer', borderRadius: '6px' }}>
-              {submittingReview ? 'Enviando...' : 'Publicar resena'}
+              {submittingReview ? 'Enviando...' : 'Publicar reseña'}
             </button>
           </form>
 
           {reviews.length === 0 ? (
-            <p style={{ color: '#aaa', fontSize: '0.875rem', textAlign: 'center', padding: '2rem' }}>No hay resenas aun.</p>
+            <p style={{ color: '#aaa', fontSize: '0.875rem', textAlign: 'center', padding: '2rem' }}>No hay reseñas aún.</p>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
               {reviews.map((review: any) => (
                 <div key={review.id} style={{ padding: '1rem', border: '1px solid #f0f0f0', borderRadius: '8px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
-                    <span style={{ color: '#C9A84C', fontSize: '0.875rem' }}>{'★'.repeat(review.rating)}{'☆'.repeat(5 - review.rating)}</span>
+                    <div style={{ display: 'flex', gap: '2px' }}>
+                      {[1,2,3,4,5].map(s => (
+                        <svg key={s} width="14" height="14" viewBox="0 0 24 24" fill={s <= review.rating ? '#C9A84C' : '#e5e5e5'}>
+                          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                        </svg>
+                      ))}
+                    </div>
                     <span style={{ fontSize: '0.75rem', color: '#aaa' }}>{new Date(review.created_at).toLocaleDateString('es-CO')}</span>
                   </div>
                   {review.comment && <p style={{ fontSize: '0.875rem', color: '#555', lineHeight: 1.6 }}>{review.comment}</p>}
