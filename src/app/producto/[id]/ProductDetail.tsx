@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
@@ -30,12 +30,8 @@ export default function ProductDetail({ product, images, reviews, avgRating, use
     setAdding(false)
   }
 
-  async function handleBuyNow() {
-    setAdding(true)
-    if (!user) { router.push('/auth/login'); return }
-    await supabase.from('carts').upsert({ buyer_id: user.id, product_id: product.id, quantity }, { onConflict: 'buyer_id,product_id' })
-    router.push('/checkout')
-    setAdding(false)
+  function handleBuyNow() {
+    window.location.href = '/checkout?id=' + product.id + '&qty=' + quantity
   }
 
   async function handleReview(e: React.FormEvent) {
