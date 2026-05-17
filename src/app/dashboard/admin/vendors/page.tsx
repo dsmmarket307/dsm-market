@@ -114,42 +114,42 @@ export default async function AdminVendorsPage() {
               </div>
 
               {/* Datos de contacto */}
-              <div style={{ padding: "1rem 1.25rem", background: "#fafafa", borderTop: "1px solid #f0f0f0", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: "0.75rem" }}>
+              <div style={{ padding: "1rem 1.25rem", background: "#1a1a1a", borderTop: "1px solid rgba(212,175,55,.1)", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: "0.75rem" }}>
                 <div>
-                  <p style={{ fontSize: "0.6rem", textTransform: "uppercase", letterSpacing: "1px", color: "#aaa", marginBottom: "0.25rem" }}>Celular</p>
+                  <p style={{ fontSize: "0.6rem", textTransform: "uppercase", letterSpacing: "1px", color: "#888888", marginBottom: "0.25rem" }}>Celular</p>
                   <p style={{ fontSize: "0.875rem", color: "#ffffff" }}>{vendor.celular ?? vendor.phone ?? "No registrado"}</p>
                 </div>
                 <div>
-                  <p style={{ fontSize: "0.6rem", textTransform: "uppercase", letterSpacing: "1px", color: "#aaa", marginBottom: "0.25rem" }}>Cedula</p>
+                  <p style={{ fontSize: "0.6rem", textTransform: "uppercase", letterSpacing: "1px", color: "#888888", marginBottom: "0.25rem" }}>Cedula</p>
                   <p style={{ fontSize: "0.875rem", color: "#ffffff" }}>{vendor.cedula ?? "No registrada"}</p>
                 </div>
                 <div>
-                  <p style={{ fontSize: "0.6rem", textTransform: "uppercase", letterSpacing: "1px", color: "#aaa", marginBottom: "0.25rem" }}>Ciudad</p>
+                  <p style={{ fontSize: "0.6rem", textTransform: "uppercase", letterSpacing: "1px", color: "#888888", marginBottom: "0.25rem" }}>Ciudad</p>
                   <p style={{ fontSize: "0.875rem", color: "#ffffff" }}>{vendor.ciudad ?? vendor.city ?? "No registrada"}</p>
                 </div>
                 <div>
-                  <p style={{ fontSize: "0.6rem", textTransform: "uppercase", letterSpacing: "1px", color: "#aaa", marginBottom: "0.25rem" }}>Direccion</p>
+                  <p style={{ fontSize: "0.6rem", textTransform: "uppercase", letterSpacing: "1px", color: "#888888", marginBottom: "0.25rem" }}>Direccion</p>
                   <p style={{ fontSize: "0.875rem", color: "#ffffff" }}>{vendor.direccion ?? "No registrada"}</p>
                 </div>
               </div>
 
               {/* Datos bancarios */}
-              <div style={{ padding: "1rem 1.25rem", background: "#fffbeb", borderTop: "1px solid #fef3c7", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: "0.75rem" }}>
+              <div style={{ padding: "1rem 1.25rem", background: "#1a1500", borderTop: "1px solid rgba(212,175,55,.15)", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: "0.75rem" }}>
                 <div>
-                  <p style={{ fontSize: "0.6rem", textTransform: "uppercase", letterSpacing: "1px", color: "#92400e", marginBottom: "0.25rem" }}>Banco</p>
+                  <p style={{ fontSize: "0.6rem", textTransform: "uppercase", letterSpacing: "1px", color: "#D4AF37", marginBottom: "0.25rem" }}>Banco</p>
                   <p style={{ fontSize: "0.875rem", color: "#ffffff", fontWeight: 500 }}>{vendor.banco ?? "No registrado"}</p>
                 </div>
                 <div>
-                  <p style={{ fontSize: "0.6rem", textTransform: "uppercase", letterSpacing: "1px", color: "#92400e", marginBottom: "0.25rem" }}>Tipo de cuenta</p>
+                  <p style={{ fontSize: "0.6rem", textTransform: "uppercase", letterSpacing: "1px", color: "#D4AF37", marginBottom: "0.25rem" }}>Tipo de cuenta</p>
                   <p style={{ fontSize: "0.875rem", color: "#ffffff", fontWeight: 500, textTransform: "capitalize" }}>{vendor.tipo_cuenta ?? "No registrado"}</p>
                 </div>
                 <div>
-                  <p style={{ fontSize: "0.6rem", textTransform: "uppercase", letterSpacing: "1px", color: "#92400e", marginBottom: "0.25rem" }}>Numero de cuenta</p>
+                  <p style={{ fontSize: "0.6rem", textTransform: "uppercase", letterSpacing: "1px", color: "#D4AF37", marginBottom: "0.25rem" }}>Numero de cuenta</p>
                   <p style={{ fontSize: "0.875rem", color: "#ffffff", fontWeight: 500 }}>{vendor.numero_cuenta ?? "No registrado"}</p>
                 </div>
                 {vendor.documento_url && (
                   <div>
-                    <p style={{ fontSize: "0.6rem", textTransform: "uppercase", letterSpacing: "1px", color: "#92400e", marginBottom: "0.25rem" }}>Documento</p>
+                    <p style={{ fontSize: "0.6rem", textTransform: "uppercase", letterSpacing: "1px", color: "#D4AF37", marginBottom: "0.25rem" }}>Documento</p>
                     <a href={vendor.documento_url} target="_blank" style={{ fontSize: "0.875rem", color: "#D4AF37", fontWeight: 600, textDecoration: "none" }}>Ver documento</a>
                   </div>
                 )}
@@ -162,5 +162,6 @@ export default async function AdminVendorsPage() {
     </div>
   )
 }
+
 
 
