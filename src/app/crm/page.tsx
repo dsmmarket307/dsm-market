@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
@@ -72,7 +72,7 @@ export default function CRMDashboard() {
               { label: 'Ganancias totales', value: '$' + stats.gananciasTotal.toLocaleString('es-CO'), color: '#C9A84C' },
               { label: 'Ganancias este mes', value: '$' + stats.gananciasMes.toLocaleString('es-CO'), color: '#C9A84C' },
             ].map(stat => (
-              <div key={stat.label} style={{ background: '#fff', border: '1px solid #eee', borderRadius: '12px', padding: '1.25rem', boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
+              <div key={stat.label} style={{ background: '#fff', border: '1px solid rgba(212,175,55,.08)', borderRadius: '12px', padding: '1.25rem', boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
                 <p style={{ fontSize: '0.7rem', color: '#aaa', textTransform: 'uppercase', letterSpacing: '1px', margin: '0 0 0.5rem' }}>{stat.label}</p>
                 <p style={{ fontSize: '1.5rem', fontWeight: 700, color: stat.color, margin: 0 }}>{stat.value}</p>
               </div>
@@ -80,29 +80,29 @@ export default function CRMDashboard() {
           </div>
 
           {/* PEDIDOS RECIENTES */}
-          <div style={{ background: '#fff', border: '1px solid #eee', borderRadius: '12px', padding: '1.5rem', boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
+          <div style={{ background: '#fff', border: '1px solid rgba(212,175,55,.08)', borderRadius: '12px', padding: '1.5rem', boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
               <h2 style={{ fontSize: '1rem', fontWeight: 700, color: '#111', margin: 0 }}>Pedidos recientes</h2>
-              <a href="/crm/pedidos" style={{ fontSize: '0.8rem', color: '#C9A84C', textDecoration: 'none', fontWeight: 600 }}>Ver todos →</a>
+              <a href="/crm/pedidos" style={{ fontSize: '0.8rem', color: '#C9A84C', textDecoration: 'none', fontWeight: 600 }}>Ver todos â†’</a>
             </div>
 
             {pedidosRecientes.length === 0 ? (
-              <p style={{ color: '#aaa', fontSize: '0.875rem', textAlign: 'center', padding: '2rem 0' }}>No hay pedidos aún</p>
+              <p style={{ color: '#aaa', fontSize: '0.875rem', textAlign: 'center', padding: '2rem 0' }}>No hay pedidos aÃºn</p>
             ) : (
               <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
                 <thead>
-                  <tr style={{ borderBottom: '1px solid #f0f0f0' }}>
-                    {['Código', 'Cliente', 'Producto', 'Ganancia', 'Estado'].map(h => (
+                  <tr style={{ borderBottom: '1px solid rgba(255,255,255,.06)' }}>
+                    {['CÃ³digo', 'Cliente', 'Producto', 'Ganancia', 'Estado'].map(h => (
                       <th key={h} style={{ textAlign: 'left', padding: '0.5rem 0.75rem', fontSize: '0.7rem', color: '#aaa', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: 600 }}>{h}</th>
                     ))}
                   </tr>
                 </thead>
                 <tbody>
                   {pedidosRecientes.map(p => (
-                    <tr key={p.id} style={{ borderBottom: '1px solid #f9f9f9' }}>
-                      <td style={{ padding: '0.75rem', color: '#C9A84C', fontWeight: 600 }}>{p.codigo ?? '—'}</td>
-                      <td style={{ padding: '0.75rem', color: '#111' }}>{p.cliente_nombre ?? '—'}</td>
-                      <td style={{ padding: '0.75rem', color: '#555' }}>{p.producto_nombre ?? '—'}</td>
+                    <tr key={p.id} style={{ borderBottom: '1px solid rgba(255,255,255,.04)' }}>
+                      <td style={{ padding: '0.75rem', color: '#C9A84C', fontWeight: 600 }}>{p.codigo ?? 'â€”'}</td>
+                      <td style={{ padding: '0.75rem', color: '#111' }}>{p.cliente_nombre ?? 'â€”'}</td>
+                      <td style={{ padding: '0.75rem', color: '#555' }}>{p.producto_nombre ?? 'â€”'}</td>
                       <td style={{ padding: '0.75rem', color: '#111', fontWeight: 600 }}>${(p.ganancia ?? 0).toLocaleString('es-CO')}</td>
                       <td style={{ padding: '0.75rem' }}>
                         <span style={{ background: estadoColor[p.estado] + '20', color: estadoColor[p.estado], padding: '0.25rem 0.75rem', borderRadius: '999px', fontSize: '0.72rem', fontWeight: 600 }}>
