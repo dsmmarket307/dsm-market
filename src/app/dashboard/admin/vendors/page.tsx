@@ -134,7 +134,7 @@ export default async function AdminVendorsPage() {
               </div>
 
               {/* Datos bancarios */}
-              <div style={{ padding: "1rem 1.25rem", background: "#1a1500", borderTop: "1px solid rgba(212,175,55,.15)", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: "0.75rem" }}>
+              <div style={{ padding: "1rem 1.25rem", background: "#1a1600", borderTop: "1px solid rgba(212,175,55,.15)", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: "0.75rem" }}>
                 <div>
                   <p style={{ fontSize: "0.6rem", textTransform: "uppercase", letterSpacing: "1px", color: "#D4AF37", marginBottom: "0.25rem" }}>Banco</p>
                   <p style={{ fontSize: "0.875rem", color: "#ffffff", fontWeight: 500 }}>{vendor.banco ?? "No registrado"}</p>
@@ -162,6 +162,7 @@ export default async function AdminVendorsPage() {
     </div>
   )
 }
+
 
 
 
