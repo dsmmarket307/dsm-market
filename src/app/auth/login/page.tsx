@@ -23,7 +23,7 @@ function LoginForm() {
 
   return (
     <div>
-      <div style={{ marginBottom: '2rem' }}>
+      <div style={{ marginBottom: '2rem', textAlign: 'center' }}>
         <p style={{ fontSize: '0.65rem', letterSpacing: '3px', textTransform: 'uppercase', color: '#D4AF37', marginBottom: '0.5rem', fontWeight: 600 }}>
           Bienvenido de vuelta
         </p>
@@ -108,3 +108,4 @@ export default function LoginPage() {
     </Suspense>
   )
 }
+
