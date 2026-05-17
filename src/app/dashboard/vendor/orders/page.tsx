@@ -25,21 +25,21 @@ export default async function VendorOrdersPage() {
 
   const css = `
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
-    .vo-root{background:#F5F5F5;min-height:100vh;font-family:'Poppins',sans-serif;padding:2rem;}
+    .vo-root{background:#0f0f0f;min-height:100vh;font-family:'Poppins',sans-serif;padding:2rem;}
     .vo-inner{max-width:1000px;margin:0 auto;}
     .vo-header{background:#0B0B0B;border-radius:16px;padding:1.75rem 2rem;margin-bottom:1.5rem;border:1px solid rgba(212,175,55,.12);}
-    .vo-card{background:#fff;border-radius:16px;border:1px solid rgba(0,0,0,.06);box-shadow:0 2px 8px rgba(0,0,0,.04);margin-bottom:1.25rem;overflow:hidden;}
-    .vo-card-top{padding:1.25rem 1.5rem;display:flex;justify-content:space-between;align-items:flex-start;border-bottom:1px solid rgba(0,0,0,.06);flex-wrap:wrap;gap:1rem;}
+    .vo-card{background:#151515;border-radius:16px;border:1px solid rgba(212,175,55,.08);box-shadow:0 2px 8px rgba(0,0,0,.04);margin-bottom:1.25rem;overflow:hidden;}
+    .vo-card-top{padding:1.25rem 1.5rem;display:flex;justify-content:space-between;align-items:flex-start;border-bottom:1px solid rgba(212,175,55,.08);flex-wrap:wrap;gap:1rem;}
     .vo-badge{font-size:11px;padding:4px 12px;border-radius:999px;font-weight:600;font-family:'Poppins',sans-serif;}
-    .vo-section{padding:1.25rem 1.5rem;border-bottom:1px solid rgba(0,0,0,.06);}
+    .vo-section{padding:1.25rem 1.5rem;border-bottom:1px solid rgba(212,175,55,.08);}
     .vo-section-title{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#D4AF37;margin-bottom:12px;font-weight:700;font-family:'Poppins',sans-serif;}
     .vo-grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:13.5px;}
-    .vo-label{color:#888;font-family:'Poppins',sans-serif;}
-    .vo-value{color:#111;font-weight:600;font-family:'Poppins',sans-serif;}
+    .vo-label{color:#999999;font-family:'Poppins',sans-serif;}
+    .vo-value{color:#ffffff;font-weight:600;font-family:'Poppins',sans-serif;}
     .vo-fee-row{display:flex;justify-content:space-between;font-size:13px;padding:4px 0;font-family:'Poppins',sans-serif;}
-    .vo-input{width:100%;padding:10px 14px;border:1px solid rgba(0,0,0,.12);border-radius:10px;font-size:13.5px;outline:none;font-family:'Poppins',sans-serif;background:#fff;color:#111;}
+    .vo-input{width:100%;padding:10px 14px;border:1px solid rgba(0,0,0,.12);border-radius:10px;font-size:13.5px;outline:none;font-family:'Poppins',sans-serif;background:#151515;color:#ffffff;}
     .vo-input:focus{border-color:#D4AF37;}
-    .vo-select{width:100%;padding:10px 14px;border:1px solid rgba(0,0,0,.12);border-radius:10px;font-size:13.5px;outline:none;font-family:'Poppins',sans-serif;background:#fff;color:#111;}
+    .vo-select{width:100%;padding:10px 14px;border:1px solid rgba(0,0,0,.12);border-radius:10px;font-size:13.5px;outline:none;font-family:'Poppins',sans-serif;background:#151515;color:#ffffff;}
     .vo-submit{padding:10px 24px;background:#D4AF37;color:#0B0B0B;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Poppins',sans-serif;transition:background .2s;white-space:nowrap;}
     .vo-submit:hover{background:#e8c84a;}
   `
@@ -104,7 +104,7 @@ export default async function VendorOrdersPage() {
                     <div className="vo-fee-row"><span style={{ color: "#555" }}>Valor del producto</span><span style={{ fontWeight: 600, color: "#111" }}>${total.toLocaleString("es-CO")}</span></div>
                     <div className="vo-fee-row"><span style={{ color: "#ef4444" }}>Comision DSM (5%)</span><span style={{ color: "#ef4444" }}>- ${dsmFee.toLocaleString("es-CO")}</span></div>
                     <div className="vo-fee-row"><span style={{ color: "#ef4444" }}>Comision MP (3.29% + IVA + $952)</span><span style={{ color: "#ef4444" }}>- ${mpTotal.toLocaleString("es-CO")}</span></div>
-                    <div className="vo-fee-row" style={{ borderTop: "1px solid rgba(0,0,0,.08)", marginTop: 6, paddingTop: 8 }}>
+                    <div className="vo-fee-row" style={{ borderTop: "1px solid rgba(212,175,55,.1)", marginTop: 6, paddingTop: 8 }}>
                       <span style={{ fontWeight: 700, color: "#111" }}>Lo que recibes</span>
                       <span style={{ fontWeight: 700, color: "#1D9E75", fontSize: 16 }}>${neto.toLocaleString("es-CO")}</span>
                     </div>
@@ -152,3 +152,4 @@ export default async function VendorOrdersPage() {
     </>
   )
 }
+
