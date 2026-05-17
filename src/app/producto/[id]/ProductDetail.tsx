@@ -2,58 +2,25 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { supabase } from '@/lib/supabase'
+import { createClient } from '@/lib/supabase/client'
 
-interface Product {
-  id: string
-  name: string
-  description: string
-  price: number
-  category: string
-  status: string
-  seller_id: string
-}
-
-interface Image {
-  id: string
-  url: string
-  position: number
-}
-
-interface Seller {
-  id: string
-  full_name: string
-  avatar_url: string | null
-}
-
-interface Props {
-  product: Product
-  images: Image[]
-  seller: Seller | null
-}
-
-export default function ProductDetail({ product, images, seller }: Props) {
+export default function ProductDetail({ product, images, reviews, avgRating, user }: any) {
   const [currentImage, setCurrentImage] = useState(0)
   const [quantity, setQuantity] = useState(1)
   const [adding, setAdding] = useState(false)
   const [added, setAdded] = useState(false)
   const router = useRouter()
+  const supabase = createClient()
 
-  const formattedPrice = new Intl.NumberFormat('es-CO', {
-    style: 'currency',
-    currency: 'COP',
-    minimumFractionDigits: 0,
-  }).format(product.price)
+  const formattedPrice = new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 }).format(product.price)
+  const formattedOriginal = product.original_price ? new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 }).format(product.original_price) : null
+  const discount = product.original_price && Number(product.original_price) > Number(product.price)
+    ? Math.round((1 - Number(product.price) / Number(product.original_price)) * 100) : 0
 
   async function handleAddToCart() {
     setAdding(true)
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) { router.push('/login'); return }
-    await supabase.from('carts').upsert({
-      buyer_id: user.id,
-      product_id: product.id,
-      quantity,
-    }, { onConflict: 'buyer_id,product_id' })
+    if (!user) { router.push('/auth/login'); return }
+    await supabase.from('carts').upsert({ buyer_id: user.id, product_id: product.id, quantity }, { onConflict: 'buyer_id,product_id' })
     setAdded(true)
     setTimeout(() => setAdded(false), 2500)
     setAdding(false)
@@ -61,149 +28,215 @@ export default function ProductDetail({ product, images, seller }: Props) {
 
   async function handleBuyNow() {
     setAdding(true)
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) { router.push('/login'); return }
-    await supabase.from('carts').upsert({
-      buyer_id: user.id,
-      product_id: product.id,
-      quantity,
-    }, { onConflict: 'buyer_id,product_id' })
+    if (!user) { router.push('/auth/login'); return }
+    await supabase.from('carts').upsert({ buyer_id: user.id, product_id: product.id, quantity }, { onConflict: 'buyer_id,product_id' })
     router.push('/checkout')
     setAdding(false)
   }
 
   return (
-    <div className="min-h-screen bg-white">
-      <div className="max-w-6xl mx-auto px-4 py-10">
-        <nav className="text-sm text-gray-400 mb-8 flex items-center gap-2">
-          <a href="/" className="hover:text-gray-600 transition-colors">Inicio</a>
-          <span>/</span>
-          <a href="/catalogo" className="hover:text-gray-600 transition-colors">Catalogo</a>
-          <span>/</span>
-          <span className="text-gray-700">{product.name}</span>
-        </nav>
+    <div style={{ minHeight: '100vh', background: '#fff', fontFamily: "'Segoe UI', sans-serif" }}>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+      {/* NAVBAR */}
+      <nav style={{ padding: '0 clamp(1rem, 4vw, 2.5rem)', height: '68px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 0, background: '#0B0B0B', zIndex: 50, boxShadow: '0 2px 20px rgba(0,0,0,0.3)' }}>
+        <a href="/"><img src="https://awbepztacmvurjylfoas.supabase.co/storage/v1/object/public/assets/ChatGPT_Image_3_may_2026__21_13_12-removebg-preview.png" alt="DMS Market" style={{ height: '52px', width: 'auto', objectFit: 'contain' }} /></a>
+        <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+          <a href="/catalogo" style={{ fontSize: '0.8rem', color: '#D1D1D1', textDecoration: 'none', padding: '0.5rem 0.75rem' }}>Catalogo</a>
+          <a href="/servicios" style={{ fontSize: '0.8rem', color: '#D1D1D1', textDecoration: 'none', padding: '0.5rem 0.75rem' }}>Servicios</a>
+          {user
+            ? <a href="/dashboard" style={{ fontSize: '0.8rem', background: '#D4AF37', color: '#0B0B0B', padding: '0.6rem 1.25rem', textDecoration: 'none', borderRadius: '8px', fontWeight: 700 }}>Mi cuenta</a>
+            : <a href="/auth/login" style={{ fontSize: '0.8rem', background: '#D4AF37', color: '#0B0B0B', padding: '0.6rem 1.25rem', textDecoration: 'none', borderRadius: '8px', fontWeight: 700 }}>Ingresar</a>
+          }
+        </div>
+      </nav>
+
+      {/* BREADCRUMB */}
+      <div style={{ background: '#f8f8f8', padding: '0.75rem clamp(1rem, 4vw, 2.5rem)', borderBottom: '1px solid #eee' }}>
+        <div style={{ maxWidth: '1200px', margin: '0 auto', display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.8rem', color: '#888' }}>
+          <a href="/" style={{ color: '#888', textDecoration: 'none' }}>Inicio</a>
+          <span>/</span>
+          <a href="/catalogo" style={{ color: '#888', textDecoration: 'none' }}>Catalogo</a>
+          <span>/</span>
+          <span style={{ color: '#111' }}>{product.name}</span>
+        </div>
+      </div>
+
+      {/* CONTENIDO */}
+      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: 'clamp(1.5rem, 4vw, 3rem) clamp(1rem, 4vw, 2rem)' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 'clamp(1.5rem, 4vw, 4rem)', alignItems: 'start' }}>
+
+          {/* FOTOS */}
           <div>
-            <div className="aspect-square rounded-2xl overflow-hidden bg-gray-50 border border-gray-100 mb-4">
-              {images.length > 0 ? (
-                <img
-                  src={images[currentImage]?.url}
-                  alt={product.name}
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center text-gray-300">
-                  <svg className="w-20 h-20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                  </svg>
-                </div>
+            <div style={{ position: 'relative', width: '100%', paddingBottom: '100%', background: '#f8f8f8', borderRadius: '16px', overflow: 'hidden', border: '1px solid #eee', marginBottom: '1rem' }}>
+              {images.length > 0
+                ? <img src={images[currentImage]?.url} alt={product.name} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
+                : <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="#ddd" strokeWidth="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+                  </div>
+              }
+              {discount > 0 && (
+                <div style={{ position: 'absolute', top: '1rem', left: '1rem', background: '#EF4444', color: '#fff', fontSize: '0.75rem', fontWeight: 700, padding: '0.3rem 0.75rem', borderRadius: '999px' }}>-{discount}%</div>
               )}
             </div>
             {images.length > 1 && (
-              <div className="flex gap-3 overflow-x-auto pb-1">
-                {images.map((img, i) => (
-                  <button
-                    key={img.id}
-                    onClick={() => setCurrentImage(i)}
-                    className={`flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-all ${i === currentImage ? 'border-[#C9A84C]' : 'border-transparent hover:border-gray-200'}`}
-                  >
-                    <img src={img.url} alt="" className="w-full h-full object-cover" />
+              <div style={{ display: 'flex', gap: '0.5rem', overflowX: 'auto', paddingBottom: '0.25rem' }}>
+                {images.map((img: any, i: number) => (
+                  <button key={i} onClick={() => setCurrentImage(i)}
+                    style={{ flexShrink: 0, width: '72px', height: '72px', borderRadius: '10px', overflow: 'hidden', border: i === currentImage ? '2px solid #D4AF37' : '2px solid transparent', background: 'none', padding: 0, cursor: 'pointer' }}>
+                    <img src={img.url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                   </button>
                 ))}
               </div>
             )}
           </div>
 
-          <div className="flex flex-col">
-            <span className="text-xs font-semibold tracking-widest text-[#C9A84C] uppercase mb-3">
-              {product.category}
-            </span>
-            <h1 className="text-3xl font-bold text-gray-900 leading-tight mb-4">
-              {product.name}
-            </h1>
-            <div className="text-4xl font-bold text-gray-900 mb-6">
-              {formattedPrice}
-            </div>
-            <p className="text-gray-500 leading-relaxed mb-8">
-              {product.description}
-            </p>
+          {/* INFO */}
+          <div>
+            <p style={{ fontSize: '0.65rem', color: '#D4AF37', textTransform: 'uppercase', letterSpacing: '2px', fontWeight: 700, marginBottom: '0.5rem' }}>{product.category}</p>
+            <h1 style={{ fontSize: 'clamp(1.4rem, 3vw, 2rem)', fontWeight: 700, color: '#111', lineHeight: 1.2, marginBottom: '1rem' }}>{product.name}</h1>
 
-            <div className="flex items-center gap-4 mb-6">
-              <span className="text-sm text-gray-600 font-medium">Cantidad</span>
-              <div className="flex items-center border border-gray-200 rounded-lg overflow-hidden">
-                <button
-                  onClick={() => setQuantity(q => Math.max(1, q - 1))}
-                  className="px-4 py-2 text-gray-600 hover:bg-gray-50 transition-colors text-lg"
-                >
-                  -
-                </button>
-                <span className="px-5 py-2 text-gray-900 font-medium border-x border-gray-200">
-                  {quantity}
-                </span>
-                <button
-                  onClick={() => setQuantity(q => q + 1)}
-                  className="px-4 py-2 text-gray-600 hover:bg-gray-50 transition-colors text-lg"
-                >
-                  +
-                </button>
+            {/* ESTRELLAS */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
+              <div style={{ display: 'flex', gap: '2px' }}>
+                {[1,2,3,4,5].map(s => (
+                  <svg key={s} width="16" height="16" viewBox="0 0 24 24" fill={s <= (avgRating || product.rating || 4) ? '#D4AF37' : '#e5e5e5'}>
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                  </svg>
+                ))}
+              </div>
+              <span style={{ fontSize: '0.8rem', color: '#888' }}>({reviews.length} reseñas)</span>
+              {product.vendidos > 0 && <span style={{ fontSize: '0.8rem', color: '#888' }}>· {product.vendidos} vendidos</span>}
+            </div>
+
+            {/* PRECIO */}
+            <div style={{ marginBottom: '1.5rem' }}>
+              {formattedOriginal && <p style={{ fontSize: '0.9rem', color: '#bbb', textDecoration: 'line-through', marginBottom: '0.25rem' }}>{formattedOriginal}</p>}
+              <p style={{ fontSize: 'clamp(1.75rem, 4vw, 2.5rem)', fontWeight: 800, color: '#111', lineHeight: 1 }}>{formattedPrice}</p>
+              <p style={{ fontSize: '0.75rem', color: '#888', marginTop: '0.25rem' }}>COP · Precio final</p>
+            </div>
+
+            <p style={{ fontSize: '0.9rem', color: '#555', lineHeight: 1.7, marginBottom: '1.5rem' }}>{product.description}</p>
+
+            {/* CANTIDAD */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.25rem' }}>
+              <span style={{ fontSize: '0.85rem', color: '#555', fontWeight: 500 }}>Cantidad</span>
+              <div style={{ display: 'flex', alignItems: 'center', border: '1px solid #ddd', borderRadius: '8px', overflow: 'hidden' }}>
+                <button onClick={() => setQuantity(q => Math.max(1, q - 1))}
+                  style={{ width: '40px', height: '40px', background: '#f8f8f8', border: 'none', cursor: 'pointer', fontSize: '1.1rem', color: '#333', borderRight: '1px solid #ddd' }}>−</button>
+                <span style={{ width: '48px', textAlign: 'center', fontSize: '0.95rem', fontWeight: 600, color: '#111' }}>{quantity}</span>
+                <button onClick={() => setQuantity(q => q + 1)}
+                  style={{ width: '40px', height: '40px', background: '#f8f8f8', border: 'none', cursor: 'pointer', fontSize: '1.1rem', color: '#333', borderLeft: '1px solid #ddd' }}>+</button>
               </div>
             </div>
 
-            <div className="flex flex-col gap-3 mb-8">
-              <button
-                onClick={handleBuyNow}
-                disabled={adding}
-                className="w-full bg-[#C9A84C] hover:bg-[#b8943d] text-white font-bold py-4 rounded-xl transition-colors disabled:opacity-60 text-base"
-              >
+            {/* BOTONES ESTILO SHOPIFY */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginBottom: '1.5rem' }}>
+              <button onClick={handleBuyNow} disabled={adding}
+                style={{ width: '100%', padding: '1rem', background: adding ? '#ccc' : '#D4AF37', color: '#0B0B0B', border: 'none', borderRadius: '8px', fontSize: '0.9rem', fontWeight: 700, letterSpacing: '0.5px', cursor: adding ? 'not-allowed' : 'pointer', transition: 'background .2s' }}>
                 {adding ? 'Procesando...' : 'Comprar ahora'}
               </button>
-              <button
-                onClick={handleAddToCart}
-                disabled={adding}
-                className="w-full border-2 border-gray-200 hover:border-[#C9A84C] text-gray-700 hover:text-[#C9A84C] font-semibold py-4 rounded-xl transition-all disabled:opacity-60 text-base"
-              >
-                {added ? 'Agregado' : 'Agregar al carrito'}
+              <button onClick={handleAddToCart} disabled={adding}
+                style={{ width: '100%', padding: '1rem', background: '#fff', color: '#111', border: '2px solid #111', borderRadius: '8px', fontSize: '0.9rem', fontWeight: 700, cursor: adding ? 'not-allowed' : 'pointer', transition: 'all .2s' }}
+                onMouseEnter={e => { e.currentTarget.style.background = '#111'; e.currentTarget.style.color = '#fff' }}
+                onMouseLeave={e => { e.currentTarget.style.background = '#fff'; e.currentTarget.style.color = '#111' }}>
+                {added ? 'Agregado al carrito' : 'Agregar al carrito'}
               </button>
             </div>
 
-            <div className="grid grid-cols-3 gap-3 mb-8">
-              <div className="flex flex-col items-center text-center p-3 bg-gray-50 rounded-xl">
-                <span className="text-xs text-gray-500">Pago seguro</span>
-              </div>
-              <div className="flex flex-col items-center text-center p-3 bg-gray-50 rounded-xl">
-                <span className="text-xs text-gray-500">Envio rapido</span>
-              </div>
-              <div className="flex flex-col items-center text-center p-3 bg-gray-50 rounded-xl">
-                <span className="text-xs text-gray-500">Compra segura</span>
-              </div>
+            {/* SELLOS DE CONFIANZA */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.75rem', marginBottom: '1.5rem' }}>
+              {[
+                { icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" strokeWidth="1.75"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>, label: 'Compra segura' },
+                { icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" strokeWidth="1.75"><path d="M1 3h15v13H1z"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>, label: 'Envio rapido' },
+                { icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" strokeWidth="1.75"><path d="M9 12l2 2 4-4"/><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>, label: 'Garantia DSM' },
+              ].map(item => (
+                <div key={item.label} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.4rem', padding: '0.75rem 0.5rem', border: '1px solid #eee', borderRadius: '10px', textAlign: 'center' }}>
+                  {item.icon}
+                  <span style={{ fontSize: '0.7rem', color: '#555', fontWeight: 500 }}>{item.label}</span>
+                </div>
+              ))}
             </div>
 
-            {seller && (
-              <div className="flex items-center gap-3 p-4 border border-gray-100 rounded-xl bg-gray-50">
-                <div className="w-10 h-10 rounded-full bg-gray-200 overflow-hidden flex-shrink-0 flex items-center justify-center">
-                  {seller.avatar_url ? (
-                    <img src={seller.avatar_url} alt="" className="w-full h-full object-cover" />
-                  ) : (
-                    <span className="text-gray-500 font-semibold text-sm">
-                      {seller.full_name?.charAt(0).toUpperCase()}
-                    </span>
-                  )}
-                </div>
-                <div>
-                  <p className="text-xs text-gray-400">Vendedor</p>
-                  <p className="text-sm font-semibold text-gray-700">{seller.full_name}</p>
-                </div>
-                <div className="ml-auto">
-                  <span className="text-xs bg-green-50 text-green-700 px-2 py-1 rounded-full font-medium">
-                    Verificado
-                  </span>
-                </div>
+            {product.envio_gratis && (
+              <div style={{ padding: '0.75rem 1rem', background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: '8px', fontSize: '0.8rem', color: '#16a34a', fontWeight: 600 }}>
+                Este producto tiene envio gratis
               </div>
             )}
           </div>
         </div>
+
+        {/* RESEÑAS */}
+        {reviews.length > 0 && (
+          <div style={{ marginTop: '4rem', borderTop: '1px solid #eee', paddingTop: '2rem' }}>
+            <h2 style={{ fontSize: '1.25rem', fontWeight: 700, color: '#111', marginBottom: '1.5rem' }}>Reseñas ({reviews.length})</h2>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              {reviews.map((review: any) => (
+                <div key={review.id} style={{ padding: '1.25rem', border: '1px solid #eee', borderRadius: '12px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.5rem' }}>
+                    <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: '#D4AF37', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#0B0B0B', fontWeight: 700, fontSize: '0.85rem' }}>
+                      {review.profiles?.name?.charAt(0)?.toUpperCase() ?? 'U'}
+                    </div>
+                    <div>
+                      <p style={{ fontSize: '0.85rem', fontWeight: 600, color: '#111' }}>{review.profiles?.name ?? 'Usuario'}</p>
+                      <div style={{ display: 'flex', gap: '2px' }}>
+                        {[1,2,3,4,5].map(s => (
+                          <svg key={s} width="12" height="12" viewBox="0 0 24 24" fill={s <= review.rating ? '#D4AF37' : '#e5e5e5'}>
+                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                          </svg>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                  <p style={{ fontSize: '0.875rem', color: '#555', lineHeight: 1.6 }}>{review.comment}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
+
+      {/* FOOTER */}
+      <footer style={{ background: '#0B0B0B', borderTop: '1px solid rgba(212,175,55,.15)', marginTop: '4rem', padding: 'clamp(2rem, 4vw, 3rem) clamp(1rem, 4vw, 2.5rem)' }}>
+        <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '2rem', marginBottom: '2rem' }}>
+            <div>
+              <img src="https://awbepztacmvurjylfoas.supabase.co/storage/v1/object/public/assets/ChatGPT_Image_3_may_2026__21_13_12-removebg-preview.png" alt="DMS Market" style={{ height: '60px', objectFit: 'contain', marginBottom: '1rem' }} />
+              <p style={{ fontSize: '0.8rem', color: '#888', lineHeight: 1.7 }}>El marketplace colombiano donde el comercio se vuelve arte.</p>
+            </div>
+            <div>
+              <p style={{ fontSize: '0.7rem', letterSpacing: '2px', textTransform: 'uppercase', color: '#D4AF37', marginBottom: '1rem', fontWeight: 600 }}>Comprar</p>
+              {['Catalogo', 'Servicios', 'Ofertas del mes'].map(l => (
+                <a key={l} href="/" style={{ display: 'block', fontSize: '0.85rem', color: '#888', textDecoration: 'none', marginBottom: '0.5rem' }}>{l}</a>
+              ))}
+            </div>
+            <div>
+              <p style={{ fontSize: '0.7rem', letterSpacing: '2px', textTransform: 'uppercase', color: '#D4AF37', marginBottom: '1rem', fontWeight: 600 }}>Vender</p>
+              {['Registrarse como vendedor', 'Como funciona', 'Comisiones'].map(l => (
+                <a key={l} href="/auth/register" style={{ display: 'block', fontSize: '0.85rem', color: '#888', textDecoration: 'none', marginBottom: '0.5rem' }}>{l}</a>
+              ))}
+            </div>
+            <div>
+              <p style={{ fontSize: '0.7rem', letterSpacing: '2px', textTransform: 'uppercase', color: '#D4AF37', marginBottom: '1rem', fontWeight: 600 }}>Garantias</p>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                {[
+                  { icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" strokeWidth="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>, text: 'Pagos protegidos con escrow' },
+                  { icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" strokeWidth="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>, text: 'Vendedores verificados' },
+                  { icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" strokeWidth="2"><path d="M1 3h15v13H1z"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>, text: 'Envio a todo Colombia' },
+                ].map(item => (
+                  <div key={item.text} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    {item.icon}
+                    <span style={{ fontSize: '0.8rem', color: '#888' }}>{item.text}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+          <div style={{ borderTop: '1px solid rgba(255,255,255,.06)', paddingTop: '1.5rem', display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem' }}>
+            <p style={{ fontSize: '0.75rem', color: '#444' }}>2025 DMS Market. Colombia. Todos los derechos reservados.</p>
+            <p style={{ fontSize: '0.75rem', color: '#444' }}>Pagos procesados por Mercado Pago</p>
+          </div>
+        </div>
+      </footer>
     </div>
   )
 }
