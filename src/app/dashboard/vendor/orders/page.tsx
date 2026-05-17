@@ -70,7 +70,7 @@ export default async function VendorOrdersPage() {
                   : order.status === "shipped"
                     ? { bg: "rgba(167,139,250,.1)", color: "#a78bfa" }
                     : { bg: "rgba(0,0,0,.06)", color: "#888" }
-              const statusText = { released: "Pago liberado", delivered: "Entregado", shipped: "Enviado", paid: "Pago recibido" }[order.status] ?? "Pendiente"
+              const statusText = ({ released: "Pago liberado", delivered: "Entregado", shipped: "Enviado", paid: "Pago recibido" } as Record<string,string>)[order.status] ?? "Pendiente"
 
               return (
                 <div key={order.id} className="vo-card">
