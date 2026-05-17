@@ -205,11 +205,11 @@ export default async function VendorDashboard() {
                         }
                       </div>
                       <div style={{ flex: 1, minWidth: 120 }}>
-                        <p style={{ fontSize: 14, fontWeight: 500, color: "#111", marginBottom: 3, fontFamily: "'Poppins',sans-serif" }}>{product.name}</p>
+                        <p style={{ fontSize: 14, fontWeight: 500, color: "#fff", marginBottom: 3, fontFamily: "'Poppins',sans-serif" }}>{product.name}</p>
                         <p style={{ fontSize: 11, color: "#aaa", fontFamily: "'Poppins',sans-serif" }}>{product.category}</p>
                       </div>
                       <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
-                        <p style={{ fontSize: 14, fontWeight: 700, color: "#111", whiteSpace: "nowrap", fontFamily: "'Poppins',sans-serif" }}>${Number(product.price).toLocaleString("es-CO")}</p>
+                        <p style={{ fontSize: 14, fontWeight: 700, color: "#fff", whiteSpace: "nowrap", fontFamily: "'Poppins',sans-serif" }}>${Number(product.price).toLocaleString("es-CO")}</p>
                         <span className="vd-badge" style={{
                           background: product.status === "approved" ? "rgba(29,158,117,.1)" : product.status === "rejected" ? "rgba(220,38,38,.1)" : "rgba(212,175,55,.1)",
                           color: product.status === "approved" ? "#1D9E75" : product.status === "rejected" ? "#ef4444" : "#D4AF37",
@@ -233,3 +233,4 @@ export default async function VendorDashboard() {
     </>
   )
 }
+
