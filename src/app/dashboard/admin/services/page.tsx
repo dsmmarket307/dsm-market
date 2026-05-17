@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
@@ -49,18 +49,18 @@ export default function AdminServicesPage() {
 
   if (loading) return (
     <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <p style={{ color: '#C9A84C' }}>Cargando servicios...</p>
+      <p style={{ color: '#D4AF37' }}>Cargando servicios...</p>
     </div>
   )
 
   return (
-    <div style={{ padding: '2rem', maxWidth: '1000px', margin: '0 auto', background: '#fff', minHeight: '100vh' }}>
-      <div style={{ marginBottom: '2rem', paddingBottom: '1rem', borderBottom: '2px solid #C9A84C', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+    <div style={{ padding: '2rem', maxWidth: '1000px', margin: '0 auto', background: '#0f0f0f', minHeight: '100vh' }}>
+      <div style={{ marginBottom: '2rem', paddingBottom: '1rem', borderBottom: '2px solid #D4AF37', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div>
-          <p style={{ fontSize: '0.7rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: '#C9A84C', marginBottom: '0.25rem' }}>Admin</p>
-          <h1 style={{ fontSize: '1.75rem', fontWeight: 700, color: '#111' }}>Servicios</h1>
+          <p style={{ fontSize: '0.7rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: '#D4AF37', marginBottom: '0.25rem' }}>Admin</p>
+          <h1 style={{ fontSize: '1.75rem', fontWeight: 700, color: '#ffffff' }}>Servicios</h1>
         </div>
-        <a href="/dashboard/admin" style={{ fontSize: '0.8rem', color: '#888', textDecoration: 'none' }}>← Volver al panel</a>
+        <a href="/dashboard/admin" style={{ fontSize: '0.8rem', color: '#999999', textDecoration: 'none' }}>← Volver al panel</a>
       </div>
 
       {services.length === 0 ? (
@@ -68,7 +68,7 @@ export default function AdminServicesPage() {
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
           {services.map(service => (
-            <div key={service.id} style={{ border: '1px solid #eee', borderRadius: '12px', padding: '1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem' }}>
+            <div key={service.id} style={{ border: '1px solid rgba(212,175,55,.12)', borderRadius: '12px', padding: '1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem' }}>
               <div style={{ flex: 1 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.5rem' }}>
                   <span style={{ fontSize: '0.7rem', fontWeight: 700, color: statusColor[service.status] ?? '#aaa', background: statusColor[service.status] + '20', padding: '0.2rem 0.6rem', borderRadius: '999px' }}>
@@ -76,9 +76,9 @@ export default function AdminServicesPage() {
                   </span>
                   <span style={{ fontSize: '0.7rem', color: '#aaa' }}>{service.category}</span>
                 </div>
-                <p style={{ fontSize: '1rem', fontWeight: 700, color: '#111', marginBottom: '0.25rem' }}>{service.business_name}</p>
-                <p style={{ fontSize: '0.8rem', color: '#555', marginBottom: '0.25rem' }}>{service.city} — {service.phone}</p>
-                <p style={{ fontSize: '0.8rem', color: '#888', lineHeight: 1.6 }}>{service.description?.slice(0, 120)}...</p>
+                <p style={{ fontSize: '1rem', fontWeight: 700, color: '#ffffff', marginBottom: '0.25rem' }}>{service.business_name}</p>
+                <p style={{ fontSize: '0.8rem', color: '#cccccc', marginBottom: '0.25rem' }}>{service.city} — {service.phone}</p>
+                <p style={{ fontSize: '0.8rem', color: '#999999', lineHeight: 1.6 }}>{service.description?.slice(0, 120)}...</p>
               </div>
 
               <div style={{ display: 'flex', gap: '0.5rem', flexShrink: 0 }}>
@@ -102,3 +102,4 @@ export default function AdminServicesPage() {
     </div>
   )
 }
+

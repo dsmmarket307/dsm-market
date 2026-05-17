@@ -28,44 +28,44 @@ export default async function AdminVendorsPage() {
   const rejected = vendors?.filter((v: any) => v.seller_status === "rejected").length ?? 0
 
   return (
-    <div style={{ padding: "2rem", maxWidth: "1000px", margin: "0 auto", background: "#fff", minHeight: "100vh" }}>
+    <div style={{ padding: "2rem", maxWidth: "1000px", margin: "0 auto", background: "#0f0f0f", minHeight: "100vh" }}>
 
       <div style={{ marginBottom: "2rem", paddingBottom: "1rem", borderBottom: "2px solid #C9A84C" }}>
-        <p style={{ fontSize: "0.7rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "#C9A84C", marginBottom: "0.25rem" }}>Administrador</p>
-        <h1 style={{ fontSize: "1.75rem", fontWeight: 700, color: "#111" }}>Vendedores</h1>
+        <p style={{ fontSize: "0.7rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "#D4AF37", marginBottom: "0.25rem" }}>Administrador</p>
+        <h1 style={{ fontSize: "1.75rem", fontWeight: 700, color: "#ffffff" }}>Vendedores</h1>
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "1rem", marginBottom: "2rem" }}>
         {[
-          { label: "Total", value: total, color: "#111" },
+          { label: "Total", value: total, color: "#ffffff" },
           { label: "Aprobados", value: approved, color: "#4CAF7D" },
-          { label: "Pendientes", value: pending, color: "#C9A84C" },
+          { label: "Pendientes", value: pending, color: "#D4AF37" },
           { label: "Rechazados", value: rejected, color: "#E05252" },
         ].map((stat) => (
-          <div key={stat.label} style={{ border: "1px solid #eee", padding: "1.25rem", textAlign: "center" }}>
+          <div key={stat.label} style={{ border: "1px solid rgba(212,175,55,.12)", padding: "1.25rem", textAlign: "center" }}>
             <p style={{ fontSize: "1.75rem", fontWeight: 700, color: stat.color }}>{stat.value}</p>
-            <p style={{ fontSize: "0.75rem", color: "#888", textTransform: "uppercase" }}>{stat.label}</p>
+            <p style={{ fontSize: "0.75rem", color: "#999999", textTransform: "uppercase" }}>{stat.label}</p>
           </div>
         ))}
       </div>
 
       <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
         {!vendors || vendors.length === 0 ? (
-          <p style={{ color: "#888", textAlign: "center", padding: "2rem" }}>No hay vendedores registrados.</p>
+          <p style={{ color: "#999999", textAlign: "center", padding: "2rem" }}>No hay vendedores registrados.</p>
         ) : (
           vendors.map((vendor: any) => (
-            <div key={vendor.id} style={{ border: "1px solid #eee", background: "#fff", borderRadius: "4px", overflow: "hidden" }}>
+            <div key={vendor.id} style={{ border: "1px solid rgba(212,175,55,.12)", background: "#0f0f0f", borderRadius: "4px", overflow: "hidden" }}>
 
               {/* Info principal */}
               <div style={{ padding: "1.25rem", display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: "1rem" }}>
                 <div style={{ flex: 1 }}>
                   <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "0.75rem" }}>
                     <div style={{ width: "40px", height: "40px", background: "#FBF5E6", border: "1px solid #C9A84C", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, borderRadius: "50%" }}>
-                      <span style={{ color: "#C9A84C", fontWeight: 700 }}>{vendor.name?.charAt(0)?.toUpperCase() ?? "V"}</span>
+                      <span style={{ color: "#D4AF37", fontWeight: 700 }}>{vendor.name?.charAt(0)?.toUpperCase() ?? "V"}</span>
                     </div>
                     <div>
-                      <p style={{ fontSize: "1rem", fontWeight: 600, color: "#111" }}>{vendor.name}</p>
-                      <p style={{ fontSize: "0.75rem", color: "#888" }}>ID: {vendor.id?.slice(0, 8)}...</p>
+                      <p style={{ fontSize: "1rem", fontWeight: 600, color: "#ffffff" }}>{vendor.name}</p>
+                      <p style={{ fontSize: "0.75rem", color: "#999999" }}>ID: {vendor.id?.slice(0, 8)}...</p>
                     </div>
                   </div>
 
@@ -90,7 +90,7 @@ export default async function AdminVendorsPage() {
                         </button>
                       </form>
                       <form action={async () => { "use server"; await rejectVendor(vendor.id) }}>
-                        <button type="submit" style={{ padding: "0.5rem 1rem", background: "#fff", color: "#E05252", border: "1px solid #E05252", cursor: "pointer", fontSize: "0.8rem", width: "100%" }}>
+                        <button type="submit" style={{ padding: "0.5rem 1rem", background: "#0f0f0f", color: "#E05252", border: "1px solid #E05252", cursor: "pointer", fontSize: "0.8rem", width: "100%" }}>
                           Rechazar
                         </button>
                       </form>
@@ -98,7 +98,7 @@ export default async function AdminVendorsPage() {
                   )}
                   {vendor.seller_status === "approved" && (
                     <form action={async () => { "use server"; await rejectVendor(vendor.id) }}>
-                      <button type="submit" style={{ padding: "0.5rem 1rem", background: "#fff", color: "#E05252", border: "1px solid #E05252", cursor: "pointer", fontSize: "0.8rem", width: "100%" }}>
+                      <button type="submit" style={{ padding: "0.5rem 1rem", background: "#0f0f0f", color: "#E05252", border: "1px solid #E05252", cursor: "pointer", fontSize: "0.8rem", width: "100%" }}>
                         Desactivar
                       </button>
                     </form>
@@ -117,19 +117,19 @@ export default async function AdminVendorsPage() {
               <div style={{ padding: "1rem 1.25rem", background: "#fafafa", borderTop: "1px solid #f0f0f0", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: "0.75rem" }}>
                 <div>
                   <p style={{ fontSize: "0.6rem", textTransform: "uppercase", letterSpacing: "1px", color: "#aaa", marginBottom: "0.25rem" }}>Celular</p>
-                  <p style={{ fontSize: "0.875rem", color: "#111" }}>{vendor.celular ?? vendor.phone ?? "No registrado"}</p>
+                  <p style={{ fontSize: "0.875rem", color: "#ffffff" }}>{vendor.celular ?? vendor.phone ?? "No registrado"}</p>
                 </div>
                 <div>
                   <p style={{ fontSize: "0.6rem", textTransform: "uppercase", letterSpacing: "1px", color: "#aaa", marginBottom: "0.25rem" }}>Cedula</p>
-                  <p style={{ fontSize: "0.875rem", color: "#111" }}>{vendor.cedula ?? "No registrada"}</p>
+                  <p style={{ fontSize: "0.875rem", color: "#ffffff" }}>{vendor.cedula ?? "No registrada"}</p>
                 </div>
                 <div>
                   <p style={{ fontSize: "0.6rem", textTransform: "uppercase", letterSpacing: "1px", color: "#aaa", marginBottom: "0.25rem" }}>Ciudad</p>
-                  <p style={{ fontSize: "0.875rem", color: "#111" }}>{vendor.ciudad ?? vendor.city ?? "No registrada"}</p>
+                  <p style={{ fontSize: "0.875rem", color: "#ffffff" }}>{vendor.ciudad ?? vendor.city ?? "No registrada"}</p>
                 </div>
                 <div>
                   <p style={{ fontSize: "0.6rem", textTransform: "uppercase", letterSpacing: "1px", color: "#aaa", marginBottom: "0.25rem" }}>Direccion</p>
-                  <p style={{ fontSize: "0.875rem", color: "#111" }}>{vendor.direccion ?? "No registrada"}</p>
+                  <p style={{ fontSize: "0.875rem", color: "#ffffff" }}>{vendor.direccion ?? "No registrada"}</p>
                 </div>
               </div>
 
@@ -137,20 +137,20 @@ export default async function AdminVendorsPage() {
               <div style={{ padding: "1rem 1.25rem", background: "#fffbeb", borderTop: "1px solid #fef3c7", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: "0.75rem" }}>
                 <div>
                   <p style={{ fontSize: "0.6rem", textTransform: "uppercase", letterSpacing: "1px", color: "#92400e", marginBottom: "0.25rem" }}>Banco</p>
-                  <p style={{ fontSize: "0.875rem", color: "#111", fontWeight: 500 }}>{vendor.banco ?? "No registrado"}</p>
+                  <p style={{ fontSize: "0.875rem", color: "#ffffff", fontWeight: 500 }}>{vendor.banco ?? "No registrado"}</p>
                 </div>
                 <div>
                   <p style={{ fontSize: "0.6rem", textTransform: "uppercase", letterSpacing: "1px", color: "#92400e", marginBottom: "0.25rem" }}>Tipo de cuenta</p>
-                  <p style={{ fontSize: "0.875rem", color: "#111", fontWeight: 500, textTransform: "capitalize" }}>{vendor.tipo_cuenta ?? "No registrado"}</p>
+                  <p style={{ fontSize: "0.875rem", color: "#ffffff", fontWeight: 500, textTransform: "capitalize" }}>{vendor.tipo_cuenta ?? "No registrado"}</p>
                 </div>
                 <div>
                   <p style={{ fontSize: "0.6rem", textTransform: "uppercase", letterSpacing: "1px", color: "#92400e", marginBottom: "0.25rem" }}>Numero de cuenta</p>
-                  <p style={{ fontSize: "0.875rem", color: "#111", fontWeight: 500 }}>{vendor.numero_cuenta ?? "No registrado"}</p>
+                  <p style={{ fontSize: "0.875rem", color: "#ffffff", fontWeight: 500 }}>{vendor.numero_cuenta ?? "No registrado"}</p>
                 </div>
                 {vendor.documento_url && (
                   <div>
                     <p style={{ fontSize: "0.6rem", textTransform: "uppercase", letterSpacing: "1px", color: "#92400e", marginBottom: "0.25rem" }}>Documento</p>
-                    <a href={vendor.documento_url} target="_blank" style={{ fontSize: "0.875rem", color: "#C9A84C", fontWeight: 600, textDecoration: "none" }}>Ver documento</a>
+                    <a href={vendor.documento_url} target="_blank" style={{ fontSize: "0.875rem", color: "#D4AF37", fontWeight: 600, textDecoration: "none" }}>Ver documento</a>
                   </div>
                 )}
               </div>
@@ -162,3 +162,4 @@ export default async function AdminVendorsPage() {
     </div>
   )
 }
+

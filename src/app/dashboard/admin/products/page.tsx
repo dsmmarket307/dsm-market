@@ -56,7 +56,7 @@ export default function AdminProductsPage() {
   function StarSelector({ product }: { product: any }) {
     return (
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', paddingTop: '0.75rem' }}>
-        <span style={{ fontSize: '0.7rem', color: '#888' }}>Estrellas:</span>
+        <span style={{ fontSize: '0.7rem', color: '#999999' }}>Estrellas:</span>
         <div style={{ display: 'flex', gap: '2px' }}>
           {[1,2,3,4,5].map(star => (
             <button key={star} disabled={procesando === product.id}
@@ -68,52 +68,52 @@ export default function AdminProductsPage() {
             </button>
           ))}
         </div>
-        <span style={{ fontSize: '0.7rem', color: '#C9A84C', fontWeight: 700 }}>{product.rating ?? 4}.0</span>
+        <span style={{ fontSize: '0.7rem', color: '#D4AF37', fontWeight: 700 }}>{product.rating ?? 4}.0</span>
       </div>
     )
   }
 
   if (loading) return (
     <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <p style={{ color: '#C9A84C' }}>Cargando productos...</p>
+      <p style={{ color: '#D4AF37' }}>Cargando productos...</p>
     </div>
   )
 
   return (
-    <div style={{ background: '#fff', minHeight: '100vh', padding: '2rem', fontFamily: 'sans-serif' }}>
+    <div style={{ background: '#0f0f0f', minHeight: '100vh', padding: '2rem', fontFamily: 'sans-serif' }}>
       <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
-        <div style={{ marginBottom: '2rem', paddingBottom: '1rem', borderBottom: '2px solid #C9A84C', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div style={{ marginBottom: '2rem', paddingBottom: '1rem', borderBottom: '2px solid #D4AF37', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div>
-            <p style={{ fontSize: '0.7rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: '#C9A84C', marginBottom: '0.25rem' }}>Administrador</p>
-            <h1 style={{ fontSize: '1.75rem', fontWeight: 600, color: '#111' }}>Gestion de Productos</h1>
+            <p style={{ fontSize: '0.7rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: '#D4AF37', marginBottom: '0.25rem' }}>Administrador</p>
+            <h1 style={{ fontSize: '1.75rem', fontWeight: 600, color: '#ffffff' }}>Gestion de Productos</h1>
           </div>
-          <a href="/dashboard/admin" style={{ fontSize: '0.8rem', color: '#888', textDecoration: 'none' }}>← Volver</a>
+          <a href="/dashboard/admin" style={{ fontSize: '0.8rem', color: '#999999', textDecoration: 'none' }}>← Volver</a>
         </div>
 
         <div style={{ display: 'flex', gap: '1rem', marginBottom: '2rem' }}>
-          <div style={{ flex: 1, border: '1px solid #eee', padding: '1rem', textAlign: 'center' }}>
-            <p style={{ fontSize: '1.5rem', fontWeight: 700, color: '#C9A84C' }}>{products.filter(p => p.status === 'pending').length}</p>
-            <p style={{ fontSize: '0.75rem', color: '#888' }}>Pendientes</p>
+          <div style={{ flex: 1, border: '1px solid rgba(212,175,55,.12)', padding: '1rem', textAlign: 'center' }}>
+            <p style={{ fontSize: '1.5rem', fontWeight: 700, color: '#D4AF37' }}>{products.filter(p => p.status === 'pending').length}</p>
+            <p style={{ fontSize: '0.75rem', color: '#999999' }}>Pendientes</p>
           </div>
-          <div style={{ flex: 1, border: '1px solid #eee', padding: '1rem', textAlign: 'center' }}>
+          <div style={{ flex: 1, border: '1px solid rgba(212,175,55,.12)', padding: '1rem', textAlign: 'center' }}>
             <p style={{ fontSize: '1.5rem', fontWeight: 700, color: '#4CAF7D' }}>{products.filter(p => p.status === 'approved').length}</p>
-            <p style={{ fontSize: '0.75rem', color: '#888' }}>Aprobados</p>
+            <p style={{ fontSize: '0.75rem', color: '#999999' }}>Aprobados</p>
           </div>
-          <div style={{ flex: 1, border: '1px solid #eee', padding: '1rem', textAlign: 'center' }}>
+          <div style={{ flex: 1, border: '1px solid rgba(212,175,55,.12)', padding: '1rem', textAlign: 'center' }}>
             <p style={{ fontSize: '1.5rem', fontWeight: 700, color: '#E05252' }}>{products.filter(p => p.status === 'rejected').length}</p>
-            <p style={{ fontSize: '0.75rem', color: '#888' }}>Rechazados</p>
+            <p style={{ fontSize: '0.75rem', color: '#999999' }}>Rechazados</p>
           </div>
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
           {products.length === 0 ? (
-            <p style={{ color: '#888', textAlign: 'center', padding: '2rem' }}>No hay productos.</p>
+            <p style={{ color: '#999999', textAlign: 'center', padding: '2rem' }}>No hay productos.</p>
           ) : products.map((product: any) => {
             const productImages = images.filter(i => i.product_id === product.id)
             const firstImage = productImages[0]?.url
             return (
-              <div key={product.id} style={{ border: '1px solid #eee', padding: '1.25rem', display: 'flex', gap: '1.25rem', alignItems: 'flex-start', background: '#fff', borderRadius: '8px' }}>
-                <div style={{ width: '100px', height: '100px', flexShrink: 0, background: '#f5f5f5', border: '1px solid #eee', overflow: 'hidden', borderRadius: '4px' }}>
+              <div key={product.id} style={{ border: '1px solid rgba(212,175,55,.12)', padding: '1.25rem', display: 'flex', gap: '1.25rem', alignItems: 'flex-start', background: '#0f0f0f', borderRadius: '8px' }}>
+                <div style={{ width: '100px', height: '100px', flexShrink: 0, background: '#1a1a1a', border: '1px solid rgba(212,175,55,.12)', overflow: 'hidden', borderRadius: '4px' }}>
                   {firstImage ? (
                     <img src={firstImage} alt={product.name} style={{ width: '100%', height: '100%', objectFit: 'contain', padding: '0.25rem' }} />
                   ) : (
@@ -126,15 +126,15 @@ export default function AdminProductsPage() {
                 <div style={{ flex: 1 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.5rem', flexWrap: 'wrap', gap: '0.5rem' }}>
                     <div>
-                      <p style={{ fontSize: '1rem', fontWeight: 600, color: '#111', marginBottom: '0.25rem' }}>{product.name}</p>
-                      <p style={{ fontSize: '0.75rem', color: '#C9A84C', textTransform: 'uppercase', letterSpacing: '0.1em' }}>{product.category}</p>
+                      <p style={{ fontSize: '1rem', fontWeight: 600, color: '#ffffff', marginBottom: '0.25rem' }}>{product.name}</p>
+                      <p style={{ fontSize: '0.75rem', color: '#D4AF37', textTransform: 'uppercase', letterSpacing: '0.1em' }}>{product.category}</p>
                     </div>
                     <span style={{ fontSize: '0.75rem', padding: '0.25rem 0.75rem', background: product.status === 'approved' ? '#e8f5e9' : product.status === 'rejected' ? '#fdecea' : '#fff8e1', color: product.status === 'approved' ? '#2e7d32' : product.status === 'rejected' ? '#c62828' : '#f57f17', border: `1px solid ${product.status === 'approved' ? '#4CAF7D' : product.status === 'rejected' ? '#E05252' : '#C9A84C'}`, borderRadius: '999px' }}>
                       {product.status === 'approved' ? 'Aprobado' : product.status === 'rejected' ? 'Rechazado' : 'Pendiente'}
                     </span>
                   </div>
 
-                  <p style={{ fontSize: '1.125rem', fontWeight: 700, color: '#111', marginBottom: '0.75rem' }}>${Number(product.price).toLocaleString('es-CO')} COP</p>
+                  <p style={{ fontSize: '1.125rem', fontWeight: 700, color: '#ffffff', marginBottom: '0.75rem' }}>${Number(product.price).toLocaleString('es-CO')} COP</p>
 
                   <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '0.5rem' }}>
                     {product.status !== 'approved' && (
@@ -145,13 +145,13 @@ export default function AdminProductsPage() {
                     )}
                     {product.status !== 'rejected' && (
                       <button disabled={procesando === product.id} onClick={() => updateProduct(product.id, { status: 'rejected' })}
-                        style={{ padding: '0.4rem 1rem', background: '#fff', color: '#E05252', border: '1px solid #E05252', cursor: 'pointer', fontSize: '0.75rem', borderRadius: '999px' }}>
+                        style={{ padding: '0.4rem 1rem', background: '#0f0f0f', color: '#E05252', border: '1px solid #E05252', cursor: 'pointer', fontSize: '0.75rem', borderRadius: '999px' }}>
                         {product.status === 'approved' ? 'Desactivar' : 'Rechazar'}
                       </button>
                     )}
                   </div>
 
-                  <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', paddingTop: '0.75rem', borderTop: '1px solid #f0f0f0' }}>
+                  <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', paddingTop: '0.75rem', borderTop: '1px solid rgba(255,255,255,.06)' }}>
                     <button disabled={procesando === product.id}
                       onClick={() => updateProduct(product.id, { badge: product.badge === 'Lo más vendido' ? null : 'Lo más vendido' })}
                       style={{ padding: '0.35rem 0.875rem', background: product.badge === 'Lo más vendido' ? '#C9A84C' : '#fff', color: product.badge === 'Lo más vendido' ? '#fff' : '#C9A84C', border: '1px solid #C9A84C', cursor: 'pointer', fontSize: '0.7rem', fontWeight: 600, borderRadius: '999px' }}>
@@ -172,14 +172,14 @@ export default function AdminProductsPage() {
                   <StarSelector product={product} />
 
                   {/* VENDIDOS */}
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.75rem', paddingTop: '0.75rem', borderTop: '1px solid #f0f0f0' }}>
-                    <span style={{ fontSize: '0.7rem', color: '#888' }}>Vendidos:</span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.75rem', paddingTop: '0.75rem', borderTop: '1px solid rgba(255,255,255,.06)' }}>
+                    <span style={{ fontSize: '0.7rem', color: '#999999' }}>Vendidos:</span>
                     <input
                       type="number"
                       min="0"
                       value={vendidosEdit[product.id] ?? '0'}
                       onChange={e => setVendidosEdit(prev => ({ ...prev, [product.id]: e.target.value }))}
-                      style={{ width: '80px', padding: '0.3rem 0.5rem', border: '1px solid #ddd', borderRadius: '6px', fontSize: '0.8rem', outline: 'none' }}
+                      style={{ width: '80px', padding: '0.3rem 0.5rem', border: '1px solid rgba(255,255,255,.1)', borderRadius: '6px', fontSize: '0.8rem', outline: 'none' }}
                     />
                     <button onClick={() => saveVendidos(product.id)} disabled={procesando === product.id}
                       style={{ padding: '0.3rem 0.75rem', background: '#111', color: '#fff', border: 'none', borderRadius: '999px', fontSize: '0.7rem', cursor: 'pointer', fontWeight: 600 }}>
@@ -189,8 +189,8 @@ export default function AdminProductsPage() {
                   </div>
 
                   {/* VER RESEÑAS */}
-                  <div style={{ marginTop: '0.75rem', paddingTop: '0.75rem', borderTop: '1px solid #f0f0f0' }}>
-                    <a href={`/producto/${product.id}`} target="_blank" style={{ fontSize: '0.7rem', color: '#C9A84C', textDecoration: 'none', fontWeight: 600 }}>
+                  <div style={{ marginTop: '0.75rem', paddingTop: '0.75rem', borderTop: '1px solid rgba(255,255,255,.06)' }}>
+                    <a href={`/producto/${product.id}`} target="_blank" style={{ fontSize: '0.7rem', color: '#D4AF37', textDecoration: 'none', fontWeight: 600 }}>
                       Ver producto y eliminar reseñas →
                     </a>
                   </div>
@@ -203,3 +203,4 @@ export default function AdminProductsPage() {
     </div>
   )
 }
+
