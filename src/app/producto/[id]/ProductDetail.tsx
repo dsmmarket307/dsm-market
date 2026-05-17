@@ -156,6 +156,28 @@ export default function ProductDetail({ product, images, reviews, avgRating, use
                 </div>
               ))}
             </div>
+            {/* VENDEDOR */}
+{seller && (
+  <div style={{ padding: "1rem", background: "#f8f8f8", borderRadius: "12px", border: "1px solid #eee", marginBottom: "1rem", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "1rem", flexWrap: "wrap" }}>
+    <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+      <div style={{ width: 44, height: 44, borderRadius: "50%", background: "#D4AF37", overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+        {seller.store_logo_url
+          ? <img src={seller.store_logo_url} style={{ width: "100%", height: "100%", objectFit: "cover" }} alt={seller.store_name} />
+          : <span style={{ color: "#0B0B0B", fontWeight: 700, fontSize: 18 }}>{(seller.store_name || seller.name || "T").charAt(0).toUpperCase()}</span>
+        }
+      </div>
+      <div>
+        <p style={{ fontSize: "0.7rem", color: "#888", margin: "0 0 2px" }}>Vendido por</p>
+        <p style={{ fontSize: "0.95rem", fontWeight: 700, color: "#111", margin: 0 }}>{seller.store_name || seller.name}</p>
+        {seller.store_description && <p style={{ fontSize: "0.75rem", color: "#888", margin: "2px 0 0" }}>{seller.store_description}</p>}
+      </div>
+    </div>
+    <a href={`/tienda/${seller.id}`}
+      style={{ padding: "8px 16px", background: "#0B0B0B", color: "#D4AF37", textDecoration: "none", borderRadius: "8px", fontSize: "0.8rem", fontWeight: 700, whiteSpace: "nowrap", border: "1px solid rgba(212,175,55,.3)" }}>
+      Ver tienda completa →
+    </a>
+  </div>
+)}
 
             {product.envio_gratis && (
               <div style={{ padding: '0.75rem 1rem', background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: '8px', fontSize: '0.8rem', color: '#16a34a', fontWeight: 600 }}>
