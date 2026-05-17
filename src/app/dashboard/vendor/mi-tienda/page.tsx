@@ -43,6 +43,7 @@ export default function MiTiendaPage() {
 
   async function handleSave(e: React.FormEvent) {
     e.preventDefault()
+    if (!user) return
     setSaving(true)
 
     let logoUrl = profile?.store_logo_url ?? null
@@ -78,18 +79,23 @@ export default function MiTiendaPage() {
     .mt-label{display:block;font-size:11px;color:#999;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px;font-family:'Poppins',sans-serif;}
     .mt-input{width:100%;padding:11px 14px;border:1px solid rgba(255,255,255,.08);border-radius:10px;font-size:14px;outline:none;font-family:'Poppins',sans-serif;color:#fff;background:#0f0f0f;box-sizing:border-box;transition:border-color .2s;}
     .mt-input:focus{border-color:#D4AF37;}
-    .mt-btn{width:100%;padding:14px;background:#D4AF37;color:#0B0B0B;border:none;cursor:pointer;font-size:14px;text-transform:uppercase;font-weight:700;border-radius:12px;font-family:'Poppins',sans-serif;}
+    .mt-btn{width:100%;padding:14px;background:#D4AF37;color:#0B0B0B;border:none;cursor:pointer;font-size:14px;text-transform:uppercase;font-weight:700;border-radius:12px;font-family:'Poppins',sans-serif;transition:background .2s;}
     .mt-btn:hover{background:#e8c84a;}
     .mt-preview{display:flex;align-items:center;gap:1rem;padding:1rem;background:#0f0f0f;border-radius:12px;border:1px solid rgba(212,175,55,.12);margin-bottom:1rem;}
   `
 
-  if (loading) return <div style={{ background: "#0f0f0f", minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}><p style={{ color: "#D4AF37" }}>Cargando...</p></div>
+  if (loading) return (
+    <div style={{ background: "#0f0f0f", minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
+      <p style={{ color: "#D4AF37", fontFamily: "sans-serif" }}>Cargando...</p>
+    </div>
+  )
 
   return (
     <>
       <style>{css}</style>
       <div className="mt-root">
         <div className="mt-inner">
+
           <div className="mt-header">
             <p style={{ fontSize: 11, letterSpacing: 3, textTransform: "uppercase", color: "#D4AF37", marginBottom: 4 }}>Vendedor</p>
             <h1 style={{ fontSize: "1.5rem", fontWeight: 700, color: "#fff", margin: 0 }}>Mi Tienda</h1>
@@ -102,7 +108,7 @@ export default function MiTiendaPage() {
               <div style={{ width: 56, height: 56, borderRadius: "50%", background: "#D4AF37", overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                 {logoPreview
                   ? <img src={logoPreview} style={{ width: "100%", height: "100%", objectFit: "cover" }} alt="logo" />
-                  : <span style={{ color: "#0B0B0B", fontWeight: 700, fontSize: 20 }}>{(form.store_name || profile?.name || "T").charAt(0).toUpperCase()}</span>
+                  : <span style={{ color: "#0B0B0B", fontWeight: 700, fontSize: 20 }}>{(form.store_name || "T").charAt(0).toUpperCase()}</span>
                 }
               </div>
               <div>
@@ -111,7 +117,7 @@ export default function MiTiendaPage() {
                 {form.store_phone && <p style={{ color: "#D4AF37", fontSize: 12, margin: "4px 0 0" }}>{form.store_phone}</p>}
               </div>
             </div>
-            {user && (
+            {user?.id && (
               <a href={`/tienda/${user.id}`} target="_blank"
                 style={{ display: "block", textAlign: "center", padding: "10px", border: "1px solid rgba(212,175,55,.3)", borderRadius: 10, color: "#D4AF37", textDecoration: "none", fontSize: 13, fontWeight: 600 }}>
                 Ver mi tienda publica →
@@ -125,7 +131,6 @@ export default function MiTiendaPage() {
               <p style={{ fontSize: 11, letterSpacing: 2, textTransform: "uppercase", color: "#D4AF37", marginBottom: 16 }}>Informacion de la tienda</p>
               <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
 
-                {/* LOGO UPLOAD */}
                 <div>
                   <label className="mt-label">Logo de la tienda</label>
                   <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
@@ -148,20 +153,24 @@ export default function MiTiendaPage() {
                   <label className="mt-label">Nombre de la tienda *</label>
                   <input required value={form.store_name} onChange={e => setForm(p => ({ ...p, store_name: e.target.value }))} placeholder="Ej: Moda Premium Colombia" className="mt-input" />
                 </div>
+
                 <div>
                   <label className="mt-label">Descripcion corta</label>
                   <input value={form.store_description} onChange={e => setForm(p => ({ ...p, store_description: e.target.value }))} placeholder="Ej: Ropa deportiva de alta calidad" className="mt-input" />
                 </div>
+
                 <div>
                   <label className="mt-label">Celular de contacto</label>
                   <input value={form.store_phone} onChange={e => setForm(p => ({ ...p, store_phone: e.target.value }))} placeholder="Ej: 3001234567" className="mt-input" />
                 </div>
+
               </div>
             </div>
             <button type="submit" disabled={saving} className="mt-btn">
-              {saving ? "Guardando..." : saved ? "Guardado" : "Guardar tienda"}
+              {saving ? "Guardando..." : saved ? "Guardado ✓" : "Guardar tienda"}
             </button>
           </form>
+
         </div>
       </div>
     </>
