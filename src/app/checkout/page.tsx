@@ -16,7 +16,6 @@ const ZONAS: Record<string, { rango: string; zona: string }> = {
   'manizales': { rango: '$12,000 - $18,000', zona: 'Zonal' },
   'armenia': { rango: '$12,000 - $18,000', zona: 'Zonal' },
   'ibague': { rango: '$12,000 - $18,000', zona: 'Zonal' },
-  'ibaguë': { rango: '$12,000 - $18,000', zona: 'Zonal' },
   'cartagena': { rango: '$12,000 - $18,000', zona: 'Zonal' },
   'cucuta': { rango: '$12,000 - $18,000', zona: 'Zonal' },
   'cúcuta': { rango: '$12,000 - $18,000', zona: 'Zonal' },
@@ -29,7 +28,6 @@ const ZONAS: Record<string, { rango: string; zona: string }> = {
   'soacha': { rango: '$12,000 - $18,000', zona: 'Zonal' },
   'pasto': { rango: '$15,000 - $22,000', zona: 'Territorial' },
   'monteria': { rango: '$15,000 - $22,000', zona: 'Territorial' },
-  'monterÿa': { rango: '$15,000 - $22,000', zona: 'Territorial' },
   'popayan': { rango: '$15,000 - $22,000', zona: 'Territorial' },
   'popayán': { rango: '$15,000 - $22,000', zona: 'Territorial' },
   'sincelejo': { rango: '$15,000 - $22,000', zona: 'Territorial' },
@@ -83,9 +81,29 @@ export default function CheckoutPage() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) { router.push('/auth/login'); return }
       setUserId(user.id)
-      const stored = sessionStorage.getItem('checkout_item')
-      if (!stored) { router.push('/dashboard/buyer/products'); return }
-      setItem(JSON.parse(stored))
+
+      const params = new URLSearchParams(window.location.search)
+      const productId = params.get('id')
+      const qty = parseInt(params.get('qty') ?? '1')
+
+      if (productId) {
+        const { data: p } = await supabase.from('products').select('id, name, price').eq('id', productId).single()
+        const { data: imgs } = await supabase.from('product_images').select('url').eq('product_id', productId).order('position').limit(1)
+        if (p) {
+          setItem({ id: p.id, name: p.name, price: p.price, quantity: qty, image: imgs?.[0]?.url ?? null })
+        } else {
+          router.push('/')
+          return
+        }
+      } else {
+        const stored = sessionStorage.getItem('checkout_item')
+        if (stored) {
+          setItem(JSON.parse(stored))
+        } else {
+          router.push('/')
+          return
+        }
+      }
       setLoading(false)
     }
     load()
@@ -203,13 +221,10 @@ export default function CheckoutPage() {
               <label style={{ display: 'block', fontSize: '0.65rem', letterSpacing: '2px', textTransform: 'uppercase', color: '#888', marginBottom: '0.5rem' }}>
                 Elige tu transportadora
               </label>
-              <select
-                value={transportadora}
-                onChange={e => setTransportadora(e.target.value)}
+              <select value={transportadora} onChange={e => setTransportadora(e.target.value)}
                 style={{ width: '100%', padding: '0.75rem 1rem', border: '1px solid #ddd', fontSize: '0.875rem', color: '#111', outline: 'none', background: '#fafafa', boxSizing: 'border-box', borderRadius: '6px' }}
                 onFocus={e => (e.target.style.borderColor = '#C9A84C')}
-                onBlur={e => (e.target.style.borderColor = '#ddd')}
-              >
+                onBlur={e => (e.target.style.borderColor = '#ddd')}>
                 {TRANSPORTADORAS.map(t => (
                   <option key={t} value={t}>{t}</option>
                 ))}
@@ -232,7 +247,6 @@ export default function CheckoutPage() {
         <div>
           <div style={{ border: '1px solid #eee', borderTop: '3px solid #C9A84C', padding: '1.5rem', position: 'sticky', top: '80px' }}>
             <p style={{ fontSize: '0.65rem', letterSpacing: '3px', textTransform: 'uppercase', color: '#888', marginBottom: '1.5rem' }}>Resumen</p>
-
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginBottom: '1.5rem' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.875rem' }}>
                 <span style={{ color: '#666' }}>Subtotal</span>
@@ -245,17 +259,14 @@ export default function CheckoutPage() {
                 </span>
               </div>
             </div>
-
             <div style={{ display: 'flex', justifyContent: 'space-between', padding: '1rem 0', borderTop: '2px solid #111', marginBottom: '1.5rem' }}>
               <span style={{ fontSize: '0.875rem', fontWeight: 700, color: '#111' }}>Total producto</span>
               <span style={{ fontSize: '1.25rem', fontWeight: 700, color: '#111' }}>${total.toLocaleString('es-CO')}</span>
             </div>
-
             <button onClick={handleCheckout} disabled={processing}
               style={{ width: '100%', padding: '1rem', background: processing ? '#e5e5e5' : '#C9A84C', color: processing ? '#999' : '#fff', border: 'none', fontSize: '0.75rem', fontWeight: 700, letterSpacing: '3px', textTransform: 'uppercase', cursor: processing ? 'not-allowed' : 'pointer', borderRadius: '999px', boxShadow: processing ? 'none' : '0 4px 20px rgba(201,168,76,0.4)' }}>
               {processing ? 'Procesando...' : 'Pagar con MercadoPago'}
             </button>
-
             <div style={{ marginTop: '1rem', padding: '0.75rem', background: '#f0faf4', borderRadius: '8px', border: '1px solid #c8e6c9' }}>
               <p style={{ fontSize: '0.7rem', color: '#2e7d32', textAlign: 'center', lineHeight: 1.6 }}>
                 Tu pago es seguro. El dinero se libera al vendedor después de confirmar la entrega.

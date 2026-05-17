@@ -73,17 +73,12 @@ function ProductContent() {
   async function handleBuyNow() {
     setAdding(true)
     const { data: { user } } = await supabase.auth.getUser()
-    if (!user) { router.push(`/auth/login?redirect=/producto/detalle?id=${id}`); return }
-    const checkoutItem = {
-      id: product.id,
-      name: product.name,
-      price: product.price,
-      quantity,
-      image: images[0]?.url ?? null,
-      transportadora,
+    if (!user) {
+      router.push(`/auth/login?redirect=/producto/detalle?id=${id}`)
+      setAdding(false)
+      return
     }
-    sessionStorage.setItem('checkout_item', JSON.stringify(checkoutItem))
-    router.push('/checkout')
+    router.push(`/checkout?id=${product.id}&qty=${quantity}`)
     setAdding(false)
   }
 
@@ -130,7 +125,6 @@ function ProductContent() {
         }
       `}</style>
 
-      {/* Navbar */}
       <nav style={{ borderBottom: '1px solid #f0f0f0', padding: '0 1rem', height: '56px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#fff', position: 'sticky', top: 0, zIndex: 50 }}>
         <a href="/" style={{ color: '#C9A84C', fontWeight: 700, fontSize: '1.1rem', letterSpacing: '2px', textDecoration: 'none' }}>DMS Market</a>
         <div className="product-nav-breadcrumb" style={{ display: 'flex', gap: '0.5rem', fontSize: '0.75rem', color: '#aaa' }}>
@@ -146,7 +140,6 @@ function ProductContent() {
       <div style={{ maxWidth: '1100px', margin: '0 auto', padding: 'clamp(1rem, 3vw, 2.5rem) clamp(0.75rem, 3vw, 2rem)' }}>
         <div className="product-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '3rem' }}>
 
-          {/* Galeria */}
           <div>
             <div className="product-image-main" style={{ background: '#f8f8f8', borderRadius: '8px', overflow: 'hidden', aspectRatio: '1', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '0.75rem', border: '1px solid #f0f0f0' }}>
               {images.length > 0 ? (
@@ -167,7 +160,6 @@ function ProductContent() {
             )}
           </div>
 
-          {/* Info */}
           <div style={{ display: 'flex', flexDirection: 'column' }}>
             <p style={{ fontSize: '0.65rem', letterSpacing: '3px', textTransform: 'uppercase', color: '#C9A84C', marginBottom: '0.5rem' }}>{product.category}</p>
             <h1 style={{ fontSize: 'clamp(1.25rem, 3vw, 1.75rem)', fontWeight: 600, color: '#111', lineHeight: 1.3, marginBottom: '0.5rem' }}>{product.name}</h1>
@@ -209,7 +201,6 @@ function ProductContent() {
               </div>
             </div>
 
-            {/* Cantidad */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
               <span style={{ fontSize: '0.75rem', color: '#666' }}>Cantidad:</span>
               <div style={{ display: 'flex', alignItems: 'center', border: '1px solid #ddd', borderRadius: '6px', overflow: 'hidden' }}>
@@ -219,7 +210,6 @@ function ProductContent() {
               </div>
             </div>
 
-            {/* Botones */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginBottom: '1rem' }}>
               <button onClick={handleBuyNow} disabled={adding}
                 style={{ width: '100%', padding: '1rem', background: adding ? '#e5e5e5' : '#C9A84C', color: adding ? '#999' : '#fff', border: 'none', fontSize: '0.875rem', fontWeight: 700, letterSpacing: '1px', textTransform: 'uppercase', cursor: adding ? 'not-allowed' : 'pointer', borderRadius: '8px' }}>
@@ -234,7 +224,6 @@ function ProductContent() {
               )}
             </div>
 
-            {/* Medios de pago */}
             <div style={{ marginBottom: '1rem' }}>
               <p style={{ fontSize: '0.65rem', letterSpacing: '1px', textTransform: 'uppercase', color: '#888', marginBottom: '0.5rem' }}>Medios de pago aceptados</p>
               <div style={{ display: 'flex', gap: '0.375rem', flexWrap: 'wrap' }}>
@@ -254,7 +243,6 @@ function ProductContent() {
               <p style={{ fontSize: '0.65rem', color: '#aaa', marginTop: '0.5rem' }}>Procesado por MercadoPago</p>
             </div>
 
-            {/* Transportadora */}
             <div style={{ marginBottom: '1rem' }}>
               <label style={{ display: 'block', fontSize: '0.65rem', letterSpacing: '1px', textTransform: 'uppercase', color: '#888', marginBottom: '0.5rem' }}>
                 Transportadora preferida
@@ -265,7 +253,6 @@ function ProductContent() {
               </select>
             </div>
 
-            {/* Vendedor */}
             {seller && (
               <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', padding: '0.875rem 1rem', border: '1px solid #f0f0f0', background: '#fafafa', borderRadius: '8px' }}>
                 <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: '#C9A84C', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
@@ -283,13 +270,11 @@ function ProductContent() {
           </div>
         </div>
 
-        {/* Descripcion */}
         <div style={{ marginTop: '2.5rem', padding: '1.5rem', background: '#fafafa', border: '1px solid #f0f0f0', borderRadius: '8px' }}>
           <h2 style={{ fontSize: '1rem', fontWeight: 600, color: '#111', marginBottom: '1rem' }}>Descripción del producto</h2>
           <p style={{ fontSize: '0.875rem', color: '#555', lineHeight: 1.8 }}>{product.description}</p>
         </div>
 
-        {/* RESENAS */}
         <div style={{ marginTop: '2.5rem', borderTop: '1px solid #f0f0f0', paddingTop: '2rem' }}>
           <h2 style={{ fontSize: '1.1rem', fontWeight: 600, color: '#111', marginBottom: '1.5rem' }}>
             Reseñas
