@@ -157,7 +157,7 @@ export default async function VendorDashboard() {
                   <tbody>
                     {orders.slice(0,5).map((order: any) => (
                       <tr key={order.id}>
-                        <td style={{ color: "#111", fontFamily: "monospace", fontSize: 12 }}>{order.id.slice(0,8)}...</td>
+                        <td style={{ color: "#ffffff", fontFamily: "monospace", fontSize: 12 }}>{order.id.slice(0,8)}...</td>
                         <td>
                           <span className="vd-badge" style={{
                             background: ["delivered","released"].includes(order.status) ? "rgba(29,158,117,.12)" : order.status === "paid" ? "rgba(212,175,55,.12)" : order.status === "shipped" ? "rgba(167,139,250,.12)" : "rgba(0,0,0,.06)",
@@ -198,7 +198,7 @@ export default async function VendorDashboard() {
                   const firstImage = images?.find((img: any) => img.product_id === product.id)?.url
                   return (
                     <div key={product.id} className="vd-product-row">
-                      <div style={{ width: 52, height: 52, flexShrink: 0, background: "#f5f5f5", borderRadius: 10, overflow: "hidden", border: "1px solid rgba(0,0,0,.06)" }}>
+                      <div style={{ width: 52, height: 52, flexShrink: 0, background: "#1a1a1a", borderRadius: 10, overflow: "hidden", border: "1px solid rgba(0,0,0,.06)" }}>
                         {firstImage
                           ? <img src={firstImage} alt={product.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                           : <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}><span style={{ fontSize: 9, color: "#ccc" }}>Sin foto</span></div>
@@ -217,7 +217,7 @@ export default async function VendorDashboard() {
                           {product.status === "approved" ? "Aprobado" : product.status === "rejected" ? "Rechazado" : "Pendiente"}
                         </span>
                         <div style={{ display: "flex", gap: 6 }}>
-                          <Link href={"/dashboard/vendor/products/" + product.id + "/edit"} style={{ fontSize: 12, padding: "4px 12px", border: "1px solid rgba(0,0,0,.1)", color: "#555", textDecoration: "none", fontWeight: 600, borderRadius: 8, fontFamily: "'Poppins',sans-serif" }}>Editar</Link>
+                          <Link href={"/dashboard/vendor/products/" + product.id + "/edit"} style={{ fontSize: 12, padding: "4px 12px", border: "1px solid rgba(0,0,0,.1)", color: "#cccccc", textDecoration: "none", fontWeight: 600, borderRadius: 8, fontFamily: "'Poppins',sans-serif" }}>Editar</Link>
                           <Link href={"/dashboard/vendor/products/" + product.id + "/delete"} style={{ fontSize: 12, padding: "4px 12px", border: "1px solid rgba(220,38,38,.2)", color: "#ef4444", textDecoration: "none", fontWeight: 600, borderRadius: 8, fontFamily: "'Poppins',sans-serif" }}>Eliminar</Link>
                         </div>
                       </div>
@@ -233,4 +233,5 @@ export default async function VendorDashboard() {
     </>
   )
 }
+
 
