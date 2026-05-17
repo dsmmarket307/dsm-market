@@ -1,4 +1,4 @@
-'use server'
+﻿'use server'
 
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
@@ -76,6 +76,7 @@ export async function login(formData: FormData) {
   if (profile?.role === 'seller') redirect('/dashboard/vendor')
   if (profile?.role === 'provider') redirect('/dashboard/provider')
   if (profile?.role === 'admin') redirect('/dashboard/admin')
+  if (profile?.role === 'buyer') redirect('/dashboard/buyer')
 
   redirect(redirectTo || '/dashboard')
 }
