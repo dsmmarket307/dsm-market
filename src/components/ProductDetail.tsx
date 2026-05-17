@@ -37,8 +37,6 @@ export default function ProductDetail({ product, images, reviews: initialReviews
 
   function handleBuy() {
     window.location.href = '/checkout?id=' + product.id + '&qty=' + quantity
-  }))
-    window.location.href = '/checkout'
   }
 
   async function handleAddToCart() {
@@ -327,6 +325,8 @@ export default function ProductDetail({ product, images, reviews: initialReviews
     </div>
   )
 }
+
+
 
 
 
