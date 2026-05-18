@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
@@ -278,3 +278,8 @@ export default function CheckoutPage() {
     </div>
   )
 }
+     <footer style={{ background: '#0B0B0B', borderTop: '1px solid rgba(212,175,55,.15)', marginTop: '4rem', padding: '2rem clamp(1rem, 4vw, 2.5rem)', textAlign: 'center' }}>
+        <img src="https://awbepztacmvurjylfoas.supabase.co/storage/v1/object/public/assets/ChatGPT_Image_3_may_2026__21_13_12-removebg-preview.png" alt="DMS Market" style={{ height: '50px', objectFit: 'contain', marginBottom: '1rem' }} />
+        <p style={{ fontSize: '0.75rem', color: '#444' }}>2025 DMS Market · Colombia · Todos los derechos reservados.</p>
+        <p style={{ fontSize: '0.75rem', color: '#444', marginTop: '0.25rem' }}>Pagos procesados por Mercado Pago</p>
+      </footer>
