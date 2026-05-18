@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
@@ -160,8 +160,8 @@ export default function ProductDetail({ product, images, reviews, avgRating, use
                 <img src="https://upload.wikimedia.org/wikipedia/commons/0/04/Visa.svg" alt="Visa" style={{ height: '16px', objectFit: 'contain' }} />
                 <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="Mastercard" style={{ height: '20px', objectFit: 'contain' }} />
                 <img src="https://upload.wikimedia.org/wikipedia/commons/f/fa/American_Express_logo_%282018%29.svg" alt="Amex" style={{ height: '20px', objectFit: 'contain' }} />
-                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/Nequi_Logo.svg/1200px-Nequi_Logo.svg.png" alt="Nequi" style={{ height: '20px', objectFit: 'contain' }} />
-                <img src="https://logodownload.org/wp-content/uploads/2022/03/daviplata-logo-0.png" alt="Daviplata" style={{ height: '20px', objectFit: 'contain' }} />
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQk3MNgAJzgzJIAXwJaLuKMHnMZSBqSKpbFvA&s" alt="Nequi" style={{ height: '20px', objectFit: 'contain' }} />
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR8y5JrQvWmZaGBHW3FzBOJnBXVLxYtSgRRow&s" alt="Daviplata" style={{ height: '20px', objectFit: 'contain' }} />
                 <span style={{ fontSize: '0.75rem', color: '#888' }}>PSE · Efecty · Baloto</span>
               </div>
             </div>
