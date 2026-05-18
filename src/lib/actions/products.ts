@@ -1,4 +1,4 @@
-'use server'
+﻿'use server'
 
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
@@ -26,7 +26,7 @@ export async function createProduct(formData: FormData) {
     .eq('id', user.id)
     .single()
 
-  if (profile?.seller_status !== 'approved') return { error: 'Tu perfil no está aprobado aún' }
+  if (profile?.seller_status !== 'approved') return { error: 'Tu perfil no estÃ¡ aprobado aÃºn' }
 
   const name = formData.get('name') as string
   const description = formData.get('description') as string
@@ -36,14 +36,16 @@ export async function createProduct(formData: FormData) {
   const condition = formData.get('condition') as string
   const stock = formData.get('stock') ? parseInt(formData.get('stock') as string) : null
   const envio_gratis = formData.get('envio_gratis') === 'true'
+  const variantesRaw = formData.get('variantes') as string
+  const variantes = variantesRaw ? JSON.parse(variantesRaw) : null
   const images = formData.getAll('images') as File[]
 
   if (!name || !price || !category) return { error: 'Completa todos los campos requeridos' }
-  if (images.length > 10) return { error: 'Máximo 10 fotos por producto' }
+  if (images.length > 10) return { error: 'MÃ¡ximo 10 fotos por producto' }
 
   const { data: product, error: productError } = await admin
     .from('products')
-    .insert({ seller_id: user.id, name, description, price, original_price, category, condition, stock, envio_gratis, status: 'pending' })
+    .insert({ seller_id: user.id, name, description, price, original_price, category, condition, stock, envio_gratis, variantes, status: 'pending' })
     .select()
     .single()
 
