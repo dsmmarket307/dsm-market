@@ -127,7 +127,7 @@ export default function ProductDetail({ product, images, reviews, avgRating, use
             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.25rem' }}>
               <span style={{ fontSize: '0.85rem', color: '#555', fontWeight: 500 }}>Cantidad</span>
               <div style={{ display: 'flex', alignItems: 'center', border: '1px solid #ddd', borderRadius: '8px', overflow: 'hidden' }}>
-                <button onClick={() => setQuantity(q => Math.max(1, q - 1))} style={{ width: '40px', height: '40px', background: '#f8f8f8', border: 'none', cursor: 'pointer', fontSize: '1.1rem', color: '#333', borderRight: '1px solid #ddd' }}>âˆ’</button>
+                <button onClick={() => setQuantity(q => Math.max(1, q - 1))} style={{ width: '40px', height: '40px', background: '#f8f8f8', border: 'none', cursor: 'pointer', fontSize: '1.1rem', color: '#333', borderRight: '1px solid #ddd' }}>-</button>
                 <span style={{ width: '48px', textAlign: 'center', fontSize: '0.95rem', fontWeight: 600, color: '#111' }}>{quantity}</span>
                 <button onClick={() => setQuantity(q => q + 1)} style={{ width: '40px', height: '40px', background: '#f8f8f8', border: 'none', cursor: 'pointer', fontSize: '1.1rem', color: '#333', borderLeft: '1px solid #ddd' }}>+</button>
               </div>
