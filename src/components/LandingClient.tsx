@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
@@ -67,7 +67,7 @@ export default function LandingClient({ products, images, banners }: any) {
           )}
           {product.envio_gratis && (
             <div style={{ position: 'absolute', top: '0.6rem', right: '0.6rem', background: '#16a34a', color: '#fff', fontSize: '0.6rem', fontWeight: 700, padding: '0.25rem 0.6rem', borderRadius: '999px' }}>
-              EnvÃ­o gratis
+              EnvÃƒÂ­o gratis
             </div>
           )}
           {product.original_price && Number(product.original_price) > Number(product.price) && (
@@ -120,13 +120,12 @@ export default function LandingClient({ products, images, banners }: any) {
               {banner.image_url ? (
                 <div style={{ position: 'relative', width: '100%', height: '100%' }}>
                   <img src={banner.image_url} alt={banner.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                  <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to right, rgba(11,11,11,0.85) 0%, rgba(11,11,11,0.4) 60%, transparent 100%)' }} />
                   <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'flex-start', justifyContent: 'center', padding: 'clamp(2rem, 8vw, 6rem)' }}>
                     <p style={{ color: '#D4AF37', fontSize: '0.7rem', letterSpacing: '4px', textTransform: 'uppercase', marginBottom: '1rem', fontWeight: 600 }}>DMS Market</p>
                     <h1 style={{ color: '#fff', fontSize: 'clamp(1.5rem, 4.5vw, 3.5rem)', fontWeight: 800, lineHeight: 1.1, maxWidth: '600px', marginBottom: '1rem', textShadow: '0 2px 20px rgba(0,0,0,0.5)' }}>{banner.title}</h1>
                     {banner.subtitle && <p style={{ color: 'rgba(255,255,255,0.75)', fontSize: 'clamp(0.875rem, 2vw, 1.1rem)', maxWidth: '460px', marginBottom: '2rem', lineHeight: 1.7 }}>{banner.subtitle}</p>}
                     <a href={banner.link ?? '/auth/register'} style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: '#D4AF37', color: '#0B0B0B', padding: '0.875rem 2rem', textDecoration: 'none', fontSize: '0.85rem', fontWeight: 700, borderRadius: '10px' }}>
-                      Explorar productos â†’
+                      Explorar productos Ã¢â€ â€™
                     </a>
                   </div>
                 </div>
@@ -136,7 +135,7 @@ export default function LandingClient({ products, images, banners }: any) {
                   <h1 style={{ color: '#fff', fontSize: 'clamp(1.5rem, 4.5vw, 3.5rem)', fontWeight: 800, lineHeight: 1.1, maxWidth: '600px', marginBottom: '1rem' }}>{banner.title}</h1>
                   {banner.subtitle && <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: 'clamp(0.875rem, 2vw, 1.1rem)', maxWidth: '460px', marginBottom: '2rem' }}>{banner.subtitle}</p>}
                   <a href={banner.link ?? '/auth/register'} style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: '#D4AF37', color: '#0B0B0B', padding: '0.875rem 2rem', textDecoration: 'none', fontSize: '0.85rem', fontWeight: 700, borderRadius: '10px' }}>
-                    Explorar productos â†’
+                    Explorar productos Ã¢â€ â€™
                   </a>
                 </div>
               )}
@@ -173,7 +172,7 @@ export default function LandingClient({ products, images, banners }: any) {
           <div style={{ maxWidth: '1280px', margin: '0 auto' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
               <h2 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#0B0B0B', margin: 0 }}>Explora nuestras Categorias</h2>
-              <a href="/auth/login" style={{ fontSize: '0.8rem', color: '#D4AF37', textDecoration: 'none', fontWeight: 600 }}>Ver todas â†’</a>
+              <a href="/auth/login" style={{ fontSize: '0.8rem', color: '#D4AF37', textDecoration: 'none', fontWeight: 600 }}>Ver todas Ã¢â€ â€™</a>
             </div>
             <div style={{ display: 'flex', gap: '0.75rem', overflowX: 'auto', paddingBottom: '0.5rem' }}>
               <button onClick={() => setSelectedCategory('')}
@@ -198,10 +197,10 @@ export default function LandingClient({ products, images, banners }: any) {
         <div style={{ maxWidth: '1280px', margin: '0 auto' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '0.5rem' }}>
             <h2 style={{ fontSize: 'clamp(1.1rem, 3vw, 1.4rem)', fontWeight: 700, color: '#0B0B0B', margin: 0 }}>
-              {search ? 'Resultados de bÃºsqueda' : selectedCategory ? selectedCategory : 'Productos destacados'}
+              {search ? 'Resultados de bÃƒÂºsqueda' : selectedCategory ? selectedCategory : 'Productos destacados'}
               <span style={{ fontSize: '0.8rem', color: '#aaa', fontWeight: 400, marginLeft: '0.5rem' }}>({filtered.length})</span>
             </h2>
-            <a href="/auth/login" style={{ fontSize: '0.8rem', color: '#D4AF37', textDecoration: 'none', fontWeight: 600 }}>Ver todos â†’</a>
+            <a href="/auth/login" style={{ fontSize: '0.8rem', color: '#D4AF37', textDecoration: 'none', fontWeight: 600 }}>Ver todos Ã¢â€ â€™</a>
           </div>
           {filtered.length === 0 ? (
             <div style={{ textAlign: 'center', padding: '4rem 2rem', background: '#fff', borderRadius: '16px' }}>
@@ -230,7 +229,7 @@ export default function LandingClient({ products, images, banners }: any) {
                   <span style={{ fontSize: '0.8rem', color: '#aaa', fontWeight: 400, marginLeft: '0.5rem' }}>({ofertasMes.length})</span>
                 </h2>
               </div>
-              <a href="/auth/login" style={{ fontSize: '0.8rem', color: '#EF4444', textDecoration: 'none', fontWeight: 600, border: '1px solid #EF4444', padding: '0.4rem 1rem', borderRadius: '8px' }}>Ver todas â†’</a>
+              <a href="/auth/login" style={{ fontSize: '0.8rem', color: '#EF4444', textDecoration: 'none', fontWeight: 600, border: '1px solid #EF4444', padding: '0.4rem 1rem', borderRadius: '8px' }}>Ver todas Ã¢â€ â€™</a>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(clamp(160px, 20vw, 220px), 1fr))', gap: 'clamp(0.75rem, 2vw, 1.25rem)' }}>
               {ofertasMes.map((product: any) => (
@@ -304,7 +303,7 @@ export default function LandingClient({ products, images, banners }: any) {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '2rem', marginBottom: '2.5rem' }}>
             <div>
               <img src="https://awbepztacmvurjylfoas.supabase.co/storage/v1/object/public/assets/ChatGPT_Image_3_may_2026__21_13_12-removebg-preview.png" alt="DMS Market" style={{ height: '70px', width: 'auto', objectFit: 'contain', marginBottom: '0.75rem' }} />
-              <p style={{ fontSize: '0.8rem', color: '#D1D1D1', lineHeight: 1.7, marginBottom: '1rem' }}>La plataforma donde comprar y vender es facil, seguro y rÃ¡pido.</p>
+              <p style={{ fontSize: '0.8rem', color: '#D1D1D1', lineHeight: 1.7, marginBottom: '1rem' }}>La plataforma donde comprar y vender es facil, seguro y rÃƒÂ¡pido.</p>
               <div style={{ display: 'flex', gap: '0.75rem' }}>
                 {[
                   { label: 'f', icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="#D4AF37"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg> },
@@ -344,3 +343,4 @@ export default function LandingClient({ products, images, banners }: any) {
     </div>
   )
 }
+
