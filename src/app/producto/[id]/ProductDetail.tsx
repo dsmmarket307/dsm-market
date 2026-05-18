@@ -195,7 +195,7 @@ export default function ProductDetail({ product, images, reviews, avgRating, use
                   </div>
                 </div>
                 <a href={`/tienda/${seller.id}`} style={{ padding: '8px 16px', background: '#0B0B0B', color: '#D4AF37', textDecoration: 'none', borderRadius: '8px', fontSize: '0.8rem', fontWeight: 700, whiteSpace: 'nowrap', border: '1px solid rgba(212,175,55,.3)' }}>
-                  Ver tienda completa â†’
+                  Ver tienda completa ->†’
                 </a>
               </div>
             )}
@@ -215,7 +215,7 @@ export default function ProductDetail({ product, images, reviews, avgRating, use
           {/* FORM RESEÃ‘A */}
           {user ? (
             <form onSubmit={handleReview} style={{ background: '#f8f8f8', borderRadius: '12px', padding: '1.5rem', marginBottom: '2rem', border: '1px solid #eee' }}>
-              <p style={{ fontSize: '0.85rem', fontWeight: 600, color: '#111', marginBottom: '1rem' }}>DejÃ¡ tu Resena</p>
+              <p style={{ fontSize: '0.85rem', fontWeight: 600, color: '#111', marginBottom: '1rem' }}>Deja tu Resena</p>
               <div style={{ display: 'flex', gap: '4px', marginBottom: '1rem' }}>
                 {[1,2,3,4,5].map(s => (
                   <button key={s} type="button" onClick={() => setReviewRating(s)}
