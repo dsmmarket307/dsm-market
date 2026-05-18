@@ -162,7 +162,7 @@ export default function ProductDetail({ product, images, reviews, avgRating, use
                 <img src="https://upload.wikimedia.org/wikipedia/commons/f/fa/American_Express_logo_%282018%29.svg" alt="Amex" style={{ height: '20px', objectFit: 'contain' }} />
                 <img src="https://www.nequi.com.co/wp-content/themes/nequi/assets/img/logo.svg" alt="Nequi" style={{ height: '20px', objectFit: 'contain' }} />
                 <img src="https://www.daviplata.com/documents/20182/0/Logo_DaviPlata.png" alt="Daviplata" style={{ height: '20px', objectFit: 'contain' }} />
-                <span style={{ fontSize: '0.75rem', color: '#888' }}>PSE · Efecty · Baloto</span>
+                
               </div>
             </div>
 
