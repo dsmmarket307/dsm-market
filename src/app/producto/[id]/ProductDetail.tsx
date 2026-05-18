@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
@@ -110,15 +110,15 @@ export default function ProductDetail({ product, images, reviews, avgRating, use
                   </svg>
                 ))}
               </div>
-              <span style={{ fontSize: '0.8rem', color: '#888' }}>({reviews?.length ?? 0} reseÃ±as)</span>
-              {product.vendidos > 0 && <span style={{ fontSize: '0.8rem', color: '#888' }}>Â· {product.vendidos} vendidos</span>}
+              <span style={{ fontSize: '0.8rem', color: '#888' }}>({reviews?.length ?? 0} resenas)</span>
+              {product.vendidos > 0 && <span style={{ fontSize: '0.8rem', color: '#888' }}> {product.vendidos} vendidos</span>}
             </div>
 
             {/* PRECIO */}
             <div style={{ marginBottom: '1.25rem' }}>
               {formattedOriginal && <p style={{ fontSize: '0.9rem', color: '#bbb', textDecoration: 'line-through', marginBottom: '0.25rem' }}>{formattedOriginal}</p>}
               <p style={{ fontSize: 'clamp(1.75rem, 4vw, 2.5rem)', fontWeight: 800, color: '#111', lineHeight: 1 }}>{formattedPrice}</p>
-              <p style={{ fontSize: '0.75rem', color: '#888', marginTop: '0.25rem' }}>COP Â· Precio final</p>
+              <p style={{ fontSize: '0.75rem', color: '#888', marginTop: '0.25rem' }}>COP  Precio final</p>
             </div>
 
             <p style={{ fontSize: '0.9rem', color: '#555', lineHeight: 1.7, marginBottom: '1.25rem' }}>{product.description}</p>
@@ -160,7 +160,7 @@ export default function ProductDetail({ product, images, reviews, avgRating, use
                 <img src="https://upload.wikimedia.org/wikipedia/commons/0/04/Visa.svg" alt="Visa" style={{ height: '16px', objectFit: 'contain' }} />
                 <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="Mastercard" style={{ height: '20px', objectFit: 'contain' }} />
                 <img src="https://upload.wikimedia.org/wikipedia/commons/f/fa/American_Express_logo_%282018%29.svg" alt="Amex" style={{ height: '20px', objectFit: 'contain' }} />
-                <span style={{ fontSize: '0.75rem', color: '#888' }}>PSE Â· Efecty Â· Baloto</span>
+                <span style={{ fontSize: '0.75rem', color: '#888' }}>PSE  Efecty  Baloto</span>
               </div>
             </div>
 
@@ -210,12 +210,12 @@ export default function ProductDetail({ product, images, reviews, avgRating, use
 
         {/* RESEÃ‘AS */}
         <div style={{ marginTop: '4rem', borderTop: '1px solid #eee', paddingTop: '2rem' }}>
-          <h2 style={{ fontSize: '1.25rem', fontWeight: 700, color: '#111', marginBottom: '1.5rem' }}>ReseÃ±as {reviews?.length > 0 ? `(${reviews.length})` : ''}</h2>
+          <h2 style={{ fontSize: '1.25rem', fontWeight: 700, color: '#111', marginBottom: '1.5rem' }}>resenas {reviews?.length > 0 ? `(${reviews.length})` : ''}</h2>
 
           {/* FORM RESEÃ‘A */}
           {user ? (
             <form onSubmit={handleReview} style={{ background: '#f8f8f8', borderRadius: '12px', padding: '1.5rem', marginBottom: '2rem', border: '1px solid #eee' }}>
-              <p style={{ fontSize: '0.85rem', fontWeight: 600, color: '#111', marginBottom: '1rem' }}>DejÃ¡ tu reseÃ±a</p>
+              <p style={{ fontSize: '0.85rem', fontWeight: 600, color: '#111', marginBottom: '1rem' }}>DejÃ¡ tu Resena</p>
               <div style={{ display: 'flex', gap: '4px', marginBottom: '1rem' }}>
                 {[1,2,3,4,5].map(s => (
                   <button key={s} type="button" onClick={() => setReviewRating(s)}
@@ -229,16 +229,16 @@ export default function ProductDetail({ product, images, reviews, avgRating, use
               <textarea value={reviewText} onChange={e => setReviewText(e.target.value)} required rows={3}
                 placeholder="Contanos tu experiencia con este producto..."
                 style={{ width: '100%', padding: '0.75rem', border: '1px solid #ddd', borderRadius: '8px', fontSize: '0.875rem', outline: 'none', resize: 'vertical', fontFamily: 'sans-serif', boxSizing: 'border-box' }} />
-              {reviewSuccess && <p style={{ color: '#16a34a', fontSize: '0.85rem', marginTop: '0.5rem' }}>ReseÃ±a enviada. Gracias!</p>}
+              {reviewSuccess && <p style={{ color: '#16a34a', fontSize: '0.85rem', marginTop: '0.5rem' }}>Resena enviada. Gracias!</p>}
               <button type="submit" disabled={submittingReview}
                 style={{ marginTop: '0.75rem', padding: '0.75rem 1.5rem', background: '#D4AF37', color: '#0B0B0B', border: 'none', borderRadius: '8px', fontSize: '0.85rem', fontWeight: 700, cursor: 'pointer' }}>
-                {submittingReview ? 'Enviando...' : 'Enviar reseÃ±a'}
+                {submittingReview ? 'Enviando...' : 'Enviar Resena'}
               </button>
             </form>
           ) : (
             <div style={{ background: '#f8f8f8', borderRadius: '12px', padding: '1.25rem', marginBottom: '2rem', textAlign: 'center' }}>
               <p style={{ color: '#888', fontSize: '0.875rem' }}>
-                <a href="/auth/login" style={{ color: '#D4AF37', fontWeight: 600 }}>IniciÃ¡ sesiÃ³n</a> para dejar una reseÃ±a
+                <a href="/auth/login" style={{ color: '#D4AF37', fontWeight: 600 }}>IniciÃ¡ sesion</a> para dejar una Resena
               </p>
             </div>
           )}
@@ -269,7 +269,7 @@ export default function ProductDetail({ product, images, reviews, avgRating, use
               ))}
             </div>
           ) : (
-            <p style={{ color: '#888', fontSize: '0.875rem', textAlign: 'center', padding: '2rem' }}>Aun no hay reseÃ±as. Se el primero en opinar.</p>
+            <p style={{ color: '#888', fontSize: '0.875rem', textAlign: 'center', padding: '2rem' }}>Aun no hay resenas. Se el primero en opinar.</p>
           )}
         </div>
       </div>
