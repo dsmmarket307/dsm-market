@@ -18,6 +18,7 @@ export default function NewProductPage() {
   const [images, setImages]       = useState<File[]>([])
   const [previews, setPreviews]   = useState<string[]>([])
   const [envioGratis, setEnvioGratis] = useState(false)
+  const [variantes, setVariantes] = useState<{ nombre: string; opciones: string }[]>([])
 
   function handleImages(e: React.ChangeEvent<HTMLInputElement>) {
     const files = Array.from(e.target.files ?? [])
@@ -41,10 +42,28 @@ export default function NewProductPage() {
     setPreviews(prev => prev.filter((_,j) => j !== i))
   }
 
+  function agregarVariante() {
+    setVariantes(prev => [...prev, { nombre: "", opciones: "" }])
+  }
+
+  function eliminarVariante(i: number) {
+    setVariantes(prev => prev.filter((_,j) => j !== i))
+  }
+
+  function updateVariante(i: number, field: "nombre" | "opciones", value: string) {
+    setVariantes(prev => prev.map((v, j) => j === i ? { ...v, [field]: value } : v))
+  }
+
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault(); setError(""); setLoading(true)
     const formData = new FormData(e.currentTarget)
     formData.set("envio_gratis", String(envioGratis))
+    formData.set("variantes", JSON.stringify(
+      variantes.filter(v => v.nombre && v.opciones).map(v => ({
+        nombre: v.nombre,
+        opciones: v.opciones.split(",").map(o => o.trim()).filter(Boolean)
+      }))
+    ))
     images.forEach(img => formData.append("images", img))
     const result = await createProduct(formData)
     if (result?.error) { setError(result.error); setLoading(false) }
@@ -140,6 +159,32 @@ export default function NewProductPage() {
               </div>
             </div>
 
+            {/* VARIANTES */}
+            <div className="np-card">
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+                <label className="np-label" style={{ margin: 0 }}>Variantes (opcional)</label>
+                <button type="button" onClick={agregarVariante}
+                  style={{ padding: "6px 14px", background: "rgba(212,175,55,.1)", border: "1px solid rgba(212,175,55,.3)", borderRadius: 8, color: "#D4AF37", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "'Poppins',sans-serif" }}>
+                  + Agregar variante
+                </button>
+              </div>
+              {variantes.length === 0 && (
+                <p style={{ fontSize: 13, color: "#666", fontFamily: "'Poppins',sans-serif" }}>Ej: Talla (S, M, L, XL) o Color (Rojo, Azul, Negro)</p>
+              )}
+              {variantes.map((v, i) => (
+                <div key={i} style={{ display: "grid", gridTemplateColumns: "1fr 2fr auto", gap: 10, marginBottom: 10, alignItems: "center" }}>
+                  <input value={v.nombre} onChange={e => updateVariante(i, "nombre", e.target.value)}
+                    placeholder="Ej: Talla" className="np-input" />
+                  <input value={v.opciones} onChange={e => updateVariante(i, "opciones", e.target.value)}
+                    placeholder="Ej: S, M, L, XL" className="np-input" />
+                  <button type="button" onClick={() => eliminarVariante(i)}
+                    style={{ width: 36, height: 36, background: "rgba(220,38,38,.1)", border: "1px solid rgba(220,38,38,.2)", borderRadius: 8, color: "#ef4444", cursor: "pointer", fontSize: 16, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    ×
+                  </button>
+                </div>
+              ))}
+            </div>
+
             <div className="np-card" style={{ border: `1px solid ${envioGratis ? "rgba(22,163,74,.3)" : "rgba(212,175,55,.08)"}`, background: envioGratis ? "rgba(22,163,74,.05)" : "#151515", cursor: "pointer", transition: "all .2s" }} onClick={() => setEnvioGratis(!envioGratis)}>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
@@ -159,12 +204,7 @@ export default function NewProductPage() {
 
             <div className="np-card">
               <label className="np-label">Fotos del producto (maximo 10)</label>
-              <div
-                className="np-drop"
-                onClick={() => document.getElementById("img-input")?.click()}
-                onPaste={handlePaste}
-                tabIndex={0}
-              >
+              <div className="np-drop" onClick={() => document.getElementById("img-input")?.click()} onPaste={handlePaste} tabIndex={0}>
                 <input id="img-input" type="file" accept="image/*" multiple style={{ display: "none" }} onChange={handleImages} />
                 <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#666" strokeWidth="1.25" style={{ marginBottom: 10 }}>
                   <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>
