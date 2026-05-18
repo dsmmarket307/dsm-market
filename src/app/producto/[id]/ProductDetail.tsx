@@ -160,8 +160,8 @@ export default function ProductDetail({ product, images, reviews, avgRating, use
                 <img src="https://upload.wikimedia.org/wikipedia/commons/0/04/Visa.svg" alt="Visa" style={{ height: '16px', objectFit: 'contain' }} />
                 <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="Mastercard" style={{ height: '20px', objectFit: 'contain' }} />
                 <img src="https://upload.wikimedia.org/wikipedia/commons/f/fa/American_Express_logo_%282018%29.svg" alt="Amex" style={{ height: '20px', objectFit: 'contain' }} />
-                <img src="https://www.nequi.com.co/wp-content/themes/nequi/assets/img/logo.svg" alt="Nequi" style={{ height: '20px', objectFit: 'contain' }} />
-                <img src="https://www.daviplata.com/documents/20182/0/Logo_DaviPlata.png" alt="Daviplata" style={{ height: '20px', objectFit: 'contain' }} />
+                <img src="https://awbepztacmvurjylfoas.supabase.co/storage/v1/object/public/assets/nequi-logo-png.png" alt="Nequi" style={{ height: '20px', objectFit: 'contain' }} />
+                <img src="https://awbepztacmvurjylfoas.supabase.co/storage/v1/object/public/assets/daviplata.png" alt="Daviplata" style={{ height: '20px', objectFit: 'contain' }} />
                 
               </div>
             </div>
