@@ -97,7 +97,7 @@ export default function LandingClient({ products, images, banners }: any) {
 
       {/* NAVBAR */}
       <nav style={{ padding: '0 clamp(1rem, 4vw, 2.5rem)', height: '68px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 0, background: '#0B0B0B', zIndex: 50, boxShadow: '0 2px 20px rgba(0,0,0,0.3)' }}>
-       <img src="https://awbepztacmvurjylfoas.supabase.co/storage/v1/object/public/assets/ChatGPT_Image_3_may_2026__21_13_12-removebg-preview.png" alt="DMS Market" style={{ height: '52px', width: 'auto', objectFit: 'contain' }} />
+       <img src="https://awbepztacmvurjylfoas.supabase.co/storage/v1/object/public/assets/ChatGPT_Image_3_may_2026__21_13_12-removebg-preview.png" alt="DMS Market" style={{ height: '65px', width: 'auto', objectFit: 'contain' }} />
         <div style={{ flex: 1, maxWidth: '500px', margin: '0 clamp(0.5rem, 2vw, 2rem)', display: 'flex', background: '#1a1a1a', borderRadius: '10px', overflow: 'hidden', border: '1px solid rgba(212,175,55,0.2)' }}>
           <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Buscar productos o servicios..."
             style={{ flex: 1, padding: '0.7rem 1rem', border: 'none', fontSize: '0.875rem', outline: 'none', color: '#fff', background: 'transparent' }} />
@@ -336,6 +336,7 @@ export default function LandingClient({ products, images, banners }: any) {
     </div>
   )
 }
+
 
 
 
