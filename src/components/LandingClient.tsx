@@ -61,7 +61,7 @@ export default function LandingClient({ products, images, banners }: any) {
             </div>
           )}
           {showBadge && product.badge && (
-            <div style={{ position: 'absolute', top: '0.6rem', left: '0.6rem', background: product.badge === 'Lo mÃ¡s vendido' ? '#D4AF37' : '#EF4444', color: '#fff', fontSize: '0.6rem', fontWeight: 700, padding: '0.25rem 0.6rem', borderRadius: '999px' }}>
+            <div style={{ position: 'absolute', top: '0.6rem', left: '0.6rem', background: product.badge === 'Lo mas vendido' ? '#D4AF37' : '#EF4444', color: '#fff', fontSize: '0.6rem', fontWeight: 700, padding: '0.25rem 0.6rem', borderRadius: '999px' }}>
               {product.badge}
             </div>
           )}
@@ -172,7 +172,7 @@ export default function LandingClient({ products, images, banners }: any) {
         <div style={{ background: '#fff', padding: 'clamp(1.5rem, 3vw, 2.5rem) clamp(1rem, 4vw, 2rem)', borderBottom: '1px solid #f0f0f0' }}>
           <div style={{ maxWidth: '1280px', margin: '0 auto' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
-              <h2 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#0B0B0B', margin: 0 }}>Explora nuestras categorÃ­as</h2>
+              <h2 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#0B0B0B', margin: 0 }}>Explora nuestras Categorias</h2>
               <a href="/auth/login" style={{ fontSize: '0.8rem', color: '#D4AF37', textDecoration: 'none', fontWeight: 600 }}>Ver todas â†’</a>
             </div>
             <div style={{ display: 'flex', gap: '0.75rem', overflowX: 'auto', paddingBottom: '0.5rem' }}>
@@ -246,9 +246,9 @@ export default function LandingClient({ products, images, banners }: any) {
         <div style={{ maxWidth: '1100px', margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '2rem' }}>
           {[
             { icon: <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" strokeWidth="1.5"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>, title: 'Compra segura', desc: 'Sistema escrow que protege tu dinero hasta confirmar la entrega.' },
-            { icon: <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" strokeWidth="1.5"><path d="M9 12l2 2 4-4"/><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20z"/></svg>, title: 'Vendedores verificados', desc: 'Todos los vendedores pasan por verificaciÃ³n de identidad.' },
-            { icon: <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" strokeWidth="1.5"><path d="M5 17H3a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11a2 2 0 0 1 2 2v3"/><rect x="9" y="11" width="14" height="10" rx="1"/><path d="M16 11v-1a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v1"/></svg>, title: 'EnvÃ­os rÃ¡pidos', desc: 'Recibe tus productos a tiempo con transportadoras confiables.' },
-            { icon: <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" strokeWidth="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>, title: 'Soporte 24/7', desc: 'Estamos aquÃ­ para ayudarte en cada paso de tu compra.' },
+            { icon: <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" strokeWidth="1.5"><path d="M9 12l2 2 4-4"/><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20z"/></svg>, title: 'Vendedores verificados', desc: 'Todos los vendedores pasan por verificacion de identidad.' },
+            { icon: <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" strokeWidth="1.5"><path d="M5 17H3a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11a2 2 0 0 1 2 2v3"/><rect x="9" y="11" width="14" height="10" rx="1"/><path d="M16 11v-1a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v1"/></svg>, title: 'Envios rapidos', desc: 'Recibe tus productos a tiempo con transportadoras confiables.' },
+            { icon: <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" strokeWidth="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>, title: 'Soporte 24/7', desc: 'Estamos aqui para ayudarte en cada paso de tu compra.' },
           ].map(item => (
             <div key={item.title} style={{ textAlign: 'center', padding: '1.5rem 1rem' }}>
               <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1rem' }}>{item.icon}</div>
@@ -263,12 +263,12 @@ export default function LandingClient({ products, images, banners }: any) {
       <section style={{ background: '#F5F5F5', padding: 'clamp(3rem, 6vw, 5rem) clamp(1rem, 4vw, 2rem)' }}>
         <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
           <p style={{ color: '#D4AF37', fontSize: '0.7rem', letterSpacing: '4px', textTransform: 'uppercase', textAlign: 'center', marginBottom: '0.75rem', fontWeight: 600 }}>Simple y seguro</p>
-          <h2 style={{ fontSize: 'clamp(1.5rem, 4vw, 2rem)', fontWeight: 700, color: '#0B0B0B', marginBottom: 'clamp(2rem, 4vw, 3rem)', textAlign: 'center' }}>CÃ³mo funciona DMS Market</h2>
+          <h2 style={{ fontSize: 'clamp(1.5rem, 4vw, 2rem)', fontWeight: 700, color: '#0B0B0B', marginBottom: 'clamp(2rem, 4vw, 3rem)', textAlign: 'center' }}>Como funciona DMS Market</h2>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.5rem' }}>
             {[
-              { num: '01', title: 'Crea tu cuenta', desc: 'RegÃ­strate gratis en minutos como comprador o vendedor.' },
+              { num: '01', title: 'Crea tu cuenta', desc: 'Registrate gratis en minutos como comprador o vendedor.' },
               { num: '02', title: 'Compra o vende', desc: 'Publica productos o encuentra exactamente lo que necesitas.' },
-              { num: '03', title: 'Pago protegido', desc: 'Tu dinero queda retenido 7 dÃ­as hasta confirmar la entrega.' },
+              { num: '03', title: 'Pago protegido', desc: 'Tu dinero queda retenido 7 dias hasta confirmar la entrega.' },
             ].map((s) => (
               <div key={s.num} style={{ background: '#fff', borderRadius: '16px', padding: '2rem 1.5rem', borderTop: '4px solid #D4AF37', boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
                 <p style={{ fontSize: '2.5rem', fontWeight: 800, color: '#D4AF37', marginBottom: '1rem', lineHeight: 1 }}>{s.num}</p>
@@ -286,13 +286,13 @@ export default function LandingClient({ products, images, banners }: any) {
           <div style={{ textAlign: 'center', padding: '2.5rem 2rem', border: '1px solid rgba(212,175,55,0.3)', borderRadius: '20px', background: 'rgba(212,175,55,0.04)' }}>
             <p style={{ color: '#D4AF37', fontSize: '0.65rem', letterSpacing: '4px', textTransform: 'uppercase', marginBottom: '1rem', fontWeight: 600 }}>Para vendedores</p>
             <h2 style={{ fontSize: 'clamp(1.25rem, 3vw, 1.75rem)', fontWeight: 700, color: '#fff', marginBottom: '1rem' }}>Vende productos en DSM</h2>
-            <p style={{ fontSize: '0.875rem', color: 'rgba(255,255,255,0.5)', marginBottom: '2rem', lineHeight: 1.7 }}>Solo 5% de comisiÃ³n por venta. Sin mensualidades. Pagos protegidos con escrow.</p>
+            <p style={{ fontSize: '0.875rem', color: 'rgba(255,255,255,0.5)', marginBottom: '2rem', lineHeight: 1.7 }}>Solo 5% de comision por venta. Sin mensualidades. Pagos protegidos con escrow.</p>
             <a href="/auth/register" style={{ display: 'inline-block', background: '#D4AF37', color: '#0B0B0B', padding: '0.875rem 2rem', textDecoration: 'none', fontSize: '0.85rem', fontWeight: 700, borderRadius: '10px' }}>Quiero ser vendedor</a>
           </div>
           <div style={{ textAlign: 'center', padding: '2.5rem 2rem', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '20px' }}>
             <p style={{ color: '#aaa', fontSize: '0.65rem', letterSpacing: '4px', textTransform: 'uppercase', marginBottom: '1rem', fontWeight: 600 }}>Servicios Profesionales</p>
-            <h2 style={{ fontSize: 'clamp(1.25rem, 3vw, 1.75rem)', fontWeight: 700, color: '#fff', marginBottom: '1rem' }}>Â¿Ofreces un servicio?</h2>
-            <p style={{ fontSize: '0.875rem', color: 'rgba(255,255,255,0.5)', marginBottom: '2rem', lineHeight: 1.7 }}>Publica gratis tu servicio de diseÃ±o, plomerÃ­a, clases, reparaciones y mÃ¡s. 3 meses gratis.</p>
+            <h2 style={{ fontSize: 'clamp(1.25rem, 3vw, 1.75rem)', fontWeight: 700, color: '#fff', marginBottom: '1rem' }}>Ofreces un servicio?</h2>
+            <p style={{ fontSize: '0.875rem', color: 'rgba(255,255,255,0.5)', marginBottom: '2rem', lineHeight: 1.7 }}>Publica gratis tu servicio de diseno, plomeria, clases, reparaciones y mas. 3 meses gratis.</p>
             <a href="/auth/register-provider" style={{ display: 'inline-block', background: 'transparent', color: '#D4AF37', padding: '0.875rem 2rem', textDecoration: 'none', fontSize: '0.85rem', fontWeight: 700, borderRadius: '10px', border: '1px solid #D4AF37' }}>Publicar mi servicio gratis</a>
           </div>
         </div>
@@ -304,7 +304,7 @@ export default function LandingClient({ products, images, banners }: any) {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '2rem', marginBottom: '2.5rem' }}>
             <div>
               <img src="https://awbepztacmvurjylfoas.supabase.co/storage/v1/object/public/assets/ChatGPT_Image_3_may_2026__21_13_12-removebg-preview.png" alt="DMS Market" style={{ height: '70px', width: 'auto', objectFit: 'contain', marginBottom: '0.75rem' }} />
-              <p style={{ fontSize: '0.8rem', color: '#D1D1D1', lineHeight: 1.7, marginBottom: '1rem' }}>La plataforma donde comprar y vender es fÃ¡cil, seguro y rÃ¡pido.</p>
+              <p style={{ fontSize: '0.8rem', color: '#D1D1D1', lineHeight: 1.7, marginBottom: '1rem' }}>La plataforma donde comprar y vender es facil, seguro y rÃ¡pido.</p>
               <div style={{ display: 'flex', gap: '0.75rem' }}>
                 {[
                   { label: 'f', icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="#D4AF37"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg> },
@@ -319,8 +319,8 @@ export default function LandingClient({ products, images, banners }: any) {
               </div>
             </div>
             {[
-              { title: 'NavegaciÃ³n', links: ['Inicio', 'CategorÃ­as', 'Servicios', 'Vendedores'] },
-              { title: 'Ayuda', links: ['Centro de ayuda', 'CÃ³mo comprar', 'CÃ³mo vender', 'PolÃ­tica de privacidad'] },
+              { title: 'Navegacion', links: ['Inicio', 'Categorias', 'Servicios', 'Vendedores'] },
+              { title: 'Ayuda', links: ['Centro de ayuda', 'Como comprar', 'Como vender', 'Politica de privacidad'] },
               { title: 'Empresa', links: ['Sobre nosotros', 'Trabaja con nosotros', 'Contacto'] },
             ].map(col => (
               <div key={col.title}>
@@ -332,9 +332,9 @@ export default function LandingClient({ products, images, banners }: any) {
             ))}
           </div>
           <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: '1.5rem', display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.5rem', alignItems: 'center' }}>
-            <p style={{ fontSize: '0.75rem', color: '#666', margin: 0 }}>Â© 2025 DMS Market. Colombia. Todos los derechos reservados.</p>
+            <p style={{ fontSize: '0.75rem', color: '#666', margin: 0 }}> 2025 DMS Market. Colombia. Todos los derechos reservados.</p>
             <div style={{ display: 'flex', gap: '1.5rem' }}>
-              <a href="/politicas" style={{ fontSize: '0.75rem', color: '#666', textDecoration: 'none' }}>PolÃ­ticas</a>
+              <a href="/politicas" style={{ fontSize: '0.75rem', color: '#666', textDecoration: 'none' }}>Politicas</a>
               <a href="/auth/login" style={{ fontSize: '0.75rem', color: '#D4AF37', textDecoration: 'none', fontWeight: 600 }}>Ingresar</a>
             </div>
           </div>
