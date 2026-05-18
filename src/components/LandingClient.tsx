@@ -29,7 +29,7 @@ export default function LandingClient({ products, images, banners }: any) {
 
   function handleProductClick(productId: string) {
     router.push(`/producto/${productId}`)
-  }`)
+  }
     router.push(`/auth/register?redirect=/producto/detalle%3Fid%3D${productId}`)
   }
 
