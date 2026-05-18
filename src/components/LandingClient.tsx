@@ -121,12 +121,8 @@ export default function LandingClient({ products, images, banners }: any) {
                 <div style={{ position: 'relative', width: '100%', height: '100%' }}>
                   <img src={banner.image_url} alt={banner.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                   <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'flex-start', justifyContent: 'center', padding: 'clamp(2rem, 8vw, 6rem)' }}>
-                    <p style={{ color: '#D4AF37', fontSize: '0.7rem', letterSpacing: '4px', textTransform: 'uppercase', marginBottom: '1rem', fontWeight: 600 }}>DMS Market</p>
                     <h1 style={{ color: '#fff', fontSize: 'clamp(1.5rem, 4.5vw, 3.5rem)', fontWeight: 800, lineHeight: 1.1, maxWidth: '600px', marginBottom: '1rem', textShadow: '0 2px 20px rgba(0,0,0,0.5)' }}>{banner.title}</h1>
                     {banner.subtitle && <p style={{ color: 'rgba(255,255,255,0.75)', fontSize: 'clamp(0.875rem, 2vw, 1.1rem)', maxWidth: '460px', marginBottom: '2rem', lineHeight: 1.7 }}>{banner.subtitle}</p>}
-                    <a href={banner.link ?? '/auth/register'} style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: '#D4AF37', color: '#0B0B0B', padding: '0.875rem 2rem', textDecoration: 'none', fontSize: '0.85rem', fontWeight: 700, borderRadius: '10px' }}>
-                      Explorar productos Ã¢â€ â€™
-                    </a>
                   </div>
                 </div>
               ) : (
@@ -134,9 +130,6 @@ export default function LandingClient({ products, images, banners }: any) {
                   <p style={{ color: '#D4AF37', fontSize: '0.7rem', letterSpacing: '4px', textTransform: 'uppercase', marginBottom: '1rem' }}>DMS Market</p>
                   <h1 style={{ color: '#fff', fontSize: 'clamp(1.5rem, 4.5vw, 3.5rem)', fontWeight: 800, lineHeight: 1.1, maxWidth: '600px', marginBottom: '1rem' }}>{banner.title}</h1>
                   {banner.subtitle && <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: 'clamp(0.875rem, 2vw, 1.1rem)', maxWidth: '460px', marginBottom: '2rem' }}>{banner.subtitle}</p>}
-                  <a href={banner.link ?? '/auth/register'} style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: '#D4AF37', color: '#0B0B0B', padding: '0.875rem 2rem', textDecoration: 'none', fontSize: '0.85rem', fontWeight: 700, borderRadius: '10px' }}>
-                    Explorar productos Ã¢â€ â€™
-                  </a>
                 </div>
               )}
             </div>
@@ -343,5 +336,6 @@ export default function LandingClient({ products, images, banners }: any) {
     </div>
   )
 }
+
 
 
