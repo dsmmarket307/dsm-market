@@ -3,8 +3,19 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import { Suspense, useEffect } from 'react'
+import { useSearchParams } from 'next/navigation'
 
-export default function ProductDetail({ product, images, reviews, avgRating, user, seller }: any) {
+function ProductContent() {
+  const searchParams = useSearchParams()
+  const id = searchParams.get('id')
+  const router = useRouter()
+  const supabase = createClient()
+  const [product, setProduct] = useState<any>(null)
+  const [images, setImages] = useState<any[]>([])
+  const [seller, setSeller] = useState<any>(null)
+  const [reviews, setReviews] = useState<any[]>([])
+  const [user, setUser] = useState<any>(null)
   const [currentImage, setCurrentImage] = useState(0)
   const [quantity, setQuantity] = useState(1)
   const [adding, setAdding] = useState(false)
@@ -13,13 +24,27 @@ export default function ProductDetail({ product, images, reviews, avgRating, use
   const [reviewRating, setReviewRating] = useState(5)
   const [submittingReview, setSubmittingReview] = useState(false)
   const [reviewSuccess, setReviewSuccess] = useState(false)
-  const router = useRouter()
-  const supabase = createClient()
+  const [loading, setLoading] = useState(true)
 
-  const formattedPrice = new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 }).format(product.price)
-  const formattedOriginal = product.original_price ? new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 }).format(product.original_price) : null
-  const discount = product.original_price && Number(product.original_price) > Number(product.price)
-    ? Math.round((1 - Number(product.price) / Number(product.original_price)) * 100) : 0
+  useEffect(() => {
+    if (!id) return
+    async function load() {
+      const { data: { user } } = await supabase.auth.getUser()
+      setUser(user)
+      const { data: p } = await supabase.from('products').select('*').eq('id', id).single()
+      setProduct(p)
+      const { data: imgs } = await supabase.from('product_images').select('*').eq('product_id', id).order('position')
+      setImages(imgs ?? [])
+      if (p?.seller_id) {
+        const { data: s } = await supabase.from('profiles').select('*').eq('id', p.seller_id).single()
+        setSeller(s)
+      }
+      const { data: r } = await supabase.from('reviews').select('*').eq('product_id', id).order('created_at', { ascending: false })
+      setReviews(r ?? [])
+      setLoading(false)
+    }
+    load()
+  }, [id])
 
   async function handleAddToCart() {
     setAdding(true)
@@ -31,6 +56,7 @@ export default function ProductDetail({ product, images, reviews, avgRating, use
   }
 
   function handleBuyNow() {
+    if (!product) return
     window.location.href = '/checkout?id=' + product.id + '&qty=' + quantity
   }
 
@@ -44,8 +70,26 @@ export default function ProductDetail({ product, images, reviews, avgRating, use
     setSubmittingReview(false)
   }
 
+  if (loading) return (
+    <div style={{ minHeight: '100vh', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'sans-serif' }}>
+      <p style={{ color: '#D4AF37', letterSpacing: '2px', fontSize: '0.875rem' }}>Cargando...</p>
+    </div>
+  )
+
+  if (!product) return (
+    <div style={{ minHeight: '100vh', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'sans-serif' }}>
+      <p style={{ color: '#888' }}>Producto no encontrado</p>
+    </div>
+  )
+
+  const formattedPrice = new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 }).format(product.price)
+  const formattedOriginal = product.original_price ? new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 }).format(product.original_price) : null
+  const discount = product.original_price && Number(product.original_price) > Number(product.price)
+    ? Math.round((1 - Number(product.price) / Number(product.original_price)) * 100) : 0
+  const avgRating = reviews.length > 0 ? reviews.reduce((a, r) => a + r.rating, 0) / reviews.length : product.rating || 4
+
   return (
-    <div style={{ minHeight: '100vh', background: '#fff', fontFamily: "'Segoe UI', sans-serif" }}>
+    <div style={{ minHeight: '100vh', background: '#fff', fontFamily: 'sans-serif' }}>
 
       <nav style={{ padding: '0 clamp(1rem, 4vw, 2.5rem)', height: '68px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 0, background: '#0B0B0B', zIndex: 50, boxShadow: '0 2px 20px rgba(0,0,0,0.3)' }}>
         <a href="/"><img src="https://awbepztacmvurjylfoas.supabase.co/storage/v1/object/public/assets/ChatGPT_Image_3_may_2026__21_13_12-removebg-preview.png" alt="DMS Market" style={{ height: '52px', width: 'auto', objectFit: 'contain' }} /></a>
@@ -99,12 +143,12 @@ export default function ProductDetail({ product, images, reviews, avgRating, use
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem', flexWrap: 'wrap' }}>
               <div style={{ display: 'flex', gap: '2px' }}>
                 {[1,2,3,4,5].map(s => (
-                  <svg key={s} width="16" height="16" viewBox="0 0 24 24" fill={s <= (avgRating || product.rating || 4) ? '#D4AF37' : '#e5e5e5'}>
+                  <svg key={s} width="16" height="16" viewBox="0 0 24 24" fill={s <= avgRating ? '#D4AF37' : '#e5e5e5'}>
                     <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
                   </svg>
                 ))}
               </div>
-              <span style={{ fontSize: '0.8rem', color: '#888' }}>({reviews?.length ?? 0} reseñas)</span>
+              <span style={{ fontSize: '0.8rem', color: '#888' }}>({reviews.length} resenas)</span>
               {product.vendidos > 0 && <span style={{ fontSize: '0.8rem', color: '#888' }}>· {product.vendidos} vendidos</span>}
             </div>
 
@@ -116,30 +160,10 @@ export default function ProductDetail({ product, images, reviews, avgRating, use
 
             <p style={{ fontSize: '0.9rem', color: '#555', lineHeight: 1.7, marginBottom: '1.25rem' }}>{product.description}</p>
 
-            {product.variantes && product.variantes.length > 0 && (
-              <div style={{ marginBottom: '1.25rem' }}>
-                {product.variantes.map((v: any, i: number) => (
-                  <div key={i} style={{ marginBottom: '1rem' }}>
-                    <p style={{ fontSize: '0.75rem', fontWeight: 700, color: '#111', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '0.5rem' }}>{v.nombre}</p>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
-                      {v.opciones.map((op: string, j: number) => (
-                        <button key={j} type="button"
-                          style={{ padding: '6px 16px', border: '1px solid #ddd', borderRadius: '6px', background: '#fff', color: '#111', fontSize: '0.85rem', cursor: 'pointer', fontWeight: 500 }}
-                          onMouseEnter={e => { e.currentTarget.style.borderColor = '#D4AF37'; e.currentTarget.style.color = '#D4AF37' }}
-                          onMouseLeave={e => { e.currentTarget.style.borderColor = '#ddd'; e.currentTarget.style.color = '#111' }}>
-                          {op}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-
             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.25rem' }}>
               <span style={{ fontSize: '0.85rem', color: '#555', fontWeight: 500 }}>Cantidad</span>
               <div style={{ display: 'flex', alignItems: 'center', border: '1px solid #ddd', borderRadius: '8px', overflow: 'hidden' }}>
-                <button onClick={() => setQuantity(q => Math.max(1, q - 1))} style={{ width: '40px', height: '40px', background: '#f8f8f8', border: 'none', cursor: 'pointer', fontSize: '1.1rem', color: '#333', borderRight: '1px solid #ddd' }}>−</button>
+                <button onClick={() => setQuantity(q => Math.max(1, q - 1))} style={{ width: '40px', height: '40px', background: '#f8f8f8', border: 'none', cursor: 'pointer', fontSize: '1.1rem', color: '#333', borderRight: '1px solid #ddd' }}>-</button>
                 <span style={{ width: '48px', textAlign: 'center', fontSize: '0.95rem', fontWeight: 600, color: '#111' }}>{quantity}</span>
                 <button onClick={() => setQuantity(q => q + 1)} style={{ width: '40px', height: '40px', background: '#f8f8f8', border: 'none', cursor: 'pointer', fontSize: '1.1rem', color: '#333', borderLeft: '1px solid #ddd' }}>+</button>
               </div>
@@ -154,11 +178,11 @@ export default function ProductDetail({ product, images, reviews, avgRating, use
                 style={{ width: '100%', padding: '1rem', background: '#fff', color: '#111', border: '2px solid #111', borderRadius: '8px', fontSize: '0.9rem', fontWeight: 700, cursor: adding ? 'not-allowed' : 'pointer' }}
                 onMouseEnter={e => { e.currentTarget.style.background = '#111'; e.currentTarget.style.color = '#fff' }}
                 onMouseLeave={e => { e.currentTarget.style.background = '#fff'; e.currentTarget.style.color = '#111' }}>
-                {added ? '✓ Agregado al carrito' : 'Agregar al carrito'}
+                {added ? 'Agregado al carrito' : 'Agregar al carrito'}
               </button>
               {added && (
                 <a href="/carrito" style={{ width: '100%', padding: '0.875rem', background: '#0B0B0B', color: '#D4AF37', border: '1px solid rgba(212,175,55,.3)', borderRadius: '8px', fontSize: '0.9rem', fontWeight: 700, textAlign: 'center', textDecoration: 'none', display: 'block' }}>
-                  Ver mi carrito →
+                  Ver mi carrito
                 </a>
               )}
             </div>
@@ -169,7 +193,6 @@ export default function ProductDetail({ product, images, reviews, avgRating, use
                 <img src="https://http2.mlstatic.com/frontend-assets/mp-web-navigation/ui-navigation/5.19.1/mercadopago/logo__large@2x.png" alt="Mercado Pago" style={{ height: '20px', objectFit: 'contain' }} />
                 <img src="https://upload.wikimedia.org/wikipedia/commons/0/04/Visa.svg" alt="Visa" style={{ height: '16px', objectFit: 'contain' }} />
                 <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="Mastercard" style={{ height: '20px', objectFit: 'contain' }} />
-                <img src="https://upload.wikimedia.org/wikipedia/commons/f/fa/American_Express_logo_%282018%29.svg" alt="Amex" style={{ height: '20px', objectFit: 'contain' }} />
                 <span style={{ fontSize: '0.75rem', color: '#888' }}>PSE · Efecty · Baloto</span>
               </div>
             </div>
@@ -191,20 +214,13 @@ export default function ProductDetail({ product, images, reviews, avgRating, use
               <div style={{ padding: '1rem', background: '#f8f8f8', borderRadius: '12px', border: '1px solid #eee', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                   <div style={{ width: 44, height: 44, borderRadius: '50%', background: '#D4AF37', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                    {seller.store_logo_url
-                      ? <img src={seller.store_logo_url} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt={seller.store_name} />
-                      : <span style={{ color: '#0B0B0B', fontWeight: 700, fontSize: 18 }}>{(seller.store_name || seller.name || 'T').charAt(0).toUpperCase()}</span>
-                    }
+                    <span style={{ color: '#0B0B0B', fontWeight: 700, fontSize: 18 }}>{(seller.store_name || seller.name || 'T').charAt(0).toUpperCase()}</span>
                   </div>
                   <div>
                     <p style={{ fontSize: '0.7rem', color: '#888', margin: '0 0 2px' }}>Vendido por</p>
                     <p style={{ fontSize: '0.95rem', fontWeight: 700, color: '#111', margin: 0 }}>{seller.store_name || seller.name}</p>
-                    {seller.store_description && <p style={{ fontSize: '0.75rem', color: '#888', margin: '2px 0 0' }}>{seller.store_description}</p>}
                   </div>
                 </div>
-                <a href={`/tienda/${seller.id}`} style={{ padding: '8px 16px', background: '#0B0B0B', color: '#D4AF37', textDecoration: 'none', borderRadius: '8px', fontSize: '0.8rem', fontWeight: 700, whiteSpace: 'nowrap', border: '1px solid rgba(212,175,55,.3)' }}>
-                  Ver tienda completa →
-                </a>
               </div>
             )}
 
@@ -217,11 +233,13 @@ export default function ProductDetail({ product, images, reviews, avgRating, use
         </div>
 
         <div style={{ marginTop: '4rem', borderTop: '1px solid #eee', paddingTop: '2rem' }}>
-          <h2 style={{ fontSize: '1.25rem', fontWeight: 700, color: '#111', marginBottom: '1.5rem' }}>Reseñas {reviews?.length > 0 ? `(${reviews.length})` : ''}</h2>
+          <h2 style={{ fontSize: '1.25rem', fontWeight: 700, color: '#111', marginBottom: '1.5rem' }}>
+            Resenas {reviews.length > 0 ? `(${reviews.length})` : ''}
+          </h2>
 
           {user ? (
             <form onSubmit={handleReview} style={{ background: '#f8f8f8', borderRadius: '12px', padding: '1.5rem', marginBottom: '2rem', border: '1px solid #eee' }}>
-              <p style={{ fontSize: '0.85rem', fontWeight: 600, color: '#111', marginBottom: '1rem' }}>Deja tu reseña</p>
+              <p style={{ fontSize: '0.85rem', fontWeight: 600, color: '#111', marginBottom: '1rem' }}>Deja tu resena</p>
               <div style={{ display: 'flex', gap: '4px', marginBottom: '1rem' }}>
                 {[1,2,3,4,5].map(s => (
                   <button key={s} type="button" onClick={() => setReviewRating(s)}
@@ -235,30 +253,30 @@ export default function ProductDetail({ product, images, reviews, avgRating, use
               <textarea value={reviewText} onChange={e => setReviewText(e.target.value)} required rows={3}
                 placeholder="Contanos tu experiencia con este producto..."
                 style={{ width: '100%', padding: '0.75rem', border: '1px solid #ddd', borderRadius: '8px', fontSize: '0.875rem', outline: 'none', resize: 'vertical', fontFamily: 'sans-serif', boxSizing: 'border-box' }} />
-              {reviewSuccess && <p style={{ color: '#16a34a', fontSize: '0.85rem', marginTop: '0.5rem' }}>Reseña enviada. Gracias!</p>}
+              {reviewSuccess && <p style={{ color: '#16a34a', fontSize: '0.85rem', marginTop: '0.5rem' }}>Resena enviada. Gracias!</p>}
               <button type="submit" disabled={submittingReview}
                 style={{ marginTop: '0.75rem', padding: '0.75rem 1.5rem', background: '#D4AF37', color: '#0B0B0B', border: 'none', borderRadius: '8px', fontSize: '0.85rem', fontWeight: 700, cursor: 'pointer' }}>
-                {submittingReview ? 'Enviando...' : 'Enviar reseña'}
+                {submittingReview ? 'Enviando...' : 'Enviar resena'}
               </button>
             </form>
           ) : (
             <div style={{ background: '#f8f8f8', borderRadius: '12px', padding: '1.25rem', marginBottom: '2rem', textAlign: 'center' }}>
               <p style={{ color: '#888', fontSize: '0.875rem' }}>
-                <a href="/auth/login" style={{ color: '#D4AF37', fontWeight: 600 }}>Inicia sesion</a> para dejar una reseña
+                <a href="/auth/login" style={{ color: '#D4AF37', fontWeight: 600 }}>Inicia sesion</a> para dejar una resena
               </p>
             </div>
           )}
 
-          {reviews?.length > 0 ? (
+          {reviews.length > 0 ? (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               {reviews.map((review: any) => (
                 <div key={review.id} style={{ padding: '1.25rem', border: '1px solid #eee', borderRadius: '12px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.5rem' }}>
                     <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: '#D4AF37', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#0B0B0B', fontWeight: 700, fontSize: '0.85rem', flexShrink: 0 }}>
-                      {review.profiles?.name?.charAt(0)?.toUpperCase() ?? 'U'}
+                      U
                     </div>
                     <div>
-                      <p style={{ fontSize: '0.85rem', fontWeight: 600, color: '#111', margin: 0 }}>{review.profiles?.name ?? 'Usuario'}</p>
+                      <p style={{ fontSize: '0.85rem', fontWeight: 600, color: '#111', margin: 0 }}>Usuario</p>
                       <div style={{ display: 'flex', gap: '2px', marginTop: '2px' }}>
                         {[1,2,3,4,5].map(s => (
                           <svg key={s} width="12" height="12" viewBox="0 0 24 24" fill={s <= review.rating ? '#D4AF37' : '#e5e5e5'}>
@@ -274,7 +292,7 @@ export default function ProductDetail({ product, images, reviews, avgRating, use
               ))}
             </div>
           ) : (
-            <p style={{ color: '#888', fontSize: '0.875rem', textAlign: 'center', padding: '2rem' }}>Aun no hay reseñas. Se el primero en opinar.</p>
+            <p style={{ color: '#888', fontSize: '0.875rem', textAlign: 'center', padding: '2rem' }}>Aun no hay resenas. Se el primero en opinar.</p>
           )}
         </div>
       </div>
@@ -321,5 +339,13 @@ export default function ProductDetail({ product, images, reviews, avgRating, use
         </div>
       </footer>
     </div>
+  )
+}
+
+export default function ProductPage() {
+  return (
+    <Suspense fallback={<div style={{ minHeight: '100vh', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>Cargando...</div>}>
+      <ProductContent />
+    </Suspense>
   )
 }
