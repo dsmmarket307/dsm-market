@@ -11,10 +11,13 @@ export default function ProductDetail({ product, images, reviews, avgRating, use
   const [added, setAdded] = useState(false)
   const [reviewText, setReviewText] = useState('')
   const [reviewRating, setReviewRating] = useState(5)
+  const [reviewerName, setReviewerName] = useState('')
+  const [reviewPhoto, setReviewPhoto] = useState<File | null>(null)
   const [submittingReview, setSubmittingReview] = useState(false)
   const [reviewSuccess, setReviewSuccess] = useState(false)
   const router = useRouter()
   const supabase = createClient()
+  const isAdmin = user?.user_metadata?.role === 'admin'
 
   const formattedPrice = new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 }).format(product.price)
   const formattedOriginal = product.original_price ? new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 }).format(product.original_price) : null
@@ -37,11 +40,29 @@ export default function ProductDetail({ product, images, reviews, avgRating, use
   async function handleReview(e: React.FormEvent) {
     e.preventDefault()
     if (!user) { router.push('/auth/login'); return }
+    if (!reviewerName.trim()) return
     setSubmittingReview(true)
-    await supabase.from('reviews').insert({ product_id: product.id, buyer_id: user.id, rating: reviewRating, comment: reviewText })
+    const formData = new FormData()
+    formData.append('product_id', product.id)
+    formData.append('rating', String(reviewRating))
+    formData.append('comment', reviewText)
+    formData.append('reviewer_name', reviewerName)
+    if (reviewPhoto) formData.append('photo', reviewPhoto)
+    await fetch('/api/reviews', { method: 'POST', body: formData })
     setReviewSuccess(true)
     setReviewText('')
+    setReviewerName('')
+    setReviewPhoto(null)
     setSubmittingReview(false)
+  }
+
+  async function handleDeleteReview(id: string) {
+    await fetch('/api/reviews', {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id })
+    })
+    window.location.reload()
   }
 
   return (
@@ -110,7 +131,7 @@ export default function ProductDetail({ product, images, reviews, avgRating, use
                 ))}
               </div>
               <span style={{ fontSize: '0.8rem', color: '#888' }}>({reviews?.length ?? 0} reseñas)</span>
-              {product.vendidos > 0 && <span style={{ fontSize: '0.8rem', color: '#888' }}>· {product.vendidos} vendidos</span>}
+              {product.vendidos > 0 && <span style={{ fontSize: '0.8rem', color: '#888' }}>· +{product.vendidos} vendidos</span>}
             </div>
 
             <div style={{ marginBottom: '1.25rem' }}>
@@ -219,12 +240,32 @@ export default function ProductDetail({ product, images, reviews, avgRating, use
                   </button>
                 ))}
               </div>
+              <input
+                type="text"
+                value={reviewerName}
+                onChange={e => setReviewerName(e.target.value)}
+                required
+                placeholder="Tu nombre *"
+                style={{ width: '100%', padding: '0.75rem', border: '1px solid #ddd', borderRadius: '8px', fontSize: '0.875rem', outline: 'none', marginBottom: '0.75rem', boxSizing: 'border-box' as const }}
+              />
               <textarea value={reviewText} onChange={e => setReviewText(e.target.value)} required rows={3}
                 placeholder="Contanos tu experiencia con este producto..."
-                style={{ width: '100%', padding: '0.75rem', border: '1px solid #ddd', borderRadius: '8px', fontSize: '0.875rem', outline: 'none', resize: 'vertical', fontFamily: 'sans-serif', boxSizing: 'border-box' }} />
-              {reviewSuccess && <p style={{ color: '#16a34a', fontSize: '0.85rem', marginTop: '0.5rem' }}>Reseña enviada. Gracias!</p>}
+                style={{ width: '100%', padding: '0.75rem', border: '1px solid #ddd', borderRadius: '8px', fontSize: '0.875rem', outline: 'none', resize: 'vertical', fontFamily: 'sans-serif', boxSizing: 'border-box' as const }} />
+              <div style={{ marginTop: '0.75rem', marginBottom: '0.75rem' }}>
+                <p style={{ fontSize: '0.75rem', color: '#888', marginBottom: '0.4rem' }}>Foto del producto (opcional)</p>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={e => setReviewPhoto(e.target.files?.[0] ?? null)}
+                  style={{ fontSize: '0.8rem', color: '#555' }}
+                />
+                {reviewPhoto && (
+                  <img src={URL.createObjectURL(reviewPhoto)} alt="preview" style={{ marginTop: '0.5rem', width: '80px', height: '80px', objectFit: 'cover', borderRadius: '8px', border: '1px solid #eee' }} />
+                )}
+              </div>
+              {reviewSuccess && <p style={{ color: '#16a34a', fontSize: '0.85rem', marginBottom: '0.5rem' }}>Reseña enviada. Gracias!</p>}
               <button type="submit" disabled={submittingReview}
-                style={{ marginTop: '0.75rem', padding: '0.75rem 1.5rem', background: '#D4AF37', color: '#0B0B0B', border: 'none', borderRadius: '8px', fontSize: '0.85rem', fontWeight: 700, cursor: 'pointer' }}>
+                style={{ padding: '0.75rem 1.5rem', background: '#D4AF37', color: '#0B0B0B', border: 'none', borderRadius: '8px', fontSize: '0.85rem', fontWeight: 700, cursor: 'pointer' }}>
                 {submittingReview ? 'Enviando...' : 'Enviar reseña'}
               </button>
             </form>
@@ -240,23 +281,34 @@ export default function ProductDetail({ product, images, reviews, avgRating, use
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               {reviews.map((review: any) => (
                 <div key={review.id} style={{ padding: '1.25rem', border: '1px solid #eee', borderRadius: '12px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.5rem' }}>
-                    <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: '#D4AF37', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#0B0B0B', fontWeight: 700, fontSize: '0.85rem', flexShrink: 0 }}>
-                      {review.profiles?.name?.charAt(0)?.toUpperCase() ?? 'U'}
-                    </div>
-                    <div>
-                      <p style={{ fontSize: '0.85rem', fontWeight: 600, color: '#111', margin: 0 }}>{review.profiles?.name ?? 'Usuario'}</p>
-                      <div style={{ display: 'flex', gap: '2px', marginTop: '2px' }}>
-                        {[1,2,3,4,5].map(s => (
-                          <svg key={s} width="12" height="12" viewBox="0 0 24 24" fill={s <= review.rating ? '#D4AF37' : '#e5e5e5'}>
-                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                          </svg>
-                        ))}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.5rem', justifyContent: 'space-between' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                      <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: '#D4AF37', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#0B0B0B', fontWeight: 700, fontSize: '0.85rem', flexShrink: 0 }}>
+                        {(review.reviewer_name || review.profiles?.name || 'U').charAt(0).toUpperCase()}
+                      </div>
+                      <div>
+                        <p style={{ fontSize: '0.85rem', fontWeight: 600, color: '#111', margin: 0 }}>{review.reviewer_name || review.profiles?.name || 'Usuario'}</p>
+                        <div style={{ display: 'flex', gap: '2px', marginTop: '2px' }}>
+                          {[1,2,3,4,5].map(s => (
+                            <svg key={s} width="12" height="12" viewBox="0 0 24 24" fill={s <= review.rating ? '#D4AF37' : '#e5e5e5'}>
+                              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                            </svg>
+                          ))}
+                        </div>
                       </div>
                     </div>
-                    <span style={{ marginLeft: 'auto', fontSize: '0.75rem', color: '#bbb' }}>{new Date(review.created_at).toLocaleDateString('es-CO')}</span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                      <span style={{ fontSize: '0.75rem', color: '#bbb' }}>{new Date(review.created_at).toLocaleDateString('es-CO')}</span>
+                      {isAdmin && (
+                        <button onClick={() => handleDeleteReview(review.id)}
+                          style={{ padding: '0.25rem 0.75rem', background: 'none', border: '1px solid #EF4444', color: '#EF4444', fontSize: '0.7rem', borderRadius: '999px', cursor: 'pointer', fontWeight: 600 }}>
+                          Eliminar
+                        </button>
+                      )}
+                    </div>
                   </div>
-                  <p style={{ fontSize: '0.875rem', color: '#555', lineHeight: 1.6, margin: 0 }}>{review.comment}</p>
+                  {review.comment && <p style={{ fontSize: '0.875rem', color: '#555', lineHeight: 1.6, margin: 0 }}>{review.comment}</p>}
+                  {review.photo_url && <img src={review.photo_url} alt="foto resena" style={{ marginTop: '0.75rem', width: '100px', height: '100px', objectFit: 'cover', borderRadius: '8px', border: '1px solid #eee' }} />}
                 </div>
               ))}
             </div>
