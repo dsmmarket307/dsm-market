@@ -27,23 +27,8 @@ export async function POST(req: NextRequest) {
       : 'No encontre productos que coincidan.'
 
     const systemPrompt = isLoggedIn
-      ? `Eres el Asistente DMS de DMS Market, un marketplace colombiano. El usuario esta registrado y autenticado.
-Puedes ayudarle con:
-- Busqueda y recomendacion de productos
-- Como comprar paso a paso
-- Como vender y publicar productos
-- Metodos de pago (PSE, Efecty, Nequi, Daviplata, Visa, Mastercard)
-- Envios y transportadoras
-- Soporte general del marketplace
-Responde siempre en espanol, de forma amigable, concisa y profesional.
-No inventes productos que no esten en la lista.`
-      : `Eres el Asistente DMS de DMS Market, un marketplace colombiano. El usuario no esta registrado.
-Puedes ayudarle con:
-- Busqueda y recomendacion de productos
-- Preguntas basicas sobre el marketplace
-Si pregunta sobre compras, ventas o soporte avanzado, invitale a registrarse en /auth/register.
-Responde siempre en espanol, de forma amigable y concisa.
-No inventes productos que no esten en la lista.`
+      ? `Eres el Asistente DMS de DMS Market, un marketplace colombiano. El usuario esta registrado. Ayudale con busqueda de productos, como comprar, como vender, pagos, envios y soporte. Responde en espanol, amigable y conciso. No inventes productos.`
+      : `Eres el Asistente DMS de DMS Market, un marketplace colombiano. Ayuda con busqueda de productos y preguntas basicas. Si pregunta sobre compras o ventas invitale a registrarse en /auth/register. Responde en espanol, amigable y conciso. No inventes productos.`
 
     const groqRes = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
@@ -65,6 +50,14 @@ No inventes productos que no esten en la lista.`
     })
 
     const groqData = await groqRes.json()
+    console.log('GROQ STATUS:', groqRes.status)
+    console.log('GROQ RESPONSE:', JSON.stringify(groqData))
+
+    if (!groqRes.ok) {
+      console.error('GROQ ERROR:', groqData)
+      return NextResponse.json({ reply: 'Servicio de IA no disponible. Aqui tienes productos relacionados:', products: products ?? [] })
+    }
+
     const reply = groqData.choices?.[0]?.message?.content ?? 'Lo siento, intenta de nuevo.'
 
     return NextResponse.json({ reply, products: products ?? [] })
