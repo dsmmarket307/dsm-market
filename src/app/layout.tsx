@@ -1,5 +1,6 @@
-import type { Metadata } from 'next'
+﻿import type { Metadata } from 'next'
 import './globals.css'
+import ChatBot from '@/components/ChatBot'
 
 export const metadata: Metadata = {
   title: 'DMS Market',
@@ -19,7 +20,10 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
       </head>
-      <body style={{ fontFamily: "'Inter', sans-serif" }}>{children}</body>
+      <body style={{ fontFamily: "'Inter', sans-serif" }}>
+        {children}
+        <ChatBot />
+      </body>
     </html>
   )
 }
