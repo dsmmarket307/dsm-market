@@ -1,4 +1,4 @@
-﻿import { createClient as createAdmin } from "@supabase/supabase-js"
+import { createClient as createAdmin } from "@supabase/supabase-js"
 import { NextResponse } from "next/server"
 
 export async function GET() {
@@ -9,7 +9,7 @@ export async function GET() {
 
   const { data: products } = await admin
     .from("products")
-    .select("id, name, price, original_price, category, condition, stock, badge, oferta_mes, rating")
+    .select("id, name, price, original_price, category, condition, stock, badge, oferta_mes, rating, envio_gratis")
     .eq("status", "approved")
     .order("created_at", { ascending: false })
 
