@@ -1,10 +1,10 @@
-'use client'
+﻿'use client'
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 
-export default function ProductDetail({ product, images, reviews, avgRating, user, seller }: any) {
+export default function ProductDetail({ product, images, reviews, avgRating, user, seller, recommended, recImages }: any) {
   const [currentImage, setCurrentImage] = useState(0)
   const [quantity, setQuantity] = useState(1)
   const [adding, setAdding] = useState(false)
@@ -101,7 +101,6 @@ export default function ProductDetail({ product, images, reviews, avgRating, use
             <p style={{ fontSize: '0.65rem', color: '#D4AF37', textTransform: 'uppercase', letterSpacing: '2px', fontWeight: 700, marginBottom: '0.5rem' }}>{product.category}</p>
             <h1 style={{ fontSize: 'clamp(1.4rem, 3vw, 2rem)', fontWeight: 700, color: '#111', lineHeight: 1.2, marginBottom: '0.75rem' }}>{product.name}</h1>
 
-            {/* ESTRELLAS Y VENDIDOS */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem', flexWrap: 'wrap' }}>
               <div style={{ display: 'flex', gap: '2px' }}>
                 {[1,2,3,4,5].map(s => (
@@ -110,20 +109,18 @@ export default function ProductDetail({ product, images, reviews, avgRating, use
                   </svg>
                 ))}
               </div>
-              <span style={{ fontSize: '0.8rem', color: '#888' }}>({reviews?.length ?? 0} resenas)</span>
-              {product.vendidos > 0 && <span style={{ fontSize: '0.8rem', color: '#888' }}> {product.vendidos} vendidos</span>}
+              <span style={{ fontSize: '0.8rem', color: '#888' }}>({reviews?.length ?? 0} reseñas)</span>
+              {product.vendidos > 0 && <span style={{ fontSize: '0.8rem', color: '#888' }}>· {product.vendidos} vendidos</span>}
             </div>
 
-            {/* PRECIO */}
             <div style={{ marginBottom: '1.25rem' }}>
               {formattedOriginal && <p style={{ fontSize: '0.9rem', color: '#bbb', textDecoration: 'line-through', marginBottom: '0.25rem' }}>{formattedOriginal}</p>}
               <p style={{ fontSize: 'clamp(1.75rem, 4vw, 2.5rem)', fontWeight: 800, color: '#111', lineHeight: 1 }}>{formattedPrice}</p>
-              <p style={{ fontSize: '0.75rem', color: '#888', marginTop: '0.25rem' }}>COP  Precio final</p>
+              <p style={{ fontSize: '0.75rem', color: '#888', marginTop: '0.25rem' }}>COP · Precio final</p>
             </div>
 
-            <p style={{ fontSize: '0.9rem', color: '#555', lineHeight: 1.7, marginBottom: '1.25rem' }}>{product.description}</p>
+            <p style={{ fontSize: '0.9rem', color: '#555', lineHeight: 1.7, marginBottom: '1.25rem', whiteSpace: 'pre-wrap' }}>{product.description}</p>
 
-            {/* CANTIDAD */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.25rem' }}>
               <span style={{ fontSize: '0.85rem', color: '#555', fontWeight: 500 }}>Cantidad</span>
               <div style={{ display: 'flex', alignItems: 'center', border: '1px solid #ddd', borderRadius: '8px', overflow: 'hidden' }}>
@@ -133,7 +130,6 @@ export default function ProductDetail({ product, images, reviews, avgRating, use
               </div>
             </div>
 
-            {/* BOTONES */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginBottom: '1.25rem' }}>
               <button onClick={handleBuyNow} disabled={adding}
                 style={{ width: '100%', padding: '1rem', background: adding ? '#ccc' : '#D4AF37', color: '#0B0B0B', border: 'none', borderRadius: '8px', fontSize: '0.9rem', fontWeight: 700, cursor: adding ? 'not-allowed' : 'pointer' }}>
@@ -143,16 +139,15 @@ export default function ProductDetail({ product, images, reviews, avgRating, use
                 style={{ width: '100%', padding: '1rem', background: '#fff', color: '#111', border: '2px solid #111', borderRadius: '8px', fontSize: '0.9rem', fontWeight: 700, cursor: adding ? 'not-allowed' : 'pointer' }}
                 onMouseEnter={e => { e.currentTarget.style.background = '#111'; e.currentTarget.style.color = '#fff' }}
                 onMouseLeave={e => { e.currentTarget.style.background = '#fff'; e.currentTarget.style.color = '#111' }}>
-                {added ? 'âœ“ Agregado al carrito' : 'Agregar al carrito'}
+                {added ? '✓ Agregado al carrito' : 'Agregar al carrito'}
               </button>
               {added && (
                 <a href="/carrito" style={{ width: '100%', padding: '0.875rem', background: '#0B0B0B', color: '#D4AF37', border: '1px solid rgba(212,175,55,.3)', borderRadius: '8px', fontSize: '0.9rem', fontWeight: 700, textAlign: 'center', textDecoration: 'none', display: 'block' }}>
-                  Ver mi carrito â†’
+                  Ver mi carrito →
                 </a>
               )}
             </div>
 
-            {/* LOGOS TARJETAS */}
             <div style={{ padding: '1rem', background: '#f8f8f8', borderRadius: '12px', marginBottom: '1rem' }}>
               <p style={{ fontSize: '0.7rem', color: '#888', marginBottom: '0.75rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '1px', textAlign: 'center' }}>Medios de pago aceptados</p>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
@@ -162,11 +157,9 @@ export default function ProductDetail({ product, images, reviews, avgRating, use
                 <img src="https://upload.wikimedia.org/wikipedia/commons/f/fa/American_Express_logo_%282018%29.svg" alt="Amex" style={{ height: '30px', objectFit: 'contain' }} />
                 <img src="https://awbepztacmvurjylfoas.supabase.co/storage/v1/object/public/assets/nequi-logo-png.png" alt="Nequi" style={{ height: '30px', objectFit: 'contain' }} />
                 <img src="https://awbepztacmvurjylfoas.supabase.co/storage/v1/object/public/assets/daviplata.png" alt="Daviplata" style={{ height: '30px', objectFit: 'contain' }} />
-                
               </div>
             </div>
 
-            {/* SELLOS */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.75rem', marginBottom: '1rem' }}>
               {[
                 { icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" strokeWidth="1.75"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>, label: 'Compra segura' },
@@ -180,7 +173,6 @@ export default function ProductDetail({ product, images, reviews, avgRating, use
               ))}
             </div>
 
-            {/* VENDEDOR */}
             {seller && (
               <div style={{ padding: '1rem', background: '#f8f8f8', borderRadius: '12px', border: '1px solid #eee', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
@@ -197,7 +189,7 @@ export default function ProductDetail({ product, images, reviews, avgRating, use
                   </div>
                 </div>
                 <a href={`/tienda/${seller.id}`} style={{ padding: '8px 16px', background: '#0B0B0B', color: '#D4AF37', textDecoration: 'none', borderRadius: '8px', fontSize: '0.8rem', fontWeight: 700, whiteSpace: 'nowrap', border: '1px solid rgba(212,175,55,.3)' }}>
-                  Ver tienda completa 
+                  Ver tienda →
                 </a>
               </div>
             )}
@@ -210,14 +202,13 @@ export default function ProductDetail({ product, images, reviews, avgRating, use
           </div>
         </div>
 
-        {/* RESEÃ‘AS */}
+        {/* RESEÑAS */}
         <div style={{ marginTop: '4rem', borderTop: '1px solid #eee', paddingTop: '2rem' }}>
-          <h2 style={{ fontSize: '1.25rem', fontWeight: 700, color: '#111', marginBottom: '1.5rem' }}>resenas {reviews?.length > 0 ? `(${reviews.length})` : ''}</h2>
+          <h2 style={{ fontSize: '1.25rem', fontWeight: 700, color: '#111', marginBottom: '1.5rem' }}>Reseñas {reviews?.length > 0 ? `(${reviews.length})` : ''}</h2>
 
-          {/* FORM RESEÃ‘A */}
           {user ? (
             <form onSubmit={handleReview} style={{ background: '#f8f8f8', borderRadius: '12px', padding: '1.5rem', marginBottom: '2rem', border: '1px solid #eee' }}>
-              <p style={{ fontSize: '0.85rem', fontWeight: 600, color: '#111', marginBottom: '1rem' }}>Deja tu Resena</p>
+              <p style={{ fontSize: '0.85rem', fontWeight: 600, color: '#111', marginBottom: '1rem' }}>Deja tu reseña</p>
               <div style={{ display: 'flex', gap: '4px', marginBottom: '1rem' }}>
                 {[1,2,3,4,5].map(s => (
                   <button key={s} type="button" onClick={() => setReviewRating(s)}
@@ -231,21 +222,20 @@ export default function ProductDetail({ product, images, reviews, avgRating, use
               <textarea value={reviewText} onChange={e => setReviewText(e.target.value)} required rows={3}
                 placeholder="Contanos tu experiencia con este producto..."
                 style={{ width: '100%', padding: '0.75rem', border: '1px solid #ddd', borderRadius: '8px', fontSize: '0.875rem', outline: 'none', resize: 'vertical', fontFamily: 'sans-serif', boxSizing: 'border-box' }} />
-              {reviewSuccess && <p style={{ color: '#16a34a', fontSize: '0.85rem', marginTop: '0.5rem' }}>Resena enviada. Gracias!</p>}
+              {reviewSuccess && <p style={{ color: '#16a34a', fontSize: '0.85rem', marginTop: '0.5rem' }}>Reseña enviada. Gracias!</p>}
               <button type="submit" disabled={submittingReview}
                 style={{ marginTop: '0.75rem', padding: '0.75rem 1.5rem', background: '#D4AF37', color: '#0B0B0B', border: 'none', borderRadius: '8px', fontSize: '0.85rem', fontWeight: 700, cursor: 'pointer' }}>
-                {submittingReview ? 'Enviando...' : 'Enviar Resena'}
+                {submittingReview ? 'Enviando...' : 'Enviar reseña'}
               </button>
             </form>
           ) : (
             <div style={{ background: '#f8f8f8', borderRadius: '12px', padding: '1.25rem', marginBottom: '2rem', textAlign: 'center' }}>
               <p style={{ color: '#888', fontSize: '0.875rem' }}>
-                <a href="/auth/login" style={{ color: '#D4AF37', fontWeight: 600 }}>IniciÃ¡ sesion</a> para dejar una Resena
+                <a href="/auth/login" style={{ color: '#D4AF37', fontWeight: 600 }}>Inicia sesion</a> para dejar una reseña
               </p>
             </div>
           )}
 
-          {/* LISTA RESEÃ‘AS */}
           {reviews?.length > 0 ? (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               {reviews.map((review: any) => (
@@ -271,9 +261,45 @@ export default function ProductDetail({ product, images, reviews, avgRating, use
               ))}
             </div>
           ) : (
-            <p style={{ color: '#888', fontSize: '0.875rem', textAlign: 'center', padding: '2rem' }}>Aun no hay resenas. Se el primero en opinar.</p>
+            <p style={{ color: '#888', fontSize: '0.875rem', textAlign: 'center', padding: '2rem' }}>Aun no hay reseñas. Se el primero en opinar.</p>
           )}
         </div>
+
+        {/* RECOMENDADOS */}
+        {recommended?.length > 0 && (
+          <div style={{ marginTop: '4rem', borderTop: '1px solid #eee', paddingTop: '3rem' }}>
+            <h2 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#111', marginBottom: '1.5rem' }}>También te puede interesar</h2>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: '1rem' }}>
+              {recommended.map((rec: any) => {
+                const recImg = recImages?.find((i: any) => i.product_id === rec.id)?.url
+                const hasDisc = rec.original_price && Number(rec.original_price) > Number(rec.price)
+                const pct = hasDisc ? Math.round((1 - Number(rec.price) / Number(rec.original_price)) * 100) : 0
+                return (
+                  <a key={rec.id} href={'/producto/' + rec.id}
+                    style={{ textDecoration: 'none', background: '#fff', borderRadius: '12px', border: '1px solid #eee', overflow: 'hidden', display: 'flex', flexDirection: 'column', boxShadow: '0 2px 8px rgba(0,0,0,.04)' }}
+                    onMouseEnter={e => { e.currentTarget.style.boxShadow = '0 8px 24px rgba(0,0,0,.10)' }}
+                    onMouseLeave={e => { e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,.04)' }}>
+                    <div style={{ position: 'relative', paddingBottom: '100%', background: '#f8f8f8', overflow: 'hidden' }}>
+                      {recImg
+                        ? <img src={recImg} alt={rec.name} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
+                        : <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#ddd" strokeWidth="1.25"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                          </div>
+                      }
+                      {hasDisc && <div style={{ position: 'absolute', top: 8, right: 8, background: '#EF4444', color: '#fff', fontSize: 10, fontWeight: 700, padding: '2px 8px', borderRadius: 999 }}>-{pct}%</div>}
+                    </div>
+                    <div style={{ padding: '0.75rem' }}>
+                      <p style={{ fontSize: 10, color: '#D4AF37', textTransform: 'uppercase', fontWeight: 700, letterSpacing: 1, marginBottom: 4 }}>{rec.category}</p>
+                      <p style={{ fontSize: 13, color: '#111', fontWeight: 500, lineHeight: 1.4, marginBottom: 6, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>{rec.name}</p>
+                      {hasDisc && <p style={{ fontSize: 11, color: '#bbb', textDecoration: 'line-through' }}>${Number(rec.original_price).toLocaleString('es-CO')}</p>}
+                      <p style={{ fontSize: 15, fontWeight: 700, color: '#111' }}>${Number(rec.price).toLocaleString('es-CO')}</p>
+                    </div>
+                  </a>
+                )
+              })}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* FOOTER */}

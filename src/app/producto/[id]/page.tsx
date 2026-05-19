@@ -7,7 +7,6 @@ export default async function ProductoPage({ params }: { params: Promise<{ id: s
   const { id } = await params
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-
   const admin = createAdmin(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
 
   const { data: product } = await admin
@@ -16,7 +15,6 @@ export default async function ProductoPage({ params }: { params: Promise<{ id: s
     .eq("id", id)
     .eq("status", "approved")
     .single()
-
   if (!product) redirect("/")
 
   const { data: images } = await admin
@@ -37,6 +35,20 @@ export default async function ProductoPage({ params }: { params: Promise<{ id: s
     .eq("id", product.seller_id)
     .single()
 
+  const { data: recommended } = await admin
+    .from("products")
+    .select("id, name, price, original_price, category")
+    .eq("status", "approved")
+    .eq("category", product.category)
+    .neq("id", id)
+    .order("created_at", { ascending: false })
+    .limit(6)
+
+  const recIds = recommended?.map((p: any) => p.id) ?? []
+  const { data: recImages } = recIds.length > 0
+    ? await admin.from("product_images").select("product_id, url, position").in("product_id", recIds).order("position", { ascending: true })
+    : { data: [] }
+
   const avgRating = reviews && reviews.length > 0
     ? Math.round(reviews.reduce((sum: number, r: any) => sum + r.rating, 0) / reviews.length)
     : 0
@@ -49,6 +61,8 @@ export default async function ProductoPage({ params }: { params: Promise<{ id: s
       avgRating={avgRating}
       user={user}
       seller={seller}
+      recommended={recommended ?? []}
+      recImages={recImages ?? []}
     />
   )
 }
