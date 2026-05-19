@@ -2,7 +2,7 @@
 
 export async function POST(req: NextRequest) {
   try {
-    const { name, category, price } = await req.json()
+    const { name, category } = await req.json()
     if (!name) return NextResponse.json({ error: 'Nombre requerido' }, { status: 400 })
 
     const groqRes = await fetch('https://api.groq.com/openai/v1/chat/completions', {
@@ -17,11 +17,11 @@ export async function POST(req: NextRequest) {
         messages: [
           {
             role: 'system',
-            content: 'Eres un experto en marketing para marketplaces colombianos. Genera descripciones de productos profesionales, atractivas y concisas en espanol. Maximo 3 parrafos cortos. Sin emojis. Sin asteriscos. Texto limpio listo para publicar.',
+            content: 'Eres un experto en marketing para marketplaces colombianos. Genera descripciones de productos atractivas en espanol. Estructura: 1 parrafo de introduccion del producto, luego lista de beneficios con emoji al inicio de cada uno usando solo estos emojis: o para beneficios principales. Sin precios, sin asteriscos, sin simbolos de moneda. Texto limpio y profesional.',
           },
           {
             role: 'user',
-            content: `Genera una descripcion profesional para este producto:\nNombre: ${name}\nCategoria: ${category ?? 'General'}\nPrecio: $${Number(price ?? 0).toLocaleString('es-CO')} COP\n\nIncluye: descripcion clara, beneficios principales y por que comprarlo.`,
+            content: `Genera una descripcion profesional para este producto:\nNombre: ${name}\nCategoria: ${category ?? 'General'}\n\nEstructura requerida:\n1. Parrafo corto de introduccion\n2. Lista de 4 beneficios clave, cada uno comenzando con el emoji apropiado\n\nSin precios. Sin asteriscos.`,
           },
         ],
       }),
