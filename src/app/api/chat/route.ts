@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 
 export async function POST(req: NextRequest) {
   try {
-    const { message } = await req.json()
+    const { message, isLoggedIn } = await req.json()
     if (!message) return NextResponse.json({ error: 'Mensaje requerido' }, { status: 400 })
 
     const supabase = createClient()
@@ -26,6 +26,25 @@ export async function POST(req: NextRequest) {
         ).join('\n')
       : 'No encontre productos que coincidan.'
 
+    const systemPrompt = isLoggedIn
+      ? `Eres el Asistente DMS de DMS Market, un marketplace colombiano. El usuario esta registrado y autenticado.
+Puedes ayudarle con:
+- Busqueda y recomendacion de productos
+- Como comprar paso a paso
+- Como vender y publicar productos
+- Metodos de pago (PSE, Efecty, Nequi, Daviplata, Visa, Mastercard)
+- Envios y transportadoras
+- Soporte general del marketplace
+Responde siempre en espanol, de forma amigable, concisa y profesional.
+No inventes productos que no esten en la lista.`
+      : `Eres el Asistente DMS de DMS Market, un marketplace colombiano. El usuario no esta registrado.
+Puedes ayudarle con:
+- Busqueda y recomendacion de productos
+- Preguntas basicas sobre el marketplace
+Si pregunta sobre compras, ventas o soporte avanzado, invitale a registrarse en /auth/register.
+Responde siempre en espanol, de forma amigable y concisa.
+No inventes productos que no esten en la lista.`
+
     const groqRes = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -36,13 +55,10 @@ export async function POST(req: NextRequest) {
         model: 'llama3-8b-8192',
         max_tokens: 400,
         messages: [
-          {
-            role: 'system',
-            content: 'Eres el asistente de DMS Market, un marketplace colombiano. Ayuda a los clientes a encontrar productos. Responde siempre en español, de forma amigable y concisa. Menciona nombre y precio de los productos. No inventes productos.',
-          },
+          { role: 'system', content: systemPrompt },
           {
             role: 'user',
-            content: `El cliente pregunta: "${message}"\n\nProductos disponibles:\n${productContext}\n\nRecomienda estos productos de forma natural.`,
+            content: `El cliente pregunta: "${message}"\n\nProductos disponibles:\n${productContext}\n\nResponde de forma natural.`,
           },
         ],
       }),
