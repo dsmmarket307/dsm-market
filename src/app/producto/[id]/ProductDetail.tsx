@@ -154,14 +154,14 @@ export default function ProductDetail({ product, images, reviews, avgRating, use
 
             {/* LOGOS TARJETAS */}
             <div style={{ padding: '1rem', background: '#f8f8f8', borderRadius: '12px', marginBottom: '1rem' }}>
-              <p style={{ fontSize: '0.7rem', color: '#888', marginBottom: '0.75rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '1px' }}>Medios de pago aceptados</p>
+              <p style={{ fontSize: '0.7rem', color: '#888', marginBottom: '0.75rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '1px', textAlign: 'center' }}>Medios de pago aceptados</p>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
-                <img src="https://http2.mlstatic.com/frontend-assets/mp-web-navigation/ui-navigation/5.19.1/mercadopago/logo__large@2x.png" alt="Mercado Pago" style={{ height: '20px', objectFit: 'contain' }} />
-                <img src="https://upload.wikimedia.org/wikipedia/commons/0/04/Visa.svg" alt="Visa" style={{ height: '16px', objectFit: 'contain' }} />
-                <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="Mastercard" style={{ height: '20px', objectFit: 'contain' }} />
-                <img src="https://upload.wikimedia.org/wikipedia/commons/f/fa/American_Express_logo_%282018%29.svg" alt="Amex" style={{ height: '20px', objectFit: 'contain' }} />
-                <img src="https://awbepztacmvurjylfoas.supabase.co/storage/v1/object/public/assets/nequi-logo-png.png" alt="Nequi" style={{ height: '20px', objectFit: 'contain' }} />
-                <img src="https://awbepztacmvurjylfoas.supabase.co/storage/v1/object/public/assets/daviplata.png" alt="Daviplata" style={{ height: '20px', objectFit: 'contain' }} />
+                <img src="https://http2.mlstatic.com/frontend-assets/mp-web-navigation/ui-navigation/5.19.1/mercadopago/logo__large@2x.png" alt="Mercado Pago" style={{ height: '30px', objectFit: 'contain' }} />
+                <img src="https://awbepztacmvurjylfoas.supabase.co/storage/v1/object/public/assets/visa.png" alt="Visa" style={{ height: '30px', objectFit: 'contain' }} />
+                <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="Mastercard" style={{ height: '30px', objectFit: 'contain' }} />
+                <img src="https://upload.wikimedia.org/wikipedia/commons/f/fa/American_Express_logo_%282018%29.svg" alt="Amex" style={{ height: '30px', objectFit: 'contain' }} />
+                <img src="https://awbepztacmvurjylfoas.supabase.co/storage/v1/object/public/assets/nequi-logo-png.png" alt="Nequi" style={{ height: '30px', objectFit: 'contain' }} />
+                <img src="https://awbepztacmvurjylfoas.supabase.co/storage/v1/object/public/assets/daviplata.png" alt="Daviplata" style={{ height: '30px', objectFit: 'contain' }} />
                 
               </div>
             </div>
