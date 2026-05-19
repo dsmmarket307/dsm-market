@@ -1,4 +1,4 @@
-﻿"use client"
+"use client"
 
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
@@ -189,6 +189,7 @@ export default function BuyerProductsPage() {
                             : null
                       }
                       {product.condition === "used" && <div className="pp-badge-used">Usado</div>}
+                      {product.envio_gratis && <div style={{position:"absolute",bottom:10,right:10,background:"#16a34a",color:"#fff",fontSize:10,fontWeight:700,padding:"3px 10px",borderRadius:"999px",zIndex:1}}>Envio gratis</div>}
                       <Heart productId={product.id} />
                     </div>
                     <div className="pp-body">
