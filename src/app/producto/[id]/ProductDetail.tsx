@@ -121,8 +121,7 @@ export default function ProductDetail({ product, images, reviews, avgRating, use
               <p style={{ fontSize: '0.75rem', color: '#888', marginTop: '0.25rem' }}>COP  Precio final</p>
             </div>
 
-            <p style={{ fontSize: '0.9rem', color: '#555', lineHeight: 1.7, marginBottom: '1.25rem' }}>{product.description?.split('
-').map((line: string, i: number) => (<span key={i}>{line}<br /></span>))}</p>
+            <p style={{ fontSize: '0.9rem', color: '#555', lineHeight: 1.7, marginBottom: '1.25rem' }}>{product.description}</p>
 
             {/* CANTIDAD */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.25rem' }}>
