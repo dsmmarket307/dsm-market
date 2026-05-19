@@ -165,7 +165,7 @@ export default function LandingClient({ products, images, banners }: any) {
           <div style={{ maxWidth: '1280px', margin: '0 auto' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
               <h2 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#0B0B0B', margin: 0 }}>Explora nuestras Categorias</h2>
-              <a href="/auth/login" style={{ fontSize: '0.8rem', color: '#D4AF37', textDecoration: 'none', fontWeight: 600 }}>Ver todas → Ã¢â€ â€™</a>
+              <a href="/auth/login" style={{ fontSize: '0.8rem', color: '#D4AF37', textDecoration: 'none', fontWeight: 600 }}>Ver todas</a>
             </div>
             <div style={{ display: 'flex', gap: '0.75rem', overflowX: 'auto', paddingBottom: '0.5rem' }}>
               <button onClick={() => setSelectedCategory('')}
@@ -193,7 +193,7 @@ export default function LandingClient({ products, images, banners }: any) {
               {search ? 'Resultados de bÃƒÂºsqueda' : selectedCategory ? selectedCategory : 'Productos destacados'}
               <span style={{ fontSize: '0.8rem', color: '#aaa', fontWeight: 400, marginLeft: '0.5rem' }}>({filtered.length})</span>
             </h2>
-            <a href="/auth/login" style={{ fontSize: '0.8rem', color: '#D4AF37', textDecoration: 'none', fontWeight: 600 }}>Ver todos Ã¢â€ â€™</a>
+            <a href="/auth/login" style={{ fontSize: '0.8rem', color: '#D4AF37', textDecoration: 'none', fontWeight: 600 }}>Ver todos</a>
           </div>
           {filtered.length === 0 ? (
             <div style={{ textAlign: 'center', padding: '4rem 2rem', background: '#fff', borderRadius: '16px' }}>
@@ -222,7 +222,7 @@ export default function LandingClient({ products, images, banners }: any) {
                   <span style={{ fontSize: '0.8rem', color: '#aaa', fontWeight: 400, marginLeft: '0.5rem' }}>({ofertasMes.length})</span>
                 </h2>
               </div>
-              <a href="/auth/login" style={{ fontSize: '0.8rem', color: '#EF4444', textDecoration: 'none', fontWeight: 600, border: '1px solid #EF4444', padding: '0.4rem 1rem', borderRadius: '8px' }}>Ver todas → Ã¢â€ â€™</a>
+              <a href="/auth/login" style={{ fontSize: '0.8rem', color: '#EF4444', textDecoration: 'none', fontWeight: 600, border: '1px solid #EF4444', padding: '0.4rem 1rem', borderRadius: '8px' }}>Ver todas</a>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(clamp(160px, 20vw, 220px), 1fr))', gap: 'clamp(0.75rem, 2vw, 1.25rem)' }}>
               {ofertasMes.map((product: any) => (
