@@ -19,6 +19,11 @@ export default function NewProductPage() {
   const [previews, setPreviews]   = useState<string[]>([])
   const [envioGratis, setEnvioGratis] = useState(false)
   const [variantes, setVariantes] = useState<{ nombre: string; opciones: string }[]>([])
+  const [description, setDescription] = useState("")
+  const [generatingDesc, setGeneratingDesc] = useState(false)
+  const [nameVal, setNameVal] = useState("")
+  const [categoryVal, setCategoryVal] = useState("")
+  const [priceVal, setPriceVal] = useState("")
 
   function handleImages(e: React.ChangeEvent<HTMLInputElement>) {
     const files = Array.from(e.target.files ?? [])
@@ -54,10 +59,30 @@ export default function NewProductPage() {
     setVariantes(prev => prev.map((v, j) => j === i ? { ...v, [field]: value } : v))
   }
 
+  async function generateDescription() {
+    if (!nameVal.trim()) { setError("Escribe el nombre del producto primero"); return }
+    setError("")
+    setGeneratingDesc(true)
+    try {
+      const res = await fetch('/api/generate-description', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: nameVal, category: categoryVal, price: priceVal }),
+      })
+      const data = await res.json()
+      if (data.description) setDescription(data.description)
+      else setError("No se pudo generar la descripcion. Escríbela manualmente.")
+    } catch {
+      setError("Error al conectar con IA. Escríbela manualmente.")
+    }
+    setGeneratingDesc(false)
+  }
+
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault(); setError(""); setLoading(true)
     const formData = new FormData(e.currentTarget)
     formData.set("envio_gratis", String(envioGratis))
+    formData.set("description", description)
     formData.set("variantes", JSON.stringify(
       variantes.filter(v => v.nombre && v.opciones).map(v => ({
         nombre: v.nombre,
@@ -91,6 +116,9 @@ export default function NewProductPage() {
     .np-btn-cancel:hover{border-color:#D4AF37;color:#D4AF37;}
     .np-drop{border:2px dashed rgba(212,175,55,.2);border-radius:12px;padding:2.5rem;text-align:center;cursor:pointer;transition:border-color .2s;outline:none;}
     .np-drop:hover,.np-drop:focus{border-color:#D4AF37;}
+    .np-btn-ia{padding:10px 18px;background:rgba(212,175,55,.1);border:1px solid rgba(212,175,55,.4);border-radius:10px;color:#D4AF37;font-size:12px;font-weight:700;cursor:pointer;font-family:'Poppins',sans-serif;transition:all .2s;white-space:nowrap;}
+    .np-btn-ia:hover{background:rgba(212,175,55,.2);}
+    .np-btn-ia:disabled{opacity:.5;cursor:not-allowed;}
   `
 
   return (
@@ -111,11 +139,23 @@ export default function NewProductPage() {
             <div className="np-card">
               <div style={{ marginBottom: 16 }}>
                 <label className="np-label">Nombre del producto *</label>
-                <input name="name" type="text" required placeholder="Nombre del producto" className="np-input" />
+                <input name="name" type="text" required placeholder="Nombre del producto" className="np-input"
+                  value={nameVal} onChange={e => setNameVal(e.target.value)} />
               </div>
               <div>
-                <label className="np-label">Descripcion</label>
-                <textarea name="description" rows={4} placeholder="Describe tu producto..." className="np-textarea" />
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+                  <label className="np-label" style={{ margin: 0 }}>Descripcion</label>
+                  <button type="button" className="np-btn-ia" onClick={generateDescription} disabled={generatingDesc}>
+                    {generatingDesc ? "Generando..." : "Generar con IA"}
+                  </button>
+                </div>
+                <textarea name="description" rows={4} placeholder="Describe tu producto o usa el boton para generarla con IA..."
+                  className="np-textarea" value={description} onChange={e => setDescription(e.target.value)} />
+                {description && (
+                  <p style={{ fontSize: 11, color: "#D4AF37", marginTop: 6, fontFamily: "'Poppins',sans-serif" }}>
+                    Descripcion generada con IA. Puedes editarla libremente.
+                  </p>
+                )}
               </div>
             </div>
 
@@ -123,7 +163,8 @@ export default function NewProductPage() {
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 16 }}>
                 <div>
                   <label className="np-label">Precio de venta (COP) *</label>
-                  <input name="price" type="number" required min="0" step="100" placeholder="0" className="np-input" />
+                  <input name="price" type="number" required min="0" step="100" placeholder="0" className="np-input"
+                    value={priceVal} onChange={e => setPriceVal(e.target.value)} />
                 </div>
                 <div>
                   <label className="np-label">Precio original (tachado, opcional)</label>
@@ -133,7 +174,8 @@ export default function NewProductPage() {
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
                 <div>
                   <label className="np-label">Categoria *</label>
-                  <select name="category" required className="np-select">
+                  <select name="category" required className="np-select"
+                    value={categoryVal} onChange={e => setCategoryVal(e.target.value)}>
                     <option value="">Seleccionar...</option>
                     {categories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
                   </select>
@@ -159,7 +201,6 @@ export default function NewProductPage() {
               </div>
             </div>
 
-            {/* VARIANTES */}
             <div className="np-card">
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
                 <label className="np-label" style={{ margin: 0 }}>Variantes (opcional)</label>
@@ -179,7 +220,7 @@ export default function NewProductPage() {
                     placeholder="Ej: S, M, L, XL" className="np-input" />
                   <button type="button" onClick={() => eliminarVariante(i)}
                     style={{ width: 36, height: 36, background: "rgba(220,38,38,.1)", border: "1px solid rgba(220,38,38,.2)", borderRadius: 8, color: "#ef4444", cursor: "pointer", fontSize: 16, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                    ×
+                    x
                   </button>
                 </div>
               ))}
