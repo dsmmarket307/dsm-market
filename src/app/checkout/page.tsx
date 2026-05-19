@@ -280,12 +280,14 @@ export default function CheckoutPage() {
 
             {/* LOGOS TARJETAS */}
             <div style={{ marginTop: '1rem', padding: '0.75rem', background: '#f8f8f8', borderRadius: '8px' }}>
-              <p style={{ fontSize: '0.65rem', color: '#888', marginBottom: '0.5rem', textAlign: 'center', letterSpacing: '1px', textTransform: 'uppercase' }}>Medios de pago</p>
+              <p style={{ fontSize: '0.65rem', color: '#888', marginBottom: '0.75rem', textAlign: 'center', letterSpacing: '1px', textTransform: 'uppercase' }}>Medios de pago</p>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
                 <img src="https://http2.mlstatic.com/frontend-assets/mp-web-navigation/ui-navigation/5.19.1/mercadopago/logo__large@2x.png" alt="Mercado Pago" style={{ height: '18px', objectFit: 'contain' }} />
-                <img src="https://upload.wikimedia.org/wikipedia/commons/0/04/Visa.svg" alt="Visa" style={{ height: '14px', objectFit: 'contain' }} />
-                <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="Mastercard" style={{ height: '18px', objectFit: 'contain' }} />
-                <span style={{ fontSize: '0.7rem', color: '#888' }}>PSE · Efecty</span>
+                <img src="https://awbepztacmvurjylfoas.supabase.co/storage/v1/object/public/assets/Visa-Logo.jpg" alt="Visa" style={{ height: '18px', objectFit: 'contain' }} />
+                <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="Mastercard" style={{ height: '20px', objectFit: 'contain' }} />
+                <img src="https://awbepztacmvurjylfoas.supabase.co/storage/v1/object/public/assets/nequi-logo-png.png" alt="Nequi" style={{ height: '20px', objectFit: 'contain' }} />
+                <img src="https://awbepztacmvurjylfoas.supabase.co/storage/v1/object/public/assets/daviplata.png" alt="Daviplata" style={{ height: '20px', objectFit: 'contain' }} />
+                <img src="https://awbepztacmvurjylfoas.supabase.co/storage/v1/object/public/assets/logo%20efecty.jpg" alt="Efecty" style={{ height: '20px', objectFit: 'contain' }} />
               </div>
             </div>
           </div>
