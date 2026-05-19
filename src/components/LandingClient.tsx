@@ -26,6 +26,15 @@ export default function LandingClient({ products, images, banners }: any) {
   })
 
   const ofertasMes = products.filter((p: any) => p.oferta_mes === true)
+  const filteredDisplay = search.trim() || selectedCategory
+    ? filtered
+    : (() => {
+        const countByCategory: Record<string, number> = {}
+        return filtered.filter((p: any) => {
+          countByCategory[p.category] = (countByCategory[p.category] ?? 0) + 1
+          return countByCategory[p.category] <= 3
+        })
+      })()
 
   function handleProductClick(productId: string) {
     router.push(`/producto/${productId}`)
@@ -195,14 +204,14 @@ export default function LandingClient({ products, images, banners }: any) {
             </h2>
             <a href="/auth/login" style={{ fontSize: '0.8rem', color: '#D4AF37', textDecoration: 'none', fontWeight: 600 }}>Ver todos</a>
           </div>
-          {filtered.length === 0 ? (
+          {filteredDisplay.length === 0 ? (
             <div style={{ textAlign: 'center', padding: '4rem 2rem', background: '#fff', borderRadius: '16px' }}>
               <p style={{ color: '#888', marginBottom: '1rem' }}>No se encontraron productos.</p>
               <button onClick={() => { setSearch(''); setSelectedCategory('') }} style={{ padding: '0.625rem 1.5rem', background: '#D4AF37', color: '#0B0B0B', border: 'none', cursor: 'pointer', fontSize: '0.8rem', borderRadius: '8px', fontWeight: 700 }}>Ver todos</button>
             </div>
           ) : (
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(clamp(160px, 20vw, 220px), 1fr))', gap: 'clamp(0.75rem, 2vw, 1.25rem)' }}>
-              {filtered.map((product: any) => (
+              {filteredDisplay.map((product: any) => (
                 <ProductCard key={product.id} product={product} />
               ))}
             </div>
