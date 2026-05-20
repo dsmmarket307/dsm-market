@@ -4,10 +4,12 @@ import { useState, useRef, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 
 interface Message {
-  role: 'user' | 'bot'
+  role: 'user' | 'bot' | 'admin'
   text: string
   products?: any[]
 }
+
+const SUPPORT_TRIGGERS = ['asesor', 'soporte humano', 'hablar con alguien', 'ayuda humana', 'quiero hablar con un asesor', 'hablar con asesor']
 
 export default function ChatBot() {
   const [open, setOpen] = useState(false)
@@ -17,7 +19,9 @@ export default function ChatBot() {
   ])
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
+  const [asesorMode, setAsesorMode] = useState(false)
   const [asesorMsg, setAsesorMsg] = useState(false)
+  const [conversationId, setConversationId] = useState<string | null>(null)
   const bottomRef = useRef<HTMLDivElement>(null)
   const supabase = createClient()
 
@@ -29,13 +33,67 @@ export default function ChatBot() {
     if (open) bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages, open])
 
+  useEffect(() => {
+    if (!conversationId) return
+    const channel = supabase
+      .channel('chat_messages_' + conversationId)
+      .on('postgres_changes', {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'chat_messages',
+        filter: 'conversation_id=eq.' + conversationId,
+      }, (payload: any) => {
+        if (payload.new.sender_type === 'admin') {
+          setMessages(prev => [...prev, { role: 'admin', text: payload.new.message }])
+        }
+      })
+      .subscribe()
+    return () => { supabase.removeChannel(channel) }
+  }, [conversationId])
+
+  async function createConversation() {
+    if (!user || conversationId) return conversationId
+    const { data } = await supabase.from('conversations').insert({ user_id: user.id }).select('id').single()
+    if (data?.id) { setConversationId(data.id); return data.id }
+    return null
+  }
+
+  async function saveMessage(convId: string, senderType: string, message: string) {
+    await supabase.from('chat_messages').insert({ conversation_id: convId, sender_type: senderType, message })
+  }
+
+  async function activateAsesor() {
+    setAsesorMsg(true)
+    setAsesorMode(true)
+    const convId = await createConversation()
+    if (convId) await saveMessage(convId, 'ai', 'Un asesor de DMS Market se unira a la conversacion pronto.')
+    setMessages(prev => [...prev, { role: 'bot', text: 'Un asesor de DMS Market se unira a la conversacion pronto. Por favor espera.' }])
+  }
+
+  function isSupportTrigger(text: string) {
+    const lower = text.toLowerCase()
+    return SUPPORT_TRIGGERS.some(t => lower.includes(t))
+  }
+
   async function sendMessage() {
     const text = input.trim()
     if (!text || loading) return
     setInput('')
     setMessages(prev => [...prev, { role: 'user', text }])
+
+    if (isSupportTrigger(text) && user && !asesorMode) {
+      await activateAsesor()
+      return
+    }
+
+    if (asesorMode) {
+      if (conversationId) await saveMessage(conversationId, 'user', text)
+      return
+    }
+
     setLoading(true)
     try {
+      const convId = conversationId ?? await createConversation()
       const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -43,6 +101,10 @@ export default function ChatBot() {
       })
       const data = await res.json()
       setMessages(prev => [...prev, { role: 'bot', text: data.reply, products: data.products }])
+      if (convId) {
+        await saveMessage(convId, 'user', text)
+        await saveMessage(convId, 'ai', data.reply)
+      }
     } catch {
       setMessages(prev => [...prev, { role: 'bot', text: 'Error de conexion. Intenta de nuevo.' }])
     }
@@ -51,14 +113,6 @@ export default function ChatBot() {
 
   function handleKey(e: React.KeyboardEvent) {
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage() }
-  }
-
-  function handleAsesor() {
-    setAsesorMsg(true)
-    setMessages(prev => [...prev, {
-      role: 'bot',
-      text: 'Un asesor de DMS te respondera pronto. Tambien puedes contactarnos por WhatsApp.'
-    }])
   }
 
   return (
@@ -91,8 +145,9 @@ export default function ChatBot() {
         }}>
 
           <div style={{
-            background: 'linear-gradient(135deg, #C9A84C, #e8c96a)',
-            padding: '0.875rem 1rem', display: 'flex', alignItems: 'center', gap: '0.75rem'
+            background: asesorMode ? 'linear-gradient(135deg, #2e7d32, #4CAF7D)' : 'linear-gradient(135deg, #C9A84C, #e8c96a)',
+            padding: '0.875rem 1rem', display: 'flex', alignItems: 'center', gap: '0.75rem',
+            transition: 'background 0.3s'
           }}>
             <div style={{
               width: '40px', height: '40px', borderRadius: '50%',
@@ -100,21 +155,32 @@ export default function ChatBot() {
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               flexShrink: 0, boxShadow: '0 2px 8px rgba(0,0,0,0.15)'
             }}>
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-                <circle cx="12" cy="8" r="4" fill="#C9A84C"/>
-                <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" stroke="#C9A84C" strokeWidth="2" strokeLinecap="round"/>
-                <circle cx="18" cy="6" r="3" fill="#4CAF7D"/>
-                <path d="M16.5 6l1 1 2-2" stroke="#fff" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
+              {asesorMode ? (
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                  <circle cx="12" cy="8" r="4" fill="#2e7d32"/>
+                  <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" stroke="#2e7d32" strokeWidth="2" strokeLinecap="round"/>
+                </svg>
+              ) : (
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                  <circle cx="12" cy="8" r="4" fill="#C9A84C"/>
+                  <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" stroke="#C9A84C" strokeWidth="2" strokeLinecap="round"/>
+                  <circle cx="18" cy="6" r="3" fill="#4CAF7D"/>
+                  <path d="M16.5 6l1 1 2-2" stroke="#fff" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              )}
             </div>
             <div style={{ flex: 1 }}>
-              <p style={{ color: '#fff', fontWeight: 700, fontSize: '0.875rem', margin: 0 }}>Asistente DMS</p>
+              <p style={{ color: '#fff', fontWeight: 700, fontSize: '0.875rem', margin: 0 }}>
+                {asesorMode ? 'Soporte DMS' : 'Asistente DMS'}
+              </p>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', marginTop: '2px' }}>
-                <div style={{ width: '7px', height: '7px', borderRadius: '50%', background: '#4CAF7D' }} />
-                <p style={{ color: 'rgba(255,255,255,0.9)', fontSize: '0.68rem', margin: 0 }}>En linea</p>
+                <div style={{ width: '7px', height: '7px', borderRadius: '50%', background: '#fff' }} />
+                <p style={{ color: 'rgba(255,255,255,0.9)', fontSize: '0.68rem', margin: 0 }}>
+                  {asesorMode ? 'Asesor conectado' : 'En linea'}
+                </p>
               </div>
             </div>
-            {user && (
+            {user && !asesorMode && (
               <div style={{ fontSize: '0.6rem', color: 'rgba(255,255,255,0.85)', textAlign: 'right' }}>
                 <p style={{ margin: 0 }}>Usuario</p>
                 <p style={{ margin: 0, fontWeight: 600 }}>verificado</p>
@@ -128,13 +194,19 @@ export default function ChatBot() {
           }}>
             {messages.map((msg, i) => (
               <div key={i}>
+                {msg.role === 'admin' && (
+                  <div style={{ fontSize: '0.65rem', color: '#2e7d32', textAlign: 'left', marginBottom: '2px', fontWeight: 600 }}>
+                    Asesor DMS
+                  </div>
+                )}
                 <div style={{ display: 'flex', justifyContent: msg.role === 'user' ? 'flex-end' : 'flex-start' }}>
                   <div style={{
                     maxWidth: '80%', padding: '0.6rem 0.875rem',
                     borderRadius: msg.role === 'user' ? '16px 16px 4px 16px' : '16px 16px 16px 4px',
-                    background: msg.role === 'user' ? '#C9A84C' : '#f5f5f5',
-                    color: msg.role === 'user' ? '#fff' : '#111',
+                    background: msg.role === 'user' ? '#C9A84C' : msg.role === 'admin' ? '#e8f5e9' : '#f5f5f5',
+                    color: msg.role === 'user' ? '#fff' : msg.role === 'admin' ? '#2e7d32' : '#111',
                     fontSize: '0.8rem', lineHeight: 1.5,
+                    border: msg.role === 'admin' ? '1px solid #c8e6c9' : 'none'
                   }}>
                     {msg.text}
                   </div>
@@ -170,10 +242,10 @@ export default function ChatBot() {
             <div ref={bottomRef} />
           </div>
 
-          {user && (
+          {user && !asesorMode && (
             <div style={{ padding: '0 0.75rem 0.5rem' }}>
               <button
-                onClick={handleAsesor}
+                onClick={activateAsesor}
                 disabled={asesorMsg}
                 style={{
                   width: '100%', padding: '0.5rem',
@@ -196,7 +268,7 @@ export default function ChatBot() {
               value={input}
               onChange={e => setInput(e.target.value)}
               onKeyDown={handleKey}
-              placeholder={user ? 'Como puedo ayudarte?' : 'Que estas buscando?'}
+              placeholder={asesorMode ? 'Escribe al asesor...' : user ? 'Como puedo ayudarte?' : 'Que estas buscando?'}
               style={{
                 flex: 1, padding: '0.6rem 0.875rem',
                 border: '1px solid #ddd', borderRadius: '999px',
@@ -208,7 +280,7 @@ export default function ChatBot() {
               disabled={loading || !input.trim()}
               style={{
                 width: '36px', height: '36px', borderRadius: '50%',
-                background: loading || !input.trim() ? '#ddd' : '#C9A84C',
+                background: loading || !input.trim() ? '#ddd' : asesorMode ? '#2e7d32' : '#C9A84C',
                 border: 'none', cursor: loading || !input.trim() ? 'not-allowed' : 'pointer',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 fontSize: '0.875rem', color: '#fff', flexShrink: 0,
