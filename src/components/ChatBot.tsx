@@ -23,10 +23,12 @@ export default function ChatBot() {
   const [asesorMsg, setAsesorMsg] = useState(false)
   const [conversationId, setConversationId] = useState<string | null>(null)
   const bottomRef = useRef<HTMLDivElement>(null)
-  const supabase = createClient()
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => setUser(data.user))
+    const supabase = createClient()
+    supabase.auth.getSession().then(({ data }) => {
+      if (data.session?.user) setUser(data.session.user)
+    })
   }, [])
 
   useEffect(() => {
@@ -35,6 +37,7 @@ export default function ChatBot() {
 
   useEffect(() => {
     if (!conversationId) return
+    const supabase = createClient()
     const channel = supabase
       .channel('chat_messages_' + conversationId)
       .on('postgres_changes', {
@@ -52,13 +55,20 @@ export default function ChatBot() {
   }, [conversationId])
 
   async function createConversation() {
-    if (!user || conversationId) return conversationId
-    const { data } = await supabase.from('conversations').insert({ user_id: user.id }).select('id').single()
-    if (data?.id) { setConversationId(data.id); return data.id }
-    return null
+    if (conversationId) return conversationId
+    const supabase = createClient()
+    const { data, error } = await supabase
+      .from('conversations')
+      .insert({ user_id: user?.id ?? null })
+      .select('id')
+      .single()
+    if (error) { console.error('createConversation error:', error); return null }
+    setConversationId(data.id)
+    return data.id
   }
 
   async function saveMessage(convId: string, senderType: string, message: string) {
+    const supabase = createClient()
     await supabase.from('chat_messages').insert({ conversation_id: convId, sender_type: senderType, message })
   }
 
@@ -87,13 +97,13 @@ export default function ChatBot() {
     }
 
     if (asesorMode) {
-      if (conversationId) await saveMessage(conversationId, 'user', text)
+      const convId = conversationId ?? await createConversation()
+      if (convId) await saveMessage(convId, 'user', text)
       return
     }
 
     setLoading(true)
     try {
-      const convId = conversationId ?? await createConversation()
       const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -101,10 +111,6 @@ export default function ChatBot() {
       })
       const data = await res.json()
       setMessages(prev => [...prev, { role: 'bot', text: data.reply, products: data.products }])
-      if (convId) {
-        await saveMessage(convId, 'user', text)
-        await saveMessage(convId, 'ai', data.reply)
-      }
     } catch {
       setMessages(prev => [...prev, { role: 'bot', text: 'Error de conexion. Intenta de nuevo.' }])
     }
@@ -143,7 +149,6 @@ export default function ChatBot() {
           fontFamily: 'sans-serif', overflow: 'hidden',
           border: '1px solid #f0f0f0',
         }}>
-
           <div style={{
             background: asesorMode ? 'linear-gradient(135deg, #2e7d32, #4CAF7D)' : 'linear-gradient(135deg, #C9A84C, #e8c96a)',
             padding: '0.875rem 1rem', display: 'flex', alignItems: 'center', gap: '0.75rem',
