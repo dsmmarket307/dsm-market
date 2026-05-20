@@ -25,21 +25,45 @@ export default function NewProductPage() {
   const [categoryVal, setCategoryVal] = useState("")
   const [priceVal, setPriceVal] = useState("")
 
-  function handleImages(e: React.ChangeEvent<HTMLInputElement>) {
-    const files = Array.from(e.target.files ?? [])
-    if (files.length + images.length > 10) { setError("Maximo 10 fotos"); return }
-    setImages(prev => [...prev, ...files])
-    setPreviews(prev => [...prev, ...files.map(f => URL.createObjectURL(f))])
+  async function compressImage(file: File): Promise<File> {
+    return new Promise((resolve) => {
+      const img = new Image()
+      const url = URL.createObjectURL(file)
+      img.onload = () => {
+        const canvas = document.createElement("canvas")
+        const MAX = 1200
+        let w = img.width, h = img.height
+        if (w > MAX) { h = Math.round(h * MAX / w); w = MAX }
+        if (h > MAX) { w = Math.round(w * MAX / h); h = MAX }
+        canvas.width = w; canvas.height = h
+        canvas.getContext("2d")!.drawImage(img, 0, 0, w, h)
+        canvas.toBlob(blob => {
+          if (blob) resolve(new File([blob], file.name, { type: "image/jpeg" }))
+          else resolve(file)
+        }, "image/jpeg", 0.75)
+        URL.revokeObjectURL(url)
+      }
+      img.src = url
+    })
   }
 
-  function handlePaste(e: React.ClipboardEvent) {
+  async function handleImages(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = Array.from(e.target.files ?? [])
+    if (files.length + images.length > 10) { setError("Maximo 10 fotos"); return }
+    const compressed = await Promise.all(files.map(compressImage))
+    setImages(prev => [...prev, ...compressed])
+    setPreviews(prev => [...prev, ...compressed.map(f => URL.createObjectURL(f))])
+  }
+
+  async function handlePaste(e: React.ClipboardEvent) {
     const items = Array.from(e.clipboardData?.items ?? [])
     const imageItems = items.filter(item => item.type.startsWith("image/"))
     if (imageItems.length === 0) return
     const files = imageItems.map(item => item.getAsFile()).filter(Boolean) as File[]
     if (files.length + images.length > 10) { setError("Maximo 10 fotos"); return }
-    setImages(prev => [...prev, ...files])
-    setPreviews(prev => [...prev, ...files.map(f => URL.createObjectURL(f))])
+    const compressed = await Promise.all(files.map(compressImage))
+    setImages(prev => [...prev, ...compressed])
+    setPreviews(prev => [...prev, ...compressed.map(f => URL.createObjectURL(f))])
   }
 
   function removeImage(i: number) {
@@ -71,9 +95,9 @@ export default function NewProductPage() {
       })
       const data = await res.json()
       if (data.description) setDescription(data.description)
-      else setError("No se pudo generar la descripcion. Escríbela manualmente.")
+      else setError("No se pudo generar la descripcion. Escribela manualmente.")
     } catch {
-      setError("Error al conectar con IA. Escríbela manualmente.")
+      setError("Error al conectar con IA. Escribela manualmente.")
     }
     setGeneratingDesc(false)
   }
