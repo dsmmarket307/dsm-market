@@ -39,7 +39,7 @@ export default function ChatBot() {
     if (!conversationId) return
     const supabase = createClient()
     const channel = supabase
-      .channel('chat_messages_' + conversationId)
+      .channel('chat_' + conversationId)
       .on('postgres_changes', {
         event: 'INSERT',
         schema: 'public',
@@ -56,33 +56,37 @@ export default function ChatBot() {
 
   async function createConversation() {
     if (conversationId) return conversationId
-    const supabase = createClient()
-    const { data, error } = await supabase
-      .from('conversations')
-      .insert({ user_id: user?.id ?? null })
-      .select('id')
-      .single()
-    if (error) { console.error('createConversation error:', error); return null }
-    setConversationId(data.id)
-    return data.id
+    const res = await fetch('/api/support', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'create' })
+    })
+    const data = await res.json()
+    if (data.conversationId) {
+      setConversationId(data.conversationId)
+      return data.conversationId
+    }
+    return null
   }
 
-  async function saveMessage(convId: string, senderType: string, message: string) {
-    const supabase = createClient()
-    await supabase.from('chat_messages').insert({ conversation_id: convId, sender_type: senderType, message })
+  async function saveUserMessage(convId: string, message: string) {
+    await fetch('/api/support', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'message', conversationId: convId, message })
+    })
   }
 
   async function activateAsesor() {
     setAsesorMsg(true)
     setAsesorMode(true)
     const convId = await createConversation()
-    if (convId) await saveMessage(convId, 'ai', 'Un asesor de DMS Market se unira a la conversacion pronto.')
     setMessages(prev => [...prev, { role: 'bot', text: 'Un asesor de DMS Market se unira a la conversacion pronto. Por favor espera.' }])
+    if (convId) await saveUserMessage(convId, 'Usuario solicito asesor humano')
   }
 
   function isSupportTrigger(text: string) {
-    const lower = text.toLowerCase()
-    return SUPPORT_TRIGGERS.some(t => lower.includes(t))
+    return SUPPORT_TRIGGERS.some(t => text.toLowerCase().includes(t))
   }
 
   async function sendMessage() {
@@ -98,7 +102,7 @@ export default function ChatBot() {
 
     if (asesorMode) {
       const convId = conversationId ?? await createConversation()
-      if (convId) await saveMessage(convId, 'user', text)
+      if (convId) await saveUserMessage(convId, text)
       return
     }
 
@@ -155,8 +159,7 @@ export default function ChatBot() {
             transition: 'background 0.3s'
           }}>
             <div style={{
-              width: '40px', height: '40px', borderRadius: '50%',
-              background: '#fff',
+              width: '40px', height: '40px', borderRadius: '50%', background: '#fff',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               flexShrink: 0, boxShadow: '0 2px 8px rgba(0,0,0,0.15)'
             }}>
@@ -249,17 +252,14 @@ export default function ChatBot() {
 
           {user && !asesorMode && (
             <div style={{ padding: '0 0.75rem 0.5rem' }}>
-              <button
-                onClick={activateAsesor}
-                disabled={asesorMsg}
+              <button onClick={activateAsesor} disabled={asesorMsg}
                 style={{
                   width: '100%', padding: '0.5rem',
                   background: asesorMsg ? '#f5f5f5' : '#fff',
                   border: '1px solid #C9A84C', borderRadius: '8px',
                   color: asesorMsg ? '#aaa' : '#C9A84C',
                   fontSize: '0.75rem', fontWeight: 600, cursor: asesorMsg ? 'default' : 'pointer'
-                }}
-              >
+                }}>
                 {asesorMsg ? 'Asesor notificado' : 'Hablar con asesor DMS'}
               </button>
             </div>
@@ -269,10 +269,7 @@ export default function ChatBot() {
             padding: '0.75rem', borderTop: '1px solid #f0f0f0',
             display: 'flex', gap: '0.5rem'
           }}>
-            <input
-              value={input}
-              onChange={e => setInput(e.target.value)}
-              onKeyDown={handleKey}
+            <input value={input} onChange={e => setInput(e.target.value)} onKeyDown={handleKey}
               placeholder={asesorMode ? 'Escribe al asesor...' : user ? 'Como puedo ayudarte?' : 'Que estas buscando?'}
               style={{
                 flex: 1, padding: '0.6rem 0.875rem',
@@ -280,17 +277,14 @@ export default function ChatBot() {
                 fontSize: '0.8rem', outline: 'none', color: '#111'
               }}
             />
-            <button
-              onClick={sendMessage}
-              disabled={loading || !input.trim()}
+            <button onClick={sendMessage} disabled={loading || !input.trim()}
               style={{
                 width: '36px', height: '36px', borderRadius: '50%',
                 background: loading || !input.trim() ? '#ddd' : asesorMode ? '#2e7d32' : '#C9A84C',
                 border: 'none', cursor: loading || !input.trim() ? 'not-allowed' : 'pointer',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 fontSize: '0.875rem', color: '#fff', flexShrink: 0,
-              }}
-            >
+              }}>
               &gt;
             </button>
           </div>
