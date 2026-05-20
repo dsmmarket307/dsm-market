@@ -4,7 +4,6 @@ import { useState, useEffect, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
 
 export default function SoportePage() {
-  const supabase = createClient()
   const [conversations, setConversations] = useState<any[]>([])
   const [selected, setSelected] = useState<any>(null)
   const [messages, setMessages] = useState<any[]>([])
@@ -14,8 +13,9 @@ export default function SoportePage() {
 
   useEffect(() => {
     loadConversations()
+    const supabase = createClient()
     const channel = supabase
-      .channel('admin_conversations')
+      .channel('admin_support')
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'conversations' }, () => loadConversations())
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'chat_messages' }, (payload: any) => {
         if (selected && payload.new.conversation_id === selected.id) {
@@ -31,30 +31,33 @@ export default function SoportePage() {
   }, [messages])
 
   async function loadConversations() {
-    const { data } = await supabase
-      .from('conversations')
-      .select('*')
-      .order('created_at', { ascending: false })
-    setConversations(data ?? [])
+    const res = await fetch('/api/support', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'list' })
+    })
+    const data = await res.json()
+    setConversations(data.conversations ?? [])
   }
 
   async function selectConversation(conv: any) {
     setSelected(conv)
-    const { data } = await supabase
-      .from('chat_messages')
-      .select('*')
-      .eq('conversation_id', conv.id)
-      .order('created_at', { ascending: true })
-    setMessages(data ?? [])
+    const res = await fetch('/api/support', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'messages', conversationId: conv.id })
+    })
+    const data = await res.json()
+    setMessages(data.messages ?? [])
   }
 
   async function sendReply() {
     if (!reply.trim() || !selected) return
     setSending(true)
-    await supabase.from('chat_messages').insert({
-      conversation_id: selected.id,
-      sender_type: 'admin',
-      message: reply.trim()
+    await fetch('/api/support', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'message', conversationId: selected.id, message: reply.trim(), senderType: 'admin' })
     })
     setReply('')
     setSending(false)
@@ -86,16 +89,13 @@ export default function SoportePage() {
                 padding: '0.875rem 1rem', borderRadius: 10, marginBottom: 8, cursor: 'pointer',
                 background: selected?.id === conv.id ? 'rgba(212,175,55,.1)' : '#151515',
                 border: selected?.id === conv.id ? '1px solid rgba(212,175,55,.3)' : '1px solid rgba(255,255,255,.05)',
-                transition: 'all .2s'
               }}>
-              <p style={{ color: '#fff', fontSize: 13, fontWeight: 600, margin: 0 }}>
-                {conv.profiles?.full_name ?? 'Usuario'}
-              </p>
+              <p style={{ color: '#fff', fontSize: 13, fontWeight: 600, margin: 0 }}>Usuario</p>
               <p style={{ color: '#888', fontSize: 11, margin: '4px 0 0' }}>
                 {new Date(conv.created_at).toLocaleDateString('es-CO')}
               </p>
-              <div style={{ display: 'inline-block', marginTop: 6, padding: '2px 8px', borderRadius: 999, background: conv.status === 'active' ? 'rgba(76,175,61,.15)' : 'rgba(255,255,255,.05)', fontSize: 10, color: conv.status === 'active' ? '#4CAF7D' : '#888' }}>
-                {conv.status === 'active' ? 'Activa' : 'Cerrada'}
+              <div style={{ display: 'inline-block', marginTop: 6, padding: '2px 8px', borderRadius: 999, background: 'rgba(76,175,61,.15)', fontSize: 10, color: '#4CAF7D' }}>
+                Activa
               </div>
             </div>
           ))}
@@ -109,11 +109,9 @@ export default function SoportePage() {
           ) : (
             <>
               <div style={{ padding: '1rem 1.5rem', borderBottom: '1px solid rgba(255,255,255,.05)' }}>
-                <p style={{ color: '#fff', fontWeight: 600, fontSize: 14, margin: 0 }}>
-                  {selected.profiles?.full_name ?? 'Usuario'}
-                </p>
+                <p style={{ color: '#fff', fontWeight: 600, fontSize: 14, margin: 0 }}>Conversacion activa</p>
                 <p style={{ color: '#888', fontSize: 11, margin: '2px 0 0' }}>
-                  Conversacion iniciada {new Date(selected.created_at).toLocaleDateString('es-CO')}
+                  Iniciada {new Date(selected.created_at).toLocaleDateString('es-CO')}
                 </p>
               </div>
 
@@ -140,10 +138,7 @@ export default function SoportePage() {
               </div>
 
               <div style={{ padding: '1rem 1.5rem', borderTop: '1px solid rgba(255,255,255,.05)', display: 'flex', gap: '0.75rem' }}>
-                <input
-                  value={reply}
-                  onChange={e => setReply(e.target.value)}
-                  onKeyDown={handleKey}
+                <input value={reply} onChange={e => setReply(e.target.value)} onKeyDown={handleKey}
                   placeholder="Escribe tu respuesta..."
                   style={{
                     flex: 1, padding: '0.75rem 1rem',
