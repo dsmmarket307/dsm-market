@@ -11,6 +11,15 @@ interface Message {
 
 const SUPPORT_TRIGGERS = ['asesor', 'soporte humano', 'hablar con alguien', 'ayuda humana', 'quiero hablar con un asesor', 'hablar con asesor']
 
+const QUICK_OPTIONS = [
+  'Soy nuevo',
+  'Ayuda para usar la plataforma',
+  'Problema con mis envios',
+  'Transportadora y Envio',
+  'Garantias',
+  'Hablar con asesor DMS',
+]
+
 export default function ChatBot() {
   const [open, setOpen] = useState(false)
   const [user, setUser] = useState<any>(null)
@@ -22,6 +31,7 @@ export default function ChatBot() {
   const [asesorMode, setAsesorMode] = useState(false)
   const [asesorMsg, setAsesorMsg] = useState(false)
   const [conversationId, setConversationId] = useState<string | null>(null)
+  const [showOptions, setShowOptions] = useState(true)
   const bottomRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -80,6 +90,7 @@ export default function ChatBot() {
   async function activateAsesor() {
     setAsesorMsg(true)
     setAsesorMode(true)
+    setShowOptions(false)
     const convId = await createConversation()
     setMessages(prev => [...prev, { role: 'bot', text: 'Un asesor de DMS Market se unira a la conversacion pronto. Por favor espera.' }])
     if (convId) await saveUserMessage(convId, 'Usuario solicito asesor humano')
@@ -89,10 +100,37 @@ export default function ChatBot() {
     return SUPPORT_TRIGGERS.some(t => text.toLowerCase().includes(t))
   }
 
+  async function handleQuickOption(option: string) {
+    setShowOptions(false)
+    if (option === 'Hablar con asesor DMS') {
+      if (user) {
+        await activateAsesor()
+      } else {
+        setMessages(prev => [...prev, { role: 'user', text: option }, { role: 'bot', text: 'Para hablar con un asesor necesitas iniciar sesion. Puedes hacerlo en /auth/login' }])
+      }
+      return
+    }
+    setMessages(prev => [...prev, { role: 'user', text: option }])
+    setLoading(true)
+    try {
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: option, isLoggedIn: !!user }),
+      })
+      const data = await res.json()
+      setMessages(prev => [...prev, { role: 'bot', text: data.reply, products: data.products }])
+    } catch {
+      setMessages(prev => [...prev, { role: 'bot', text: 'Error de conexion. Intenta de nuevo.' }])
+    }
+    setLoading(false)
+  }
+
   async function sendMessage() {
     const text = input.trim()
     if (!text || loading) return
     setInput('')
+    setShowOptions(false)
     setMessages(prev => [...prev, { role: 'user', text }])
 
     if (isSupportTrigger(text) && user && !asesorMode) {
@@ -146,7 +184,7 @@ export default function ChatBot() {
       {open && (
         <div style={{
           position: 'fixed', bottom: '5rem', right: '1.5rem', zIndex: 999,
-          width: '340px', height: '500px',
+          width: '340px', height: '520px',
           background: '#fff', borderRadius: '16px',
           boxShadow: '0 8px 40px rgba(0,0,0,0.15)',
           display: 'flex', flexDirection: 'column',
@@ -237,6 +275,25 @@ export default function ChatBot() {
                 )}
               </div>
             ))}
+
+            {showOptions && !asesorMode && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', marginTop: '0.25rem' }}>
+                {QUICK_OPTIONS.map(opt => (
+                  <button key={opt} onClick={() => handleQuickOption(opt)}
+                    style={{
+                      padding: '0.5rem 0.75rem', background: '#fff',
+                      border: opt === 'Hablar con asesor DMS' ? '1px solid #C9A84C' : '1px solid #eee',
+                      borderRadius: '8px', cursor: 'pointer', fontSize: '0.75rem',
+                      color: opt === 'Hablar con asesor DMS' ? '#C9A84C' : '#111',
+                      fontWeight: opt === 'Hablar con asesor DMS' ? 600 : 400,
+                      textAlign: 'left', transition: 'all .15s'
+                    }}>
+                    {opt}
+                  </button>
+                ))}
+              </div>
+            )}
+
             {loading && (
               <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
                 <div style={{
@@ -249,21 +306,6 @@ export default function ChatBot() {
             )}
             <div ref={bottomRef} />
           </div>
-
-          {user && !asesorMode && (
-            <div style={{ padding: '0 0.75rem 0.5rem' }}>
-              <button onClick={activateAsesor} disabled={asesorMsg}
-                style={{
-                  width: '100%', padding: '0.5rem',
-                  background: asesorMsg ? '#f5f5f5' : '#fff',
-                  border: '1px solid #C9A84C', borderRadius: '8px',
-                  color: asesorMsg ? '#aaa' : '#C9A84C',
-                  fontSize: '0.75rem', fontWeight: 600, cursor: asesorMsg ? 'default' : 'pointer'
-                }}>
-                {asesorMsg ? 'Asesor notificado' : 'Hablar con asesor DMS'}
-              </button>
-            </div>
-          )}
 
           <div style={{
             padding: '0.75rem', borderTop: '1px solid #f0f0f0',
