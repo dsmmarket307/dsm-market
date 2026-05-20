@@ -68,7 +68,6 @@ export default function ProductDetail({ product, images, reviews, avgRating, use
   return (
     <div style={{ minHeight: '100vh', background: '#fff', fontFamily: "'Segoe UI', sans-serif" }}>
 
-      {/* NAVBAR */}
       <nav style={{ padding: '0 clamp(1rem, 4vw, 2.5rem)', height: '68px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 0, background: '#0B0B0B', zIndex: 50, boxShadow: '0 2px 20px rgba(0,0,0,0.3)' }}>
         <a href="/"><img src="https://awbepztacmvurjylfoas.supabase.co/storage/v1/object/public/assets/ChatGPT_Image_3_may_2026__21_13_12-removebg-preview.png" alt="DMS Market" style={{ height: '52px', width: 'auto', objectFit: 'contain' }} /></a>
         <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
@@ -81,7 +80,6 @@ export default function ProductDetail({ product, images, reviews, avgRating, use
         </div>
       </nav>
 
-      {/* BREADCRUMB */}
       <div style={{ background: '#f8f8f8', padding: '0.75rem clamp(1rem, 4vw, 2.5rem)', borderBottom: '1px solid #eee' }}>
         <div style={{ maxWidth: '1200px', margin: '0 auto', display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.8rem', color: '#888' }}>
           <a href="/" style={{ color: '#888', textDecoration: 'none' }}>Inicio</a>
@@ -90,11 +88,9 @@ export default function ProductDetail({ product, images, reviews, avgRating, use
         </div>
       </div>
 
-      {/* CONTENIDO */}
       <div style={{ maxWidth: '1200px', margin: '0 auto', padding: 'clamp(1.5rem, 4vw, 3rem) clamp(1rem, 4vw, 2rem)' }}>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 'clamp(1.5rem, 4vw, 4rem)', alignItems: 'start' }}>
 
-          {/* FOTOS */}
           <div>
             <div style={{ position: 'relative', width: '100%', paddingBottom: '100%', background: '#f8f8f8', borderRadius: '16px', overflow: 'hidden', border: '1px solid #eee', marginBottom: '1rem' }}>
               {images.length > 0
@@ -117,7 +113,6 @@ export default function ProductDetail({ product, images, reviews, avgRating, use
             )}
           </div>
 
-          {/* INFO */}
           <div>
             <p style={{ fontSize: '0.65rem', color: '#D4AF37', textTransform: 'uppercase', letterSpacing: '2px', fontWeight: 700, marginBottom: '0.5rem' }}>{product.category}</p>
             <h1 style={{ fontSize: 'clamp(1.4rem, 3vw, 2rem)', fontWeight: 700, color: '#111', lineHeight: 1.2, marginBottom: '0.75rem' }}>{product.name}</h1>
@@ -169,15 +164,16 @@ export default function ProductDetail({ product, images, reviews, avgRating, use
               )}
             </div>
 
+            {/* MEDIOS DE PAGO */}
             <div style={{ padding: '1rem', background: '#f8f8f8', borderRadius: '12px', marginBottom: '1rem' }}>
               <p style={{ fontSize: '0.7rem', color: '#888', marginBottom: '0.75rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '1px', textAlign: 'center' }}>Medios de pago aceptados</p>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '1rem', flexWrap: 'wrap', padding: '0.25rem 0' }}>
                 <img src="https://http2.mlstatic.com/frontend-assets/mp-web-navigation/ui-navigation/5.19.1/mercadopago/logo__large@2x.png" alt="Mercado Pago" style={{ height: '30px', objectFit: 'contain' }} />
-                <img src="https://awbepztacmvurjylfoas.supabase.co/storage/v1/object/public/assets/visa.png" alt="Visa" style={{ height: '30px', objectFit: 'contain' }} />
+                <img src="https://awbepztacmvurjylfoas.supabase.co/storage/v1/object/public/assets/Visa-Logo.jpg" alt="Visa" style={{ height: '30px', objectFit: 'contain' }} />
                 <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="Mastercard" style={{ height: '30px', objectFit: 'contain' }} />
-                <img src="https://upload.wikimedia.org/wikipedia/commons/f/fa/American_Express_logo_%282018%29.svg" alt="Amex" style={{ height: '30px', objectFit: 'contain' }} />
                 <img src="https://awbepztacmvurjylfoas.supabase.co/storage/v1/object/public/assets/nequi-logo-png.png" alt="Nequi" style={{ height: '30px', objectFit: 'contain' }} />
                 <img src="https://awbepztacmvurjylfoas.supabase.co/storage/v1/object/public/assets/daviplata.png" alt="Daviplata" style={{ height: '30px', objectFit: 'contain' }} />
+                <img src="https://awbepztacmvurjylfoas.supabase.co/storage/v1/object/public/assets/logo%20efecty.jpg" alt="Efecty" style={{ height: '30px', objectFit: 'contain' }} />
               </div>
             </div>
 
@@ -240,28 +236,15 @@ export default function ProductDetail({ product, images, reviews, avgRating, use
                   </button>
                 ))}
               </div>
-              <input
-                type="text"
-                value={reviewerName}
-                onChange={e => setReviewerName(e.target.value)}
-                required
-                placeholder="Tu nombre *"
-                style={{ width: '100%', padding: '0.75rem', border: '1px solid #ddd', borderRadius: '8px', fontSize: '0.875rem', outline: 'none', marginBottom: '0.75rem', boxSizing: 'border-box' as const }}
-              />
+              <input type="text" value={reviewerName} onChange={e => setReviewerName(e.target.value)} required placeholder="Tu nombre *"
+                style={{ width: '100%', padding: '0.75rem', border: '1px solid #ddd', borderRadius: '8px', fontSize: '0.875rem', outline: 'none', marginBottom: '0.75rem', boxSizing: 'border-box' as const }} />
               <textarea value={reviewText} onChange={e => setReviewText(e.target.value)} required rows={3}
                 placeholder="Contanos tu experiencia con este producto..."
                 style={{ width: '100%', padding: '0.75rem', border: '1px solid #ddd', borderRadius: '8px', fontSize: '0.875rem', outline: 'none', resize: 'vertical', fontFamily: 'sans-serif', boxSizing: 'border-box' as const }} />
               <div style={{ marginTop: '0.75rem', marginBottom: '0.75rem' }}>
                 <p style={{ fontSize: '0.75rem', color: '#888', marginBottom: '0.4rem' }}>Foto del producto (opcional)</p>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={e => setReviewPhoto(e.target.files?.[0] ?? null)}
-                  style={{ fontSize: '0.8rem', color: '#555' }}
-                />
-                {reviewPhoto && (
-                  <img src={URL.createObjectURL(reviewPhoto)} alt="preview" style={{ marginTop: '0.5rem', width: '80px', height: '80px', objectFit: 'cover', borderRadius: '8px', border: '1px solid #eee' }} />
-                )}
+                <input type="file" accept="image/*" onChange={e => setReviewPhoto(e.target.files?.[0] ?? null)} style={{ fontSize: '0.8rem', color: '#555' }} />
+                {reviewPhoto && <img src={URL.createObjectURL(reviewPhoto)} alt="preview" style={{ marginTop: '0.5rem', width: '80px', height: '80px', objectFit: 'cover', borderRadius: '8px', border: '1px solid #eee' }} />}
               </div>
               {reviewSuccess && <p style={{ color: '#16a34a', fontSize: '0.85rem', marginBottom: '0.5rem' }}>Reseña enviada. Gracias!</p>}
               <button type="submit" disabled={submittingReview}
@@ -354,7 +337,6 @@ export default function ProductDetail({ product, images, reviews, avgRating, use
         )}
       </div>
 
-      {/* FOOTER */}
       <footer style={{ background: '#0B0B0B', borderTop: '1px solid rgba(212,175,55,.15)', marginTop: '4rem', padding: 'clamp(2rem, 4vw, 3rem) clamp(1rem, 4vw, 2.5rem)' }}>
         <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '2rem', marginBottom: '2rem' }}>
