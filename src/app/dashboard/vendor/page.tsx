@@ -229,10 +229,12 @@ export default async function VendorDashboard() {
             )}
           </div>
 
+                  <ReporteIA type="vendor" />
         </div>
       </div>
     </>
   )
 }
+
 
 

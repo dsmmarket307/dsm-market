@@ -101,6 +101,8 @@ export default async function AdminDashboard() {
           <p style={{ marginTop: "1rem", fontSize: "0.8rem", color: "#4CAF7D", fontWeight: 600 }}>Ver soporte</p>
         </Link>
       </div>
+          <ReporteIA type="admin" />
     </div>
   )
 }
+
