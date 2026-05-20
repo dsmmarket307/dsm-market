@@ -81,7 +81,7 @@ export default function BuyerProductsPage() {
   const [userId, setUserId] = useState<string | null>(null)
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => setUserId(data.user?.id ?? null))
+    createClient().auth.getUser().then(({ data }) => setUserId(data.user?.id ?? null))
     fetch("/api/products")
       .then(r => r.json())
       .then(data => { setProducts(data.products ?? []); setImages(data.images ?? []); setLoading(false) })
