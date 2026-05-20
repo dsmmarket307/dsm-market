@@ -1,4 +1,4 @@
-﻿"use client"
+"use client"
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
@@ -15,7 +15,7 @@ export default function FavoritesPage() {
       if (!user) { router.push("/auth/login"); return }
       const { data } = await supabase
         .from("favorites")
-        .select("product_id, products(id, name, price, category), product_images(url)")
+        .select("product_id, products(id, name, price, category)")
         .eq("user_id", user.id)
       setFavorites(data ?? [])
       setLoading(false)
