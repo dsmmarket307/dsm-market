@@ -31,10 +31,29 @@ function Stars({ rating }: { rating: number }) {
   )
 }
 
-function Heart({ productId }: { productId: string }) {
+function Heart({ productId, userId }: { productId: string, userId: string | null }) {
   const [on, setOn] = useState(false)
+  const supabase = createClient()
+
+  useEffect(() => {
+    if (!userId) return
+    supabase.from("favorites").select("id").eq("user_id", userId).eq("product_id", productId).single()
+      .then(({ data }) => { if (data) setOn(true) })
+  }, [userId, productId])
+
+  async function toggle(e: React.MouseEvent) {
+    e.stopPropagation()
+    if (!userId) return
+    if (on) {
+      await supabase.from("favorites").delete().eq("user_id", userId).eq("product_id", productId)
+    } else {
+      await supabase.from("favorites").insert({ user_id: userId, product_id: productId })
+    }
+    setOn(!on)
+  }
+
   return (
-    <button onClick={e => { e.stopPropagation(); setOn(!on) }}
+    <button onClick={toggle}
       style={{position:"absolute",top:10,right:10,width:32,height:32,borderRadius:"50%",background:"rgba(255,255,255,.92)",border:"none",display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",boxShadow:"0 2px 8px rgba(0,0,0,.12)",transition:"all .2s",zIndex:2}}>
       <svg width="15" height="15" viewBox="0 0 24 24" fill={on ? "#ef4444" : "none"} stroke={on ? "#ef4444" : "#999"} strokeWidth="2">
         <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
@@ -58,8 +77,10 @@ export default function BuyerProductsPage() {
   const [search,   setSearch]     = useState("")
   const [category, setCategory]   = useState("Todas")
   const [priceRange,setPriceRange]= useState(0)
+  const [userId, setUserId] = useState<string | null>(null)
 
   useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => setUserId(data.user?.id ?? null))
     fetch("/api/products")
       .then(r => r.json())
       .then(data => { setProducts(data.products ?? []); setImages(data.images ?? []); setLoading(false) })
@@ -190,7 +211,7 @@ export default function BuyerProductsPage() {
                       }
                       {product.condition === "used" && <div className="pp-badge-used">Usado</div>}
                       {product.envio_gratis && <div style={{position:"absolute",bottom:10,right:10,background:"#16a34a",color:"#fff",fontSize:10,fontWeight:700,padding:"3px 10px",borderRadius:"999px",zIndex:1}}>Envio gratis</div>}
-                      <Heart productId={product.id} />
+                      <Heart productId={product.id} userId={userId} />
                     </div>
                     <div className="pp-body">
                       <p className="pp-cat">{product.category}</p>
