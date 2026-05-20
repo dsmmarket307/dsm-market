@@ -55,21 +55,49 @@ export default async function AdminDashboard() {
           <div style={{ width: "32px", height: "3px", background: "#D4AF37", marginBottom: "1rem" }} />
           <p style={{ fontSize: "1.125rem", fontWeight: 600, color: "#ffffff", marginBottom: "0.375rem" }}>Vendedores</p>
           <p style={{ fontSize: "0.8rem", color: "#999999" }}>Aprobar o rechazar perfiles de vendedores</p>
-          <p style={{ marginTop: "1rem", fontSize: "0.8rem", color: "#D4AF37", fontWeight: 600 }}>Ver vendedores →</p>
+          <p style={{ marginTop: "1rem", fontSize: "0.8rem", color: "#D4AF37", fontWeight: 600 }}>Ver vendedores</p>
         </Link>
 
         <Link href="/dashboard/admin/products" style={{ textDecoration: "none", border: "1px solid rgba(212,175,55,.12)", padding: "1.5rem", display: "block" }}>
           <div style={{ width: "32px", height: "3px", background: "#D4AF37", marginBottom: "1rem" }} />
           <p style={{ fontSize: "1.125rem", fontWeight: 600, color: "#ffffff", marginBottom: "0.375rem" }}>Productos</p>
           <p style={{ fontSize: "0.8rem", color: "#999999" }}>Aprobar o rechazar productos de vendedores</p>
-          <p style={{ marginTop: "1rem", fontSize: "0.8rem", color: "#D4AF37", fontWeight: 600 }}>Ver productos →</p>
+          <p style={{ marginTop: "1rem", fontSize: "0.8rem", color: "#D4AF37", fontWeight: 600 }}>Ver productos</p>
         </Link>
 
         <Link href="/dashboard/admin/services" style={{ textDecoration: "none", border: "1px solid rgba(212,175,55,.12)", padding: "1.5rem", display: "block" }}>
           <div style={{ width: "32px", height: "3px", background: "#D4AF37", marginBottom: "1rem" }} />
           <p style={{ fontSize: "1.125rem", fontWeight: 600, color: "#ffffff", marginBottom: "0.375rem" }}>Servicios</p>
           <p style={{ fontSize: "0.8rem", color: "#999999" }}>Aprobar o rechazar servicios de proveedores</p>
-          <p style={{ marginTop: "1rem", fontSize: "0.8rem", color: "#D4AF37", fontWeight: 600 }}>Ver servicios →</p>
+          <p style={{ marginTop: "1rem", fontSize: "0.8rem", color: "#D4AF37", fontWeight: 600 }}>Ver servicios</p>
+        </Link>
+
+        <Link href="/dashboard/admin/orders" style={{ textDecoration: "none", border: "1px solid rgba(212,175,55,.12)", padding: "1.5rem", display: "block" }}>
+          <div style={{ width: "32px", height: "3px", background: "#D4AF37", marginBottom: "1rem" }} />
+          <p style={{ fontSize: "1.125rem", fontWeight: 600, color: "#ffffff", marginBottom: "0.375rem" }}>Ordenes y Pagos</p>
+          <p style={{ fontSize: "0.8rem", color: "#999999" }}>Ver y gestionar ordenes del marketplace</p>
+          <p style={{ marginTop: "1rem", fontSize: "0.8rem", color: "#D4AF37", fontWeight: 600 }}>Ver ordenes</p>
+        </Link>
+
+        <Link href="/dashboard/admin/disputes" style={{ textDecoration: "none", border: "1px solid rgba(212,175,55,.12)", padding: "1.5rem", display: "block" }}>
+          <div style={{ width: "32px", height: "3px", background: "#D4AF37", marginBottom: "1rem" }} />
+          <p style={{ fontSize: "1.125rem", fontWeight: 600, color: "#ffffff", marginBottom: "0.375rem" }}>Disputas</p>
+          <p style={{ fontSize: "0.8rem", color: "#999999" }}>Resolver disputas entre compradores y vendedores</p>
+          <p style={{ marginTop: "1rem", fontSize: "0.8rem", color: "#D4AF37", fontWeight: 600 }}>Ver disputas</p>
+        </Link>
+
+        <Link href="/crm" style={{ textDecoration: "none", border: "1px solid rgba(212,175,55,.12)", padding: "1.5rem", display: "block" }}>
+          <div style={{ width: "32px", height: "3px", background: "#D4AF37", marginBottom: "1rem" }} />
+          <p style={{ fontSize: "1.125rem", fontWeight: 600, color: "#ffffff", marginBottom: "0.375rem" }}>CRM Dropi</p>
+          <p style={{ fontSize: "0.8rem", color: "#999999" }}>Gestion de pedidos y productos Dropi</p>
+          <p style={{ marginTop: "1rem", fontSize: "0.8rem", color: "#D4AF37", fontWeight: 600 }}>Ver CRM</p>
+        </Link>
+
+        <Link href="/dashboard/admin/soporte" style={{ textDecoration: "none", border: "1px solid rgba(76,175,61,.2)", padding: "1.5rem", display: "block" }}>
+          <div style={{ width: "32px", height: "3px", background: "#4CAF7D", marginBottom: "1rem" }} />
+          <p style={{ fontSize: "1.125rem", fontWeight: 600, color: "#ffffff", marginBottom: "0.375rem" }}>Soporte</p>
+          <p style={{ fontSize: "0.8rem", color: "#999999" }}>Responder conversaciones de usuarios en tiempo real</p>
+          <p style={{ marginTop: "1rem", fontSize: "0.8rem", color: "#4CAF7D", fontWeight: 600 }}>Ver soporte</p>
         </Link>
       </div>
     </div>
