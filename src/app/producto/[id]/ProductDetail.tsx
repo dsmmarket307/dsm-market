@@ -137,6 +137,46 @@ export default function ProductDetail({ product, images, reviews, avgRating, use
 
             <p style={{ fontSize: '0.9rem', color: '#555', lineHeight: 1.7, marginBottom: '1.25rem', whiteSpace: 'pre-wrap' }}>{product.description}</p>
 
+            {/* VARIANTES */}
+            {Array.isArray(product.variantes) && product.variantes.length > 0 && (
+              <div style={{ marginBottom: '1.25rem' }}>
+                {product.variantes.map((v: any, i: number) => (
+                  v?.nombre && Array.isArray(v?.opciones) && v.opciones.length > 0 && (
+                    <div key={i} style={{ marginBottom: '0.75rem' }}>
+                      <p style={{ fontSize: '0.75rem', color: '#888', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '0.5rem' }}>{v.nombre}</p>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+                        {v.opciones.map((op: string, j: number) => (
+                          <span key={j} style={{ padding: '0.35rem 0.9rem', border: '1.5px solid #ddd', borderRadius: '8px', fontSize: '0.85rem', color: '#333', fontWeight: 500, background: '#f8f8f8', cursor: 'default' }}>
+                            {op}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )
+                ))}
+              </div>
+            )}
+
+            {/* VARIANTES */}
+            {Array.isArray(product.variantes) && product.variantes.length > 0 && (
+              <div style={{ marginBottom: '1.25rem' }}>
+                {product.variantes.map((v: any, i: number) => (
+                  v?.nombre && Array.isArray(v?.opciones) && v.opciones.length > 0 && (
+                    <div key={i} style={{ marginBottom: '0.75rem' }}>
+                      <p style={{ fontSize: '0.75rem', color: '#888', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '0.5rem' }}>{v.nombre}</p>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+                        {v.opciones.map((op: string, j: number) => (
+                          <span key={j} style={{ padding: '0.35rem 0.9rem', border: '1.5px solid #ddd', borderRadius: '8px', fontSize: '0.85rem', color: '#333', fontWeight: 500, background: '#f8f8f8', cursor: 'default' }}>
+                            {op}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )
+                ))}
+              </div>
+            )}
+
             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.25rem' }}>
               <span style={{ fontSize: '0.85rem', color: '#555', fontWeight: 500 }}>Cantidad</span>
               <div style={{ display: 'flex', alignItems: 'center', border: '1px solid #ddd', borderRadius: '8px', overflow: 'hidden' }}>
