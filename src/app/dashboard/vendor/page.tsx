@@ -2,6 +2,7 @@
 import { createClient as createAdmin } from "@supabase/supabase-js"
 import { redirect } from "next/navigation"
 import Link from "next/link"
+import ReporteIA from "@/components/ReporteIA"
 
 export default async function VendorDashboard() {
   const supabase = await createClient()
