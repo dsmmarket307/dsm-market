@@ -1,5 +1,4 @@
 ﻿'use client'
-
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
@@ -15,6 +14,7 @@ export default function ProductDetail({ product, images, reviews, avgRating, use
   const [reviewPhoto, setReviewPhoto] = useState<File | null>(null)
   const [submittingReview, setSubmittingReview] = useState(false)
   const [reviewSuccess, setReviewSuccess] = useState(false)
+  const [selectedVariantes, setSelectedVariantes] = useState<Record<string, string>>({})
   const router = useRouter()
   const supabase = createClient()
   const isAdmin = user?.user_metadata?.role === 'admin'
@@ -23,6 +23,13 @@ export default function ProductDetail({ product, images, reviews, avgRating, use
   const formattedOriginal = product.original_price ? new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 }).format(product.original_price) : null
   const discount = product.original_price && Number(product.original_price) > Number(product.price)
     ? Math.round((1 - Number(product.price) / Number(product.original_price)) * 100) : 0
+
+  function buildCheckoutUrl() {
+    let url = '/checkout?id=' + product.id + '&qty=' + quantity
+    const v = Object.entries(selectedVariantes).filter(([, val]) => val).map(([k, val]) => k + ':' + val).join('|')
+    if (v) url += '&variantes=' + encodeURIComponent(v)
+    return url
+  }
 
   async function handleAddToCart() {
     setAdding(true)
@@ -33,9 +40,7 @@ export default function ProductDetail({ product, images, reviews, avgRating, use
     setAdding(false)
   }
 
-  function handleBuyNow() {
-    window.location.href = '/checkout?id=' + product.id + '&qty=' + quantity
-  }
+  function handleBuyNow() { window.location.href = buildCheckoutUrl() }
 
   async function handleReview(e: React.FormEvent) {
     e.preventDefault()
@@ -57,33 +62,27 @@ export default function ProductDetail({ product, images, reviews, avgRating, use
   }
 
   async function handleDeleteReview(id: string) {
-    await fetch('/api/reviews', {
-      method: 'DELETE',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id })
-    })
+    await fetch('/api/reviews', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id }) })
     window.location.reload()
   }
 
+  const tieneVariantes = Array.isArray(product.variantes) && product.variantes.length > 0
+
   return (
     <div style={{ minHeight: '100vh', background: '#fff', fontFamily: "'Segoe UI', sans-serif" }}>
-
       <nav style={{ padding: '0 clamp(1rem, 4vw, 2.5rem)', height: '68px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 0, background: '#0B0B0B', zIndex: 50, boxShadow: '0 2px 20px rgba(0,0,0,0.3)' }}>
         <a href="/"><img src="https://awbepztacmvurjylfoas.supabase.co/storage/v1/object/public/assets/ChatGPT_Image_3_may_2026__21_13_12-removebg-preview.png" alt="DMS Market" style={{ height: '52px', width: 'auto', objectFit: 'contain' }} /></a>
         <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
           <a href="/" style={{ fontSize: '0.8rem', color: '#D1D1D1', textDecoration: 'none', padding: '0.5rem 0.75rem' }}>Catalogo</a>
           <a href="/servicios" style={{ fontSize: '0.8rem', color: '#D1D1D1', textDecoration: 'none', padding: '0.5rem 0.75rem' }}>Servicios</a>
-          {user
-            ? <a href="/dashboard" style={{ fontSize: '0.8rem', background: '#D4AF37', color: '#0B0B0B', padding: '0.6rem 1.25rem', textDecoration: 'none', borderRadius: '8px', fontWeight: 700 }}>Mi cuenta</a>
-            : <a href="/auth/login" style={{ fontSize: '0.8rem', background: '#D4AF37', color: '#0B0B0B', padding: '0.6rem 1.25rem', textDecoration: 'none', borderRadius: '8px', fontWeight: 700 }}>Ingresar</a>
-          }
+          {user ? <a href="/dashboard" style={{ fontSize: '0.8rem', background: '#D4AF37', color: '#0B0B0B', padding: '0.6rem 1.25rem', textDecoration: 'none', borderRadius: '8px', fontWeight: 700 }}>Mi cuenta</a>
+                : <a href="/auth/login" style={{ fontSize: '0.8rem', background: '#D4AF37', color: '#0B0B0B', padding: '0.6rem 1.25rem', textDecoration: 'none', borderRadius: '8px', fontWeight: 700 }}>Ingresar</a>}
         </div>
       </nav>
 
       <div style={{ background: '#f8f8f8', padding: '0.75rem clamp(1rem, 4vw, 2.5rem)', borderBottom: '1px solid #eee' }}>
         <div style={{ maxWidth: '1200px', margin: '0 auto', display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.8rem', color: '#888' }}>
-          <a href="/" style={{ color: '#888', textDecoration: 'none' }}>Inicio</a>
-          <span>/</span>
+          <a href="/" style={{ color: '#888', textDecoration: 'none' }}>Inicio</a><span>/</span>
           <span style={{ color: '#111' }}>{product.name}</span>
         </div>
       </div>
@@ -95,17 +94,13 @@ export default function ProductDetail({ product, images, reviews, avgRating, use
             <div style={{ position: 'relative', width: '100%', paddingBottom: '100%', background: '#f8f8f8', borderRadius: '16px', overflow: 'hidden', border: '1px solid #eee', marginBottom: '1rem' }}>
               {images.length > 0
                 ? <img src={images[currentImage]?.url} alt={product.name} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
-                : <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="#ddd" strokeWidth="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
-                  </div>
-              }
+                : <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}><svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="#ddd" strokeWidth="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></div>}
               {discount > 0 && <div style={{ position: 'absolute', top: '1rem', left: '1rem', background: '#EF4444', color: '#fff', fontSize: '0.75rem', fontWeight: 700, padding: '0.3rem 0.75rem', borderRadius: '999px' }}>-{discount}%</div>}
             </div>
             {images.length > 1 && (
               <div style={{ display: 'flex', gap: '0.5rem', overflowX: 'auto', paddingBottom: '0.25rem' }}>
                 {images.map((img: any, i: number) => (
-                  <button key={i} onClick={() => setCurrentImage(i)}
-                    style={{ flexShrink: 0, width: '72px', height: '72px', borderRadius: '10px', overflow: 'hidden', border: i === currentImage ? '2px solid #D4AF37' : '2px solid transparent', background: 'none', padding: 0, cursor: 'pointer' }}>
+                  <button key={i} onClick={() => setCurrentImage(i)} style={{ flexShrink: 0, width: '72px', height: '72px', borderRadius: '10px', overflow: 'hidden', border: i === currentImage ? '2px solid #D4AF37' : '2px solid transparent', background: 'none', padding: 0, cursor: 'pointer' }}>
                     <img src={img.url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                   </button>
                 ))}
@@ -116,19 +111,13 @@ export default function ProductDetail({ product, images, reviews, avgRating, use
           <div>
             <p style={{ fontSize: '0.65rem', color: '#D4AF37', textTransform: 'uppercase', letterSpacing: '2px', fontWeight: 700, marginBottom: '0.5rem' }}>{product.category}</p>
             <h1 style={{ fontSize: 'clamp(1.4rem, 3vw, 2rem)', fontWeight: 700, color: '#111', lineHeight: 1.2, marginBottom: '0.75rem' }}>{product.name}</h1>
-
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem', flexWrap: 'wrap' }}>
               <div style={{ display: 'flex', gap: '2px' }}>
-                {[1,2,3,4,5].map(s => (
-                  <svg key={s} width="16" height="16" viewBox="0 0 24 24" fill={s <= (avgRating || product.rating || 4) ? '#D4AF37' : '#e5e5e5'}>
-                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                  </svg>
-                ))}
+                {[1,2,3,4,5].map(s => (<svg key={s} width="16" height="16" viewBox="0 0 24 24" fill={s <= (avgRating || product.rating || 4) ? '#D4AF37' : '#e5e5e5'}><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>))}
               </div>
               <span style={{ fontSize: '0.8rem', color: '#888' }}>({reviews?.length ?? 0} reseñas)</span>
               {product.vendidos > 0 && <span style={{ fontSize: '0.8rem', color: '#888' }}>· +{product.vendidos} vendidos</span>}
             </div>
-
             <div style={{ marginBottom: '1.25rem' }}>
               {formattedOriginal && <p style={{ fontSize: '0.9rem', color: '#bbb', textDecoration: 'line-through', marginBottom: '0.25rem' }}>{formattedOriginal}</p>}
               <p style={{ fontSize: 'clamp(1.75rem, 4vw, 2.5rem)', fontWeight: 800, color: '#111', lineHeight: 1 }}>{formattedPrice}</p>
@@ -137,43 +126,29 @@ export default function ProductDetail({ product, images, reviews, avgRating, use
 
             <p style={{ fontSize: '0.9rem', color: '#555', lineHeight: 1.7, marginBottom: '1.25rem', whiteSpace: 'pre-wrap' }}>{product.description}</p>
 
-            {/* VARIANTES */}
-            {Array.isArray(product.variantes) && product.variantes.length > 0 && (
-              <div style={{ marginBottom: '1.25rem' }}>
-                {product.variantes.map((v: any, i: number) => (
-                  v?.nombre && Array.isArray(v?.opciones) && v.opciones.length > 0 && (
-                    <div key={i} style={{ marginBottom: '0.75rem' }}>
-                      <p style={{ fontSize: '0.75rem', color: '#888', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '0.5rem' }}>{v.nombre}</p>
+            {tieneVariantes && (
+              <div style={{ marginBottom: '1.25rem', padding: '1rem', background: '#f8f8f8', borderRadius: '12px', border: '1px solid #eee' }}>
+                {product.variantes.map((v: any, i: number) => {
+                  if (!v?.nombre || !Array.isArray(v?.opciones) || v.opciones.length === 0) return null
+                  return (
+                    <div key={i} style={{ marginBottom: i < product.variantes.length - 1 ? '1rem' : 0 }}>
+                      <p style={{ fontSize: '0.75rem', color: '#555', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '0.5rem' }}>
+                        {v.nombre}{selectedVariantes[v.nombre] && <span style={{ color: '#D4AF37', marginLeft: '0.5rem', textTransform: 'none', fontWeight: 600 }}>— {selectedVariantes[v.nombre]}</span>}
+                      </p>
                       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
-                        {v.opciones.map((op: string, j: number) => (
-                          <span key={j} style={{ padding: '0.35rem 0.9rem', border: '1.5px solid #ddd', borderRadius: '8px', fontSize: '0.85rem', color: '#333', fontWeight: 500, background: '#f8f8f8', cursor: 'default' }}>
-                            {op}
-                          </span>
-                        ))}
+                        {v.opciones.map((op: string, j: number) => {
+                          const sel = selectedVariantes[v.nombre] === op
+                          return (
+                            <button key={j} onClick={() => setSelectedVariantes(prev => ({ ...prev, [v.nombre]: sel ? '' : op }))}
+                              style={{ padding: '0.4rem 1rem', border: sel ? '2px solid #D4AF37' : '1.5px solid #ddd', borderRadius: '8px', fontSize: '0.85rem', fontWeight: sel ? 700 : 500, color: sel ? '#0B0B0B' : '#444', background: sel ? '#D4AF37' : '#fff', cursor: 'pointer', transition: 'all 0.15s' }}>
+                              {op}
+                            </button>
+                          )
+                        })}
                       </div>
                     </div>
                   )
-                ))}
-              </div>
-            )}
-
-            {/* VARIANTES */}
-            {Array.isArray(product.variantes) && product.variantes.length > 0 && (
-              <div style={{ marginBottom: '1.25rem' }}>
-                {product.variantes.map((v: any, i: number) => (
-                  v?.nombre && Array.isArray(v?.opciones) && v.opciones.length > 0 && (
-                    <div key={i} style={{ marginBottom: '0.75rem' }}>
-                      <p style={{ fontSize: '0.75rem', color: '#888', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '0.5rem' }}>{v.nombre}</p>
-                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
-                        {v.opciones.map((op: string, j: number) => (
-                          <span key={j} style={{ padding: '0.35rem 0.9rem', border: '1.5px solid #ddd', borderRadius: '8px', fontSize: '0.85rem', color: '#333', fontWeight: 500, background: '#f8f8f8', cursor: 'default' }}>
-                            {op}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  )
-                ))}
+                })}
               </div>
             )}
 
@@ -187,24 +162,17 @@ export default function ProductDetail({ product, images, reviews, avgRating, use
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginBottom: '1.25rem' }}>
-              <button onClick={handleBuyNow} disabled={adding}
-                style={{ width: '100%', padding: '1rem', background: adding ? '#ccc' : '#D4AF37', color: '#0B0B0B', border: 'none', borderRadius: '8px', fontSize: '0.9rem', fontWeight: 700, cursor: adding ? 'not-allowed' : 'pointer' }}>
+              <button onClick={handleBuyNow} disabled={adding} style={{ width: '100%', padding: '1rem', background: adding ? '#ccc' : '#D4AF37', color: '#0B0B0B', border: 'none', borderRadius: '8px', fontSize: '0.9rem', fontWeight: 700, cursor: adding ? 'not-allowed' : 'pointer' }}>
                 {adding ? 'Procesando...' : 'Comprar ahora'}
               </button>
-              <button onClick={handleAddToCart} disabled={adding}
-                style={{ width: '100%', padding: '1rem', background: '#fff', color: '#111', border: '2px solid #111', borderRadius: '8px', fontSize: '0.9rem', fontWeight: 700, cursor: adding ? 'not-allowed' : 'pointer' }}
+              <button onClick={handleAddToCart} disabled={adding} style={{ width: '100%', padding: '1rem', background: '#fff', color: '#111', border: '2px solid #111', borderRadius: '8px', fontSize: '0.9rem', fontWeight: 700, cursor: adding ? 'not-allowed' : 'pointer' }}
                 onMouseEnter={e => { e.currentTarget.style.background = '#111'; e.currentTarget.style.color = '#fff' }}
                 onMouseLeave={e => { e.currentTarget.style.background = '#fff'; e.currentTarget.style.color = '#111' }}>
                 {added ? '✓ Agregado al carrito' : 'Agregar al carrito'}
               </button>
-              {added && (
-                <a href="/carrito" style={{ width: '100%', padding: '0.875rem', background: '#0B0B0B', color: '#D4AF37', border: '1px solid rgba(212,175,55,.3)', borderRadius: '8px', fontSize: '0.9rem', fontWeight: 700, textAlign: 'center', textDecoration: 'none', display: 'block' }}>
-                  Ver mi carrito →
-                </a>
-              )}
+              {added && <a href="/carrito" style={{ width: '100%', padding: '0.875rem', background: '#0B0B0B', color: '#D4AF37', border: '1px solid rgba(212,175,55,.3)', borderRadius: '8px', fontSize: '0.9rem', fontWeight: 700, textAlign: 'center', textDecoration: 'none', display: 'block' }}>Ver mi carrito →</a>}
             </div>
 
-            {/* MEDIOS DE PAGO */}
             <div style={{ padding: '1rem', background: '#f8f8f8', borderRadius: '12px', marginBottom: '1rem' }}>
               <p style={{ fontSize: '0.7rem', color: '#888', marginBottom: '0.75rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '1px', textAlign: 'center' }}>Medios de pago aceptados</p>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '1rem', flexWrap: 'wrap', padding: '0.25rem 0' }}>
@@ -224,8 +192,7 @@ export default function ProductDetail({ product, images, reviews, avgRating, use
                 { icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" strokeWidth="1.75"><path d="M9 12l2 2 4-4"/><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>, label: 'Garantia DSM' },
               ].map(item => (
                 <div key={item.label} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.4rem', padding: '0.75rem 0.5rem', border: '1px solid #eee', borderRadius: '10px', textAlign: 'center' }}>
-                  {item.icon}
-                  <span style={{ fontSize: '0.7rem', color: '#555', fontWeight: 500 }}>{item.label}</span>
+                  {item.icon}<span style={{ fontSize: '0.7rem', color: '#555', fontWeight: 500 }}>{item.label}</span>
                 </div>
               ))}
             </div>
@@ -234,10 +201,8 @@ export default function ProductDetail({ product, images, reviews, avgRating, use
               <div style={{ padding: '1rem', background: '#f8f8f8', borderRadius: '12px', border: '1px solid #eee', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                   <div style={{ width: 44, height: 44, borderRadius: '50%', background: '#D4AF37', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                    {seller.store_logo_url
-                      ? <img src={seller.store_logo_url} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt={seller.store_name} />
-                      : <span style={{ color: '#0B0B0B', fontWeight: 700, fontSize: 18 }}>{(seller.store_name || seller.name || 'T').charAt(0).toUpperCase()}</span>
-                    }
+                    {seller.store_logo_url ? <img src={seller.store_logo_url} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt={seller.store_name} />
+                      : <span style={{ color: '#0B0B0B', fontWeight: 700, fontSize: 18 }}>{(seller.store_name || seller.name || 'T').charAt(0).toUpperCase()}</span>}
                   </div>
                   <div>
                     <p style={{ fontSize: '0.7rem', color: '#888', margin: '0 0 2px' }}>Vendido por</p>
@@ -245,12 +210,9 @@ export default function ProductDetail({ product, images, reviews, avgRating, use
                     {seller.store_description && <p style={{ fontSize: '0.75rem', color: '#888', margin: '2px 0 0' }}>{seller.store_description}</p>}
                   </div>
                 </div>
-                <a href={`/tienda/${seller.id}`} style={{ padding: '8px 16px', background: '#0B0B0B', color: '#D4AF37', textDecoration: 'none', borderRadius: '8px', fontSize: '0.8rem', fontWeight: 700, whiteSpace: 'nowrap', border: '1px solid rgba(212,175,55,.3)' }}>
-                  Ver tienda →
-                </a>
+                <a href={`/tienda/${seller.id}`} style={{ padding: '8px 16px', background: '#0B0B0B', color: '#D4AF37', textDecoration: 'none', borderRadius: '8px', fontSize: '0.8rem', fontWeight: 700, whiteSpace: 'nowrap', border: '1px solid rgba(212,175,55,.3)' }}>Ver tienda →</a>
               </div>
             )}
-
             {product.envio_gratis && (
               <div style={{ marginTop: '0.75rem', padding: '0.75rem 1rem', background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: '8px', fontSize: '0.8rem', color: '#16a34a', fontWeight: 600 }}>
                 Este producto tiene envio gratis
@@ -259,47 +221,35 @@ export default function ProductDetail({ product, images, reviews, avgRating, use
           </div>
         </div>
 
-        {/* RESEÑAS */}
         <div style={{ marginTop: '4rem', borderTop: '1px solid #eee', paddingTop: '2rem' }}>
           <h2 style={{ fontSize: '1.25rem', fontWeight: 700, color: '#111', marginBottom: '1.5rem' }}>Reseñas {reviews?.length > 0 ? `(${reviews.length})` : ''}</h2>
-
           {user ? (
             <form onSubmit={handleReview} style={{ background: '#f8f8f8', borderRadius: '12px', padding: '1.5rem', marginBottom: '2rem', border: '1px solid #eee' }}>
               <p style={{ fontSize: '0.85rem', fontWeight: 600, color: '#111', marginBottom: '1rem' }}>Deja tu reseña</p>
               <div style={{ display: 'flex', gap: '4px', marginBottom: '1rem' }}>
                 {[1,2,3,4,5].map(s => (
-                  <button key={s} type="button" onClick={() => setReviewRating(s)}
-                    style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '2px' }}>
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill={s <= reviewRating ? '#D4AF37' : '#e5e5e5'}>
-                      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                    </svg>
+                  <button key={s} type="button" onClick={() => setReviewRating(s)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '2px' }}>
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill={s <= reviewRating ? '#D4AF37' : '#e5e5e5'}><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
                   </button>
                 ))}
               </div>
-              <input type="text" value={reviewerName} onChange={e => setReviewerName(e.target.value)} required placeholder="Tu nombre *"
-                style={{ width: '100%', padding: '0.75rem', border: '1px solid #ddd', borderRadius: '8px', fontSize: '0.875rem', outline: 'none', marginBottom: '0.75rem', boxSizing: 'border-box' as const }} />
-              <textarea value={reviewText} onChange={e => setReviewText(e.target.value)} required rows={3}
-                placeholder="Contanos tu experiencia con este producto..."
-                style={{ width: '100%', padding: '0.75rem', border: '1px solid #ddd', borderRadius: '8px', fontSize: '0.875rem', outline: 'none', resize: 'vertical', fontFamily: 'sans-serif', boxSizing: 'border-box' as const }} />
+              <input type="text" value={reviewerName} onChange={e => setReviewerName(e.target.value)} required placeholder="Tu nombre *" style={{ width: '100%', padding: '0.75rem', border: '1px solid #ddd', borderRadius: '8px', fontSize: '0.875rem', outline: 'none', marginBottom: '0.75rem', boxSizing: 'border-box' as const }} />
+              <textarea value={reviewText} onChange={e => setReviewText(e.target.value)} required rows={3} placeholder="Contanos tu experiencia con este producto..." style={{ width: '100%', padding: '0.75rem', border: '1px solid #ddd', borderRadius: '8px', fontSize: '0.875rem', outline: 'none', resize: 'vertical', fontFamily: 'sans-serif', boxSizing: 'border-box' as const }} />
               <div style={{ marginTop: '0.75rem', marginBottom: '0.75rem' }}>
                 <p style={{ fontSize: '0.75rem', color: '#888', marginBottom: '0.4rem' }}>Foto del producto (opcional)</p>
                 <input type="file" accept="image/*" onChange={e => setReviewPhoto(e.target.files?.[0] ?? null)} style={{ fontSize: '0.8rem', color: '#555' }} />
                 {reviewPhoto && <img src={URL.createObjectURL(reviewPhoto)} alt="preview" style={{ marginTop: '0.5rem', width: '80px', height: '80px', objectFit: 'cover', borderRadius: '8px', border: '1px solid #eee' }} />}
               </div>
               {reviewSuccess && <p style={{ color: '#16a34a', fontSize: '0.85rem', marginBottom: '0.5rem' }}>Reseña enviada. Gracias!</p>}
-              <button type="submit" disabled={submittingReview}
-                style={{ padding: '0.75rem 1.5rem', background: '#D4AF37', color: '#0B0B0B', border: 'none', borderRadius: '8px', fontSize: '0.85rem', fontWeight: 700, cursor: 'pointer' }}>
+              <button type="submit" disabled={submittingReview} style={{ padding: '0.75rem 1.5rem', background: '#D4AF37', color: '#0B0B0B', border: 'none', borderRadius: '8px', fontSize: '0.85rem', fontWeight: 700, cursor: 'pointer' }}>
                 {submittingReview ? 'Enviando...' : 'Enviar reseña'}
               </button>
             </form>
           ) : (
             <div style={{ background: '#f8f8f8', borderRadius: '12px', padding: '1.25rem', marginBottom: '2rem', textAlign: 'center' }}>
-              <p style={{ color: '#888', fontSize: '0.875rem' }}>
-                <a href="/auth/login" style={{ color: '#D4AF37', fontWeight: 600 }}>Inicia sesion</a> para dejar una reseña
-              </p>
+              <p style={{ color: '#888', fontSize: '0.875rem' }}><a href="/auth/login" style={{ color: '#D4AF37', fontWeight: 600 }}>Inicia sesion</a> para dejar una reseña</p>
             </div>
           )}
-
           {reviews?.length > 0 ? (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               {reviews.map((review: any) => (
@@ -312,22 +262,13 @@ export default function ProductDetail({ product, images, reviews, avgRating, use
                       <div>
                         <p style={{ fontSize: '0.85rem', fontWeight: 600, color: '#111', margin: 0 }}>{review.reviewer_name || review.profiles?.name || 'Usuario'}</p>
                         <div style={{ display: 'flex', gap: '2px', marginTop: '2px' }}>
-                          {[1,2,3,4,5].map(s => (
-                            <svg key={s} width="12" height="12" viewBox="0 0 24 24" fill={s <= review.rating ? '#D4AF37' : '#e5e5e5'}>
-                              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                            </svg>
-                          ))}
+                          {[1,2,3,4,5].map(s => (<svg key={s} width="12" height="12" viewBox="0 0 24 24" fill={s <= review.rating ? '#D4AF37' : '#e5e5e5'}><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>))}
                         </div>
                       </div>
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                       <span style={{ fontSize: '0.75rem', color: '#bbb' }}>{new Date(review.created_at).toLocaleDateString('es-CO')}</span>
-                      {isAdmin && (
-                        <button onClick={() => handleDeleteReview(review.id)}
-                          style={{ padding: '0.25rem 0.75rem', background: 'none', border: '1px solid #EF4444', color: '#EF4444', fontSize: '0.7rem', borderRadius: '999px', cursor: 'pointer', fontWeight: 600 }}>
-                          Eliminar
-                        </button>
-                      )}
+                      {isAdmin && <button onClick={() => handleDeleteReview(review.id)} style={{ padding: '0.25rem 0.75rem', background: 'none', border: '1px solid #EF4444', color: '#EF4444', fontSize: '0.7rem', borderRadius: '999px', cursor: 'pointer', fontWeight: 600 }}>Eliminar</button>}
                     </div>
                   </div>
                   {review.comment && <p style={{ fontSize: '0.875rem', color: '#555', lineHeight: 1.6, margin: 0 }}>{review.comment}</p>}
@@ -340,7 +281,6 @@ export default function ProductDetail({ product, images, reviews, avgRating, use
           )}
         </div>
 
-        {/* RECOMENDADOS */}
         {recommended?.length > 0 && (
           <div style={{ marginTop: '4rem', borderTop: '1px solid #eee', paddingTop: '3rem' }}>
             <h2 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#111', marginBottom: '1.5rem' }}>También te puede interesar</h2>
@@ -350,17 +290,12 @@ export default function ProductDetail({ product, images, reviews, avgRating, use
                 const hasDisc = rec.original_price && Number(rec.original_price) > Number(rec.price)
                 const pct = hasDisc ? Math.round((1 - Number(rec.price) / Number(rec.original_price)) * 100) : 0
                 return (
-                  <a key={rec.id} href={'/producto/' + rec.id}
-                    style={{ textDecoration: 'none', background: '#fff', borderRadius: '12px', border: '1px solid #eee', overflow: 'hidden', display: 'flex', flexDirection: 'column', boxShadow: '0 2px 8px rgba(0,0,0,.04)' }}
+                  <a key={rec.id} href={'/producto/' + rec.id} style={{ textDecoration: 'none', background: '#fff', borderRadius: '12px', border: '1px solid #eee', overflow: 'hidden', display: 'flex', flexDirection: 'column', boxShadow: '0 2px 8px rgba(0,0,0,.04)' }}
                     onMouseEnter={e => { e.currentTarget.style.boxShadow = '0 8px 24px rgba(0,0,0,.10)' }}
                     onMouseLeave={e => { e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,.04)' }}>
                     <div style={{ position: 'relative', paddingBottom: '100%', background: '#f8f8f8', overflow: 'hidden' }}>
-                      {recImg
-                        ? <img src={recImg} alt={rec.name} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
-                        : <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#ddd" strokeWidth="1.25"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-                          </div>
-                      }
+                      {recImg ? <img src={recImg} alt={rec.name} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
+                        : <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#ddd" strokeWidth="1.25"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>}
                       {hasDisc && <div style={{ position: 'absolute', top: 8, right: 8, background: '#EF4444', color: '#fff', fontSize: 10, fontWeight: 700, padding: '2px 8px', borderRadius: 999 }}>-{pct}%</div>}
                     </div>
                     <div style={{ padding: '0.75rem' }}>
@@ -386,15 +321,11 @@ export default function ProductDetail({ product, images, reviews, avgRating, use
             </div>
             <div>
               <p style={{ fontSize: '0.7rem', letterSpacing: '2px', textTransform: 'uppercase', color: '#D4AF37', marginBottom: '1rem', fontWeight: 600 }}>Comprar</p>
-              {['Catalogo', 'Servicios', 'Ofertas del mes'].map(l => (
-                <a key={l} href="/" style={{ display: 'block', fontSize: '0.85rem', color: '#888', textDecoration: 'none', marginBottom: '0.5rem' }}>{l}</a>
-              ))}
+              {['Catalogo', 'Servicios', 'Ofertas del mes'].map(l => (<a key={l} href="/" style={{ display: 'block', fontSize: '0.85rem', color: '#888', textDecoration: 'none', marginBottom: '0.5rem' }}>{l}</a>))}
             </div>
             <div>
               <p style={{ fontSize: '0.7rem', letterSpacing: '2px', textTransform: 'uppercase', color: '#D4AF37', marginBottom: '1rem', fontWeight: 600 }}>Vender</p>
-              {['Registrarse como vendedor', 'Como funciona', 'Comisiones'].map(l => (
-                <a key={l} href="/auth/register" style={{ display: 'block', fontSize: '0.85rem', color: '#888', textDecoration: 'none', marginBottom: '0.5rem' }}>{l}</a>
-              ))}
+              {['Registrarse como vendedor', 'Como funciona', 'Comisiones'].map(l => (<a key={l} href="/auth/register" style={{ display: 'block', fontSize: '0.85rem', color: '#888', textDecoration: 'none', marginBottom: '0.5rem' }}>{l}</a>))}
             </div>
             <div>
               <p style={{ fontSize: '0.7rem', letterSpacing: '2px', textTransform: 'uppercase', color: '#D4AF37', marginBottom: '1rem', fontWeight: 600 }}>Garantias</p>
@@ -404,10 +335,7 @@ export default function ProductDetail({ product, images, reviews, avgRating, use
                   { icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" strokeWidth="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>, text: 'Vendedores verificados' },
                   { icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" strokeWidth="2"><path d="M1 3h15v13H1z"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>, text: 'Envio a todo Colombia' },
                 ].map(item => (
-                  <div key={item.text} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    {item.icon}
-                    <span style={{ fontSize: '0.8rem', color: '#888' }}>{item.text}</span>
-                  </div>
+                  <div key={item.text} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>{item.icon}<span style={{ fontSize: '0.8rem', color: '#888' }}>{item.text}</span></div>
                 ))}
               </div>
             </div>
