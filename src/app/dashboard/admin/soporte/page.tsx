@@ -33,7 +33,7 @@ export default function SoportePage() {
   async function loadConversations() {
     const { data } = await supabase
       .from('conversations')
-      .select('*, profiles(full_name)')
+      .select('*')
       .order('created_at', { ascending: false })
     setConversations(data ?? [])
   }
