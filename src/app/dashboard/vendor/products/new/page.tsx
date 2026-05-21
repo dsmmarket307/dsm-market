@@ -224,7 +224,7 @@ export default function NewProductPage() {
                   style={{ padding: "8px 16px", background: "transparent", border: "1px solid rgba(255,255,255,.1)", borderRadius: 8, color: "#888", fontSize: 12, cursor: "pointer" }}>
                   Revisar contenido
                 </button>
-                <button type="button" onClick={() => { setModerationWarning(""); document.querySelector("form")?.requestSubmit() }}
+                <button type="button" onClick={() => { setModerationWarning(""); setForceSubmit(true) }}
                   style={{ padding: "8px 16px", background: "#f59e0b", border: "none", borderRadius: 8, color: "#000", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>
                   Publicar de todas formas
                 </button>
