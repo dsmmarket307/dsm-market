@@ -25,6 +25,9 @@ export default function NewProductPage() {
   const [nameVal, setNameVal] = useState("")
   const [categoryVal, setCategoryVal] = useState("")
   const [priceVal, setPriceVal] = useState("")
+  const [moderationWarning, setModerationWarning] = useState("")
+  const [moderationBlocked, setModerationBlocked] = useState(false)
+  const [forceSubmit, setForceSubmit] = useState(false)
 
   async function compressImage(file: File): Promise<File> {
     return new Promise((resolve) => {
@@ -123,7 +126,38 @@ export default function NewProductPage() {
   }
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault(); setError(""); setLoading(true)
+    e.preventDefault()
+    setError("")
+    setModerationWarning("")
+    setModerationBlocked(false)
+
+    if (!forceSubmit) {
+      try {
+        const modRes = await fetch('/api/moderate-product', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ title: nameVal, description })
+        })
+        const modData = await modRes.json()
+
+        if (modData.status === 'blocked') {
+          setModerationBlocked(true)
+          setError('No se puede publicar este producto porque infringe las politicas del marketplace. ' + (modData.reason ?? ''))
+          return
+        }
+
+        if (modData.status === 'warning') {
+          setModerationWarning('Este producto podria contener contenido sospechoso: ' + (modData.reason ?? '') + '. Puedes continuar o revisar el contenido.')
+          setForceSubmit(true)
+          return
+        }
+      } catch {
+        // si falla la moderacion, continuar normalmente
+      }
+    }
+
+    setLoading(true)
+    setForceSubmit(false)
     const formData = new FormData(e.currentTarget)
     formData.set("envio_gratis", String(envioGratis))
     formData.set("description", description)
@@ -176,7 +210,27 @@ export default function NewProductPage() {
             <h1 style={{ fontSize: "1.5rem", fontWeight: 700, color: "#fff", margin: 0, fontFamily: "'Poppins',sans-serif" }}>Nuevo producto</h1>
           </div>
 
-          {error && <div style={{ marginBottom: 16, padding: "14px 18px", background: "rgba(220,38,38,.08)", border: "1px solid rgba(220,38,38,.2)", borderRadius: 12, color: "#ef4444", fontSize: 14, fontFamily: "'Poppins',sans-serif" }}>{error}</div>}
+          {error && (
+            <div style={{ marginBottom: 16, padding: "14px 18px", background: moderationBlocked ? "rgba(220,38,38,.08)" : "rgba(220,38,38,.08)", border: "1px solid rgba(220,38,38,.2)", borderRadius: 12, color: "#ef4444", fontSize: 14, fontFamily: "'Poppins',sans-serif" }}>
+              {error}
+            </div>
+          )}
+
+          {moderationWarning && (
+            <div style={{ marginBottom: 16, padding: "14px 18px", background: "rgba(245,158,11,.08)", border: "1px solid rgba(245,158,11,.3)", borderRadius: 12, fontFamily: "'Poppins',sans-serif" }}>
+              <p style={{ color: "#f59e0b", fontSize: 14, marginBottom: 10 }}>{moderationWarning}</p>
+              <div style={{ display: "flex", gap: 10 }}>
+                <button type="button" onClick={() => { setModerationWarning(""); setForceSubmit(false) }}
+                  style={{ padding: "8px 16px", background: "transparent", border: "1px solid rgba(255,255,255,.1)", borderRadius: 8, color: "#888", fontSize: 12, cursor: "pointer" }}>
+                  Revisar contenido
+                </button>
+                <button type="button" onClick={() => { setModerationWarning(""); document.querySelector("form")?.requestSubmit() }}
+                  style={{ padding: "8px 16px", background: "#f59e0b", border: "none", borderRadius: 8, color: "#000", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>
+                  Publicar de todas formas
+                </button>
+              </div>
+            </div>
+          )}
 
           <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 12 }}>
 
@@ -189,12 +243,7 @@ export default function NewProductPage() {
                   </button>
                 </div>
                 <input name="name" type="text" required placeholder="Nombre del producto" className="np-input"
-                  value={nameVal} onChange={e => setNameVal(e.target.value)} />
-                {nameVal && !generatingTitle && (
-                  <p style={{ fontSize: 11, color: "#888", marginTop: 6, fontFamily: "'Poppins',sans-serif" }}>
-                    Puedes editar el titulo libremente.
-                  </p>
-                )}
+                  value={nameVal} onChange={e => { setNameVal(e.target.value); setModerationWarning(""); setModerationBlocked(false); setForceSubmit(false) }} />
               </div>
               <div>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
@@ -204,7 +253,7 @@ export default function NewProductPage() {
                   </button>
                 </div>
                 <textarea name="description" rows={4} placeholder="Describe tu producto o usa el boton para generarla con IA..."
-                  className="np-textarea" value={description} onChange={e => setDescription(e.target.value)} />
+                  className="np-textarea" value={description} onChange={e => { setDescription(e.target.value); setModerationWarning(""); setModerationBlocked(false); setForceSubmit(false) }} />
                 {description && (
                   <p style={{ fontSize: 11, color: "#D4AF37", marginTop: 6, fontFamily: "'Poppins',sans-serif" }}>
                     Descripcion generada con IA. Puedes editarla libremente.
@@ -321,7 +370,9 @@ export default function NewProductPage() {
             </div>
 
             <div style={{ display: "flex", gap: 12 }}>
-              <button type="submit" disabled={loading} className="np-btn-gold">{loading ? "Publicando..." : "Publicar producto"}</button>
+              <button type="submit" disabled={loading || moderationBlocked} className="np-btn-gold">
+                {loading ? "Publicando..." : "Publicar producto"}
+              </button>
               <button type="button" onClick={() => router.back()} className="np-btn-cancel">Cancelar</button>
             </div>
 
