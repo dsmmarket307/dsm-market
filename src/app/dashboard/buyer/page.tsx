@@ -3,6 +3,7 @@ import { createClient as createAdmin } from "@supabase/supabase-js"
 import { redirect } from "next/navigation"
 import { confirmDelivery } from "@/lib/actions/orders"
 import Link from "next/link"
+import RecomendadoParaTi from "@/components/RecomendadoParaTi"
 
 export default async function BuyerDashboard() {
   const supabase = await createClient()
@@ -99,6 +100,8 @@ export default async function BuyerDashboard() {
           </div>
         )}
       </div>
+
+      <RecomendadoParaTi />
     </div>
   )
 }
