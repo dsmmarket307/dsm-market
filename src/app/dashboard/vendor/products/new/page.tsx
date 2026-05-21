@@ -1,6 +1,6 @@
 ﻿"use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { createProduct } from "@/lib/actions/products"
 
@@ -11,12 +11,14 @@ const categories = [
   "Libros","Papeleria","Vehiculos","Otros"
 ]
 
+const STORAGE_KEY = "dms_new_product_draft"
+
 export default function NewProductPage() {
   const router = useRouter()
-  const [error, setError]         = useState("")
-  const [loading, setLoading]     = useState(false)
-  const [images, setImages]       = useState<File[]>([])
-  const [previews, setPreviews]   = useState<string[]>([])
+  const [error, setError] = useState("")
+  const [loading, setLoading] = useState(false)
+  const [images, setImages] = useState<File[]>([])
+  const [previews, setPreviews] = useState<string[]>([])
   const [envioGratis, setEnvioGratis] = useState(false)
   const [variantes, setVariantes] = useState<{ nombre: string; opciones: string }[]>([])
   const [description, setDescription] = useState("")
@@ -25,9 +27,43 @@ export default function NewProductPage() {
   const [nameVal, setNameVal] = useState("")
   const [categoryVal, setCategoryVal] = useState("")
   const [priceVal, setPriceVal] = useState("")
+  const [originalPriceVal, setOriginalPriceVal] = useState("")
+  const [stockVal, setStockVal] = useState("")
+  const [conditionVal, setConditionVal] = useState("new")
   const [moderationWarning, setModerationWarning] = useState("")
   const [moderationBlocked, setModerationBlocked] = useState(false)
-  const [forceSubmit, setForceSubmit] = useState(false)
+  const [skipModeration, setSkipModeration] = useState(false)
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY)
+      if (saved) {
+        const draft = JSON.parse(saved)
+        if (draft.nameVal) setNameVal(draft.nameVal)
+        if (draft.description) setDescription(draft.description)
+        if (draft.categoryVal) setCategoryVal(draft.categoryVal)
+        if (draft.priceVal) setPriceVal(draft.priceVal)
+        if (draft.originalPriceVal) setOriginalPriceVal(draft.originalPriceVal)
+        if (draft.stockVal) setStockVal(draft.stockVal)
+        if (draft.conditionVal) setConditionVal(draft.conditionVal)
+        if (draft.envioGratis !== undefined) setEnvioGratis(draft.envioGratis)
+        if (draft.variantes) setVariantes(draft.variantes)
+      }
+    } catch {}
+  }, [])
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({
+        nameVal, description, categoryVal, priceVal,
+        originalPriceVal, stockVal, conditionVal, envioGratis, variantes
+      }))
+    } catch {}
+  }, [nameVal, description, categoryVal, priceVal, originalPriceVal, stockVal, conditionVal, envioGratis, variantes])
+
+  function clearDraft() {
+    try { localStorage.removeItem(STORAGE_KEY) } catch {}
+  }
 
   async function compressImage(file: File): Promise<File> {
     return new Promise((resolve) => {
@@ -99,7 +135,7 @@ export default function NewProductPage() {
       })
       const data = await res.json()
       if (data.title) setNameVal(data.title)
-      else setError("No se pudo generar el titulo. Escribelo manualmente.")
+      else setError("No se pudo generar el titulo.")
     } catch {
       setError("Error al conectar con IA.")
     }
@@ -114,24 +150,23 @@ export default function NewProductPage() {
       const res = await fetch('/api/generate-description', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: nameVal, category: categoryVal, price: priceVal }),
+        body: JSON.stringify({ name: nameVal, category: categoryVal }),
       })
       const data = await res.json()
       if (data.description) setDescription(data.description)
-      else setError("No se pudo generar la descripcion. Escribela manualmente.")
+      else setError("No se pudo generar la descripcion.")
     } catch {
-      setError("Error al conectar con IA. Escribela manualmente.")
+      setError("Error al conectar con IA.")
     }
     setGeneratingDesc(false)
   }
 
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault()
+  async function submitProduct(force: boolean = false) {
     setError("")
     setModerationWarning("")
     setModerationBlocked(false)
 
-    if (!forceSubmit) {
+    if (!force) {
       try {
         const modRes = await fetch('/api/moderate-product', {
           method: 'POST',
@@ -139,38 +174,49 @@ export default function NewProductPage() {
           body: JSON.stringify({ title: nameVal, description })
         })
         const modData = await modRes.json()
-
         if (modData.status === 'blocked') {
           setModerationBlocked(true)
           setError('No se puede publicar este producto porque infringe las politicas del marketplace. ' + (modData.reason ?? ''))
           return
         }
-
         if (modData.status === 'warning') {
-          setModerationWarning('Este producto podria contener contenido sospechoso: ' + (modData.reason ?? '') + '. Puedes continuar o revisar el contenido.')
-          setForceSubmit(true)
+          setModerationWarning('Este producto podria contener contenido sospechoso: ' + (modData.reason ?? ''))
           return
         }
-      } catch {
-        // si falla la moderacion, continuar normalmente
-      }
+      } catch {}
     }
 
     setLoading(true)
-    setForceSubmit(false)
-    const formData = new FormData(e.currentTarget)
-    formData.set("envio_gratis", String(envioGratis))
-    formData.set("description", description)
-    formData.set("variantes", JSON.stringify(
-      variantes.filter(v => v.nombre && v.opciones).map(v => ({
-        nombre: v.nombre,
-        opciones: v.opciones.split(",").map(o => o.trim()).filter(Boolean)
-      }))
-    ))
-    images.forEach(img => formData.append("images", img))
-    const result = await createProduct(formData)
-    if (result?.error) { setError(result.error); setLoading(false) }
-    else { router.push("/dashboard/vendor") }
+    try {
+      const formData = new FormData()
+      formData.set("name", nameVal)
+      formData.set("description", description)
+      formData.set("price", priceVal)
+      formData.set("original_price", originalPriceVal)
+      formData.set("category", categoryVal)
+      formData.set("stock", stockVal)
+      formData.set("condition", conditionVal)
+      formData.set("envio_gratis", String(envioGratis))
+      formData.set("variantes", JSON.stringify(
+        variantes.filter(v => v.nombre && v.opciones).map(v => ({
+          nombre: v.nombre,
+          opciones: v.opciones.split(",").map(o => o.trim()).filter(Boolean)
+        }))
+      ))
+      images.forEach(img => formData.append("images", img))
+      const result = await createProduct(formData)
+      if (result?.error) { setError(result.error); setLoading(false) }
+      else { clearDraft(); router.push("/dashboard/vendor") }
+    } catch (err) {
+      setError("Error al publicar. Intenta de nuevo.")
+      setLoading(false)
+    }
+  }
+
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    await submitProduct(skipModeration)
+    setSkipModeration(false)
   }
 
   const css = `
@@ -211,7 +257,7 @@ export default function NewProductPage() {
           </div>
 
           {error && (
-            <div style={{ marginBottom: 16, padding: "14px 18px", background: moderationBlocked ? "rgba(220,38,38,.08)" : "rgba(220,38,38,.08)", border: "1px solid rgba(220,38,38,.2)", borderRadius: 12, color: "#ef4444", fontSize: 14, fontFamily: "'Poppins',sans-serif" }}>
+            <div style={{ marginBottom: 16, padding: "14px 18px", background: "rgba(220,38,38,.08)", border: "1px solid rgba(220,38,38,.2)", borderRadius: 12, color: "#ef4444", fontSize: 14, fontFamily: "'Poppins',sans-serif" }}>
               {error}
             </div>
           )}
@@ -220,11 +266,11 @@ export default function NewProductPage() {
             <div style={{ marginBottom: 16, padding: "14px 18px", background: "rgba(245,158,11,.08)", border: "1px solid rgba(245,158,11,.3)", borderRadius: 12, fontFamily: "'Poppins',sans-serif" }}>
               <p style={{ color: "#f59e0b", fontSize: 14, marginBottom: 10 }}>{moderationWarning}</p>
               <div style={{ display: "flex", gap: 10 }}>
-                <button type="button" onClick={() => { setModerationWarning(""); setForceSubmit(false) }}
+                <button type="button" onClick={() => setModerationWarning("")}
                   style={{ padding: "8px 16px", background: "transparent", border: "1px solid rgba(255,255,255,.1)", borderRadius: 8, color: "#888", fontSize: 12, cursor: "pointer" }}>
                   Revisar contenido
                 </button>
-                <button type="button" onClick={() => { setModerationWarning(""); setForceSubmit(true) }}
+                <button type="button" onClick={() => { setModerationWarning(""); setSkipModeration(true); setTimeout(() => document.getElementById("form-producto")?.dispatchEvent(new Event("submit", { bubbles: true, cancelable: true })), 100) }}
                   style={{ padding: "8px 16px", background: "#f59e0b", border: "none", borderRadius: 8, color: "#000", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>
                   Publicar de todas formas
                 </button>
@@ -232,7 +278,7 @@ export default function NewProductPage() {
             </div>
           )}
 
-          <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+          <form id="form-producto" onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 12 }}>
 
             <div className="np-card">
               <div style={{ marginBottom: 16 }}>
@@ -243,7 +289,7 @@ export default function NewProductPage() {
                   </button>
                 </div>
                 <input name="name" type="text" required placeholder="Nombre del producto" className="np-input"
-                  value={nameVal} onChange={e => { setNameVal(e.target.value); setModerationWarning(""); setModerationBlocked(false); setForceSubmit(false) }} />
+                  value={nameVal} onChange={e => { setNameVal(e.target.value); setModerationWarning(""); setModerationBlocked(false) }} />
               </div>
               <div>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
@@ -252,8 +298,8 @@ export default function NewProductPage() {
                     {generatingDesc ? "Generando..." : "Generar con IA"}
                   </button>
                 </div>
-                <textarea name="description" rows={4} placeholder="Describe tu producto o usa el boton para generarla con IA..."
-                  className="np-textarea" value={description} onChange={e => { setDescription(e.target.value); setModerationWarning(""); setModerationBlocked(false); setForceSubmit(false) }} />
+                <textarea rows={4} placeholder="Describe tu producto o usa el boton para generarla con IA..."
+                  className="np-textarea" value={description} onChange={e => { setDescription(e.target.value); setModerationWarning(""); setModerationBlocked(false) }} />
                 {description && (
                   <p style={{ fontSize: 11, color: "#D4AF37", marginTop: 6, fontFamily: "'Poppins',sans-serif" }}>
                     Descripcion generada con IA. Puedes editarla libremente.
@@ -271,7 +317,8 @@ export default function NewProductPage() {
                 </div>
                 <div>
                   <label className="np-label">Precio original (tachado, opcional)</label>
-                  <input name="original_price" type="number" min="0" step="100" placeholder="Precio antes del descuento" className="np-input" />
+                  <input name="original_price" type="number" min="0" step="100" placeholder="Precio antes del descuento" className="np-input"
+                    value={originalPriceVal} onChange={e => setOriginalPriceVal(e.target.value)} />
                 </div>
               </div>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
@@ -285,7 +332,8 @@ export default function NewProductPage() {
                 </div>
                 <div>
                   <label className="np-label">Stock (cantidad disponible)</label>
-                  <input name="stock" type="number" min="1" step="1" placeholder="Ej: 10" className="np-input" />
+                  <input name="stock" type="number" min="1" step="1" placeholder="Ej: 10" className="np-input"
+                    value={stockVal} onChange={e => setStockVal(e.target.value)} />
                 </div>
               </div>
             </div>
@@ -293,12 +341,12 @@ export default function NewProductPage() {
             <div className="np-card">
               <label className="np-label">Estado del producto *</label>
               <div style={{ display: "flex", gap: 12 }}>
-                <label className="np-radio">
-                  <input type="radio" name="condition" value="new" defaultChecked style={{ accentColor: "#D4AF37" }} />
+                <label className="np-radio" style={{ border: conditionVal === "new" ? "1px solid #D4AF37" : "1px solid rgba(255,255,255,.1)" }}>
+                  <input type="radio" name="condition" value="new" checked={conditionVal === "new"} onChange={() => setConditionVal("new")} style={{ accentColor: "#D4AF37" }} />
                   <span style={{ fontSize: 14, color: "#ffffff", fontWeight: 500, fontFamily: "'Poppins',sans-serif" }}>Nuevo</span>
                 </label>
-                <label className="np-radio">
-                  <input type="radio" name="condition" value="used" style={{ accentColor: "#D4AF37" }} />
+                <label className="np-radio" style={{ border: conditionVal === "used" ? "1px solid #D4AF37" : "1px solid rgba(255,255,255,.1)" }}>
+                  <input type="radio" name="condition" value="used" checked={conditionVal === "used"} onChange={() => setConditionVal("used")} style={{ accentColor: "#D4AF37" }} />
                   <span style={{ fontSize: 14, color: "#ffffff", fontWeight: 500, fontFamily: "'Poppins',sans-serif" }}>Usado</span>
                 </label>
               </div>
@@ -337,7 +385,7 @@ export default function NewProductPage() {
                   </svg>
                   <div>
                     <p style={{ fontSize: 14, fontWeight: 700, color: envioGratis ? "#16a34a" : "#ffffff", fontFamily: "'Poppins',sans-serif" }}>Envio gratis</p>
-                    <p style={{ fontSize: 12, color: "#999999", fontFamily: "'Poppins',sans-serif" }}>El cliente no paga envio — tu asumes el costo con Interrapidisimo</p>
+                    <p style={{ fontSize: 12, color: "#999999", fontFamily: "'Poppins',sans-serif" }}>El cliente no paga envio</p>
                   </div>
                 </div>
                 <div style={{ width: 44, height: 24, borderRadius: 999, background: envioGratis ? "#16a34a" : "#333", position: "relative", transition: "all .2s", flexShrink: 0 }}>
