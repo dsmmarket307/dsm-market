@@ -2,6 +2,21 @@
 import { createClient as createAdmin } from "@supabase/supabase-js"
 import { redirect } from "next/navigation"
 import ProductDetail from "./ProductDetail"
+import type { Metadata } from "next"
+
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
+  const { id } = await params
+  const admin = createAdmin(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
+  const { data: product } = await admin.from("products").select("name, seo_title, seo_description, category").eq("id", id).single()
+  if (!product) return { title: "DMS Market" }
+  const title = product.seo_title || `${product.name} | DMS Market`
+  const description = product.seo_description || `Compra ${product.name} con envio rapido en DMS Market.`
+  return {
+    title,
+    description,
+    openGraph: { title, description, siteName: "DMS Market" },
+  }
+}
 
 export default async function ProductoPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
@@ -11,7 +26,7 @@ export default async function ProductoPage({ params }: { params: Promise<{ id: s
 
   const { data: product } = await admin
     .from("products")
-    .select("*, badge, rating, vendidos")
+    .select("*, badge, rating, vendidos, seo_title, seo_description, slug")
     .eq("id", id)
     .eq("status", "approved")
     .single()

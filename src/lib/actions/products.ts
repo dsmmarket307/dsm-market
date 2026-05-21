@@ -11,6 +11,46 @@ function getAdminClient() {
   )
 }
 
+async function generateSEO(name: string, category: string, description: string) {
+  try {
+    const prompt = `Eres un experto en SEO para marketplaces colombianos. Dado este producto genera exactamente esto en JSON sin texto extra:
+{
+  "seo_title": "titulo SEO maximo 60 caracteres incluyendo | DMS Market al final",
+  "seo_description": "meta descripcion atractiva maximo 155 caracteres mencionando compra rapida y envio",
+  "slug": "slug-limpio-sin-espacios-ni-caracteres-especiales"
+}
+
+Producto: ${name}
+Categoria: ${category}
+Descripcion: ${description ?? ""}
+
+Responde SOLO el JSON, sin explicaciones ni backticks.`
+
+    const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${process.env.GROQ_API_KEY}`,
+      },
+      body: JSON.stringify({
+        model: "llama3-8b-8192",
+        max_tokens: 300,
+        messages: [{ role: "user", content: prompt }],
+      }),
+    })
+    const data = await res.json()
+    const text = data.choices?.[0]?.message?.content ?? ""
+    return JSON.parse(text.trim())
+  } catch {
+    const slug = name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")
+    return {
+      seo_title: `${name} | DMS Market`,
+      seo_description: `Compra ${name} con envio rapido en DMS Market. Calidad garantizada.`,
+      slug,
+    }
+  }
+}
+
 export async function createProduct(formData: FormData) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -26,26 +66,35 @@ export async function createProduct(formData: FormData) {
     .eq('id', user.id)
     .single()
 
-  if (profile?.seller_status !== 'approved') return { error: 'Tu perfil no estÃ¡ aprobado aÃºn' }
+  if (profile?.seller_status !== 'approved') return { error: 'Tu perfil no esta aprobado aun' }
 
-  const name = formData.get('name') as string
+  const name        = formData.get('name') as string
   const description = formData.get('description') as string
-  const price = parseFloat(formData.get('price') as string)
+  const price       = parseFloat(formData.get('price') as string)
   const original_price = formData.get('original_price') ? parseFloat(formData.get('original_price') as string) : null
-  const category = formData.get('category') as string
-  const condition = formData.get('condition') as string
-  const stock = formData.get('stock') ? parseInt(formData.get('stock') as string) : null
+  const category    = formData.get('category') as string
+  const condition   = formData.get('condition') as string
+  const stock       = formData.get('stock') ? parseInt(formData.get('stock') as string) : null
   const envio_gratis = formData.get('envio_gratis') === 'true'
   const variantesRaw = formData.get('variantes') as string
-  const variantes = variantesRaw ? JSON.parse(variantesRaw) : null
-  const images = formData.getAll('images') as File[]
+  const variantes   = variantesRaw ? JSON.parse(variantesRaw) : null
+  const images      = formData.getAll('images') as File[]
 
   if (!name || !price || !category) return { error: 'Completa todos los campos requeridos' }
-  if (images.length > 10) return { error: 'MÃ¡ximo 10 fotos por producto' }
+  if (images.length > 10) return { error: 'Maximo 10 fotos por producto' }
+
+  // Generar SEO automaticamente — si falla no bloquea la publicacion
+  const seo = await generateSEO(name, category, description)
 
   const { data: product, error: productError } = await admin
     .from('products')
-    .insert({ seller_id: user.id, name, description, price, original_price, category, condition, stock, envio_gratis, variantes, status: 'pending' })
+    .insert({
+      seller_id: user.id, name, description, price, original_price,
+      category, condition, stock, envio_gratis, variantes, status: 'pending',
+      seo_title: seo.seo_title ?? null,
+      seo_description: seo.seo_description ?? null,
+      slug: seo.slug ?? null,
+    })
     .select()
     .single()
 
