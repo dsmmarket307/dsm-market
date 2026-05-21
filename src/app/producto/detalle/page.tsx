@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
@@ -25,6 +25,7 @@ function ProductContent() {
   const [submittingReview, setSubmittingReview] = useState(false)
   const [reviewSuccess, setReviewSuccess] = useState(false)
   const [loading, setLoading] = useState(true)
+  const [variantesSeleccionadas, setVariantesSeleccionadas] = useState<Record<string, string>>({})
 
   useEffect(() => {
     if (!id) return
@@ -46,7 +47,18 @@ function ProductContent() {
     load()
   }, [id])
 
+  const variantes = (() => {
+    try {
+      if (!product?.variantes) return []
+      if (typeof product.variantes === 'string') return JSON.parse(product.variantes)
+      return product.variantes
+    } catch { return [] }
+  })()
+
+  const todasSeleccionadas = variantes.length === 0 || variantes.every((v: any) => variantesSeleccionadas[v.nombre])
+
   async function handleAddToCart() {
+    if (!todasSeleccionadas) return
     setAdding(true)
     if (!user) { router.push('/auth/login'); return }
     await supabase.from('carts').upsert({ buyer_id: user.id, product_id: product.id, quantity }, { onConflict: 'buyer_id,product_id' })
@@ -56,8 +68,9 @@ function ProductContent() {
   }
 
   function handleBuyNow() {
-    if (!product) return
-    window.location.href = '/checkout?id=' + product.id + '&qty=' + quantity
+    if (!product || !todasSeleccionadas) return
+    const variantesStr = Object.entries(variantesSeleccionadas).map(([k, v]) => k + ':' + v).join('|')
+    window.location.href = '/checkout?id=' + product.id + '&qty=' + quantity + (variantesStr ? '&variantes=' + encodeURIComponent(variantesStr) : '')
   }
 
   async function handleReview(e: React.FormEvent) {
@@ -160,6 +173,54 @@ function ProductContent() {
 
             <p style={{ fontSize: '0.9rem', color: '#555', lineHeight: 1.7, marginBottom: '1.25rem' }}>{product.description}</p>
 
+            {variantes.length > 0 && (
+              <div style={{ marginBottom: '1.25rem' }}>
+                {variantes.map((variante: any) => (
+                  <div key={variante.nombre} style={{ marginBottom: '1rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.6rem' }}>
+                      <p style={{ fontSize: '0.8rem', fontWeight: 600, color: '#111', margin: 0, textTransform: 'uppercase', letterSpacing: '0.5px' }}>{variante.nombre}</p>
+                      {variantesSeleccionadas[variante.nombre] && (
+                        <span style={{ fontSize: '0.75rem', color: '#D4AF37', fontWeight: 600 }}>
+                          {variantesSeleccionadas[variante.nombre]}
+                        </span>
+                      )}
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', gap: '0.5rem' }}>
+                      {variante.opciones.map((opcion: string) => {
+                        const selected = variantesSeleccionadas[variante.nombre] === opcion
+                        return (
+                          <button
+                            key={opcion}
+                            type="button"
+                            onClick={() => setVariantesSeleccionadas(prev => ({ ...prev, [variante.nombre]: opcion }))}
+                            style={{
+                              padding: '0.4rem 0.875rem',
+                              borderRadius: '8px',
+                              border: selected ? '2px solid #D4AF37' : '1px solid #ddd',
+                              background: selected ? '#D4AF37' : '#fff',
+                              color: selected ? '#0B0B0B' : '#555',
+                              fontSize: '0.8rem',
+                              fontWeight: selected ? 700 : 400,
+                              cursor: 'pointer',
+                              transition: 'all 0.15s',
+                              whiteSpace: 'nowrap',
+                            }}
+                          >
+                            {opcion}
+                          </button>
+                        )
+                      })}
+                    </div>
+                  </div>
+                ))}
+                {!todasSeleccionadas && (
+                  <p style={{ fontSize: '0.75rem', color: '#f59e0b', fontWeight: 500 }}>
+                    Selecciona todas las opciones para continuar
+                  </p>
+                )}
+              </div>
+            )}
+
             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.25rem' }}>
               <span style={{ fontSize: '0.85rem', color: '#555', fontWeight: 500 }}>Cantidad</span>
               <div style={{ display: 'flex', alignItems: 'center', border: '1px solid #ddd', borderRadius: '8px', overflow: 'hidden' }}>
@@ -170,14 +231,12 @@ function ProductContent() {
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginBottom: '1.25rem' }}>
-              <button onClick={handleBuyNow} disabled={adding}
-                style={{ width: '100%', padding: '1rem', background: adding ? '#ccc' : '#D4AF37', color: '#0B0B0B', border: 'none', borderRadius: '8px', fontSize: '0.9rem', fontWeight: 700, cursor: adding ? 'not-allowed' : 'pointer' }}>
+              <button onClick={handleBuyNow} disabled={adding || !todasSeleccionadas}
+                style={{ width: '100%', padding: '1rem', background: !todasSeleccionadas ? '#e5e5e5' : adding ? '#ccc' : '#D4AF37', color: !todasSeleccionadas ? '#999' : '#0B0B0B', border: 'none', borderRadius: '8px', fontSize: '0.9rem', fontWeight: 700, cursor: !todasSeleccionadas || adding ? 'not-allowed' : 'pointer' }}>
                 {adding ? 'Procesando...' : 'Comprar ahora'}
               </button>
-              <button onClick={handleAddToCart} disabled={adding}
-                style={{ width: '100%', padding: '1rem', background: '#fff', color: '#111', border: '2px solid #111', borderRadius: '8px', fontSize: '0.9rem', fontWeight: 700, cursor: adding ? 'not-allowed' : 'pointer' }}
-                onMouseEnter={e => { e.currentTarget.style.background = '#111'; e.currentTarget.style.color = '#fff' }}
-                onMouseLeave={e => { e.currentTarget.style.background = '#fff'; e.currentTarget.style.color = '#111' }}>
+              <button onClick={handleAddToCart} disabled={adding || !todasSeleccionadas}
+                style={{ width: '100%', padding: '1rem', background: '#fff', color: !todasSeleccionadas ? '#bbb' : '#111', border: !todasSeleccionadas ? '2px solid #ddd' : '2px solid #111', borderRadius: '8px', fontSize: '0.9rem', fontWeight: 700, cursor: !todasSeleccionadas || adding ? 'not-allowed' : 'pointer' }}>
                 {added ? 'Agregado al carrito' : 'Agregar al carrito'}
               </button>
               {added && (
