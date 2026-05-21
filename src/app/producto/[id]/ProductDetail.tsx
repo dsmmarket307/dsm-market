@@ -66,7 +66,23 @@ export default function ProductDetail({ product, images, reviews, avgRating, use
     window.location.reload()
   }
 
-  const tieneVariantes = Array.isArray(product.variantes) && product.variantes.length > 0
+  // Agrupar variantes con el mismo nombre en una sola fila
+  const variantesAgrupadas: { nombre: string; opciones: string[] }[] = []
+  if (Array.isArray(product.variantes)) {
+    for (const v of product.variantes) {
+      if (!v?.nombre || !Array.isArray(v?.opciones) || v.opciones.length === 0) continue
+      const existe = variantesAgrupadas.find(g => g.nombre === v.nombre)
+      if (existe) {
+        for (const op of v.opciones) {
+          if (!existe.opciones.includes(op)) existe.opciones.push(op)
+        }
+      } else {
+        variantesAgrupadas.push({ nombre: v.nombre, opciones: [...v.opciones] })
+      }
+    }
+  }
+
+  const tieneVariantes = variantesAgrupadas.length > 0
 
   return (
     <div style={{ minHeight: '100vh', background: '#fff', fontFamily: "'Segoe UI', sans-serif" }}>
@@ -127,28 +143,43 @@ export default function ProductDetail({ product, images, reviews, avgRating, use
             <p style={{ fontSize: '0.9rem', color: '#555', lineHeight: 1.7, marginBottom: '1.25rem', whiteSpace: 'pre-wrap' }}>{product.description}</p>
 
             {tieneVariantes && (
-              <div style={{ marginBottom: '1.25rem', padding: '1rem', background: '#f8f8f8', borderRadius: '12px', border: '1px solid #eee' }}>
-                {product.variantes.map((v: any, i: number) => {
-                  if (!v?.nombre || !Array.isArray(v?.opciones) || v.opciones.length === 0) return null
-                  return (
-                    <div key={i} style={{ marginBottom: i < product.variantes.length - 1 ? '1rem' : 0 }}>
-                      <p style={{ fontSize: '0.75rem', color: '#555', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '0.5rem' }}>
-                        {v.nombre}{selectedVariantes[v.nombre] && <span style={{ color: '#D4AF37', marginLeft: '0.5rem', textTransform: 'none', fontWeight: 600 }}>— {selectedVariantes[v.nombre]}</span>}
-                      </p>
-                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
-                        {v.opciones.map((op: string, j: number) => {
-                          const sel = selectedVariantes[v.nombre] === op
-                          return (
-                            <button key={j} onClick={() => setSelectedVariantes(prev => ({ ...prev, [v.nombre]: sel ? '' : op }))}
-                              style={{ padding: '0.4rem 1rem', border: sel ? '2px solid #D4AF37' : '1.5px solid #ddd', borderRadius: '8px', fontSize: '0.85rem', fontWeight: sel ? 700 : 500, color: sel ? '#0B0B0B' : '#444', background: sel ? '#D4AF37' : '#fff', cursor: 'pointer', transition: 'all 0.15s' }}>
-                              {op}
-                            </button>
-                          )
-                        })}
-                      </div>
+              <div style={{ marginBottom: '1.25rem' }}>
+                {variantesAgrupadas.map((v, i) => (
+                  <div key={i} style={{ marginBottom: '1rem' }}>
+                    <p style={{ fontSize: '0.75rem', fontWeight: 700, color: '#333', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '0.6rem' }}>
+                      {v.nombre}
+                      {selectedVariantes[v.nombre] && (
+                        <span style={{ color: '#D4AF37', marginLeft: '0.5rem', fontWeight: 600, textTransform: 'none', letterSpacing: 0 }}>
+                          — {selectedVariantes[v.nombre]}
+                        </span>
+                      )}
+                    </p>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', flexDirection: 'row', gap: '0.5rem' }}>
+                      {v.opciones.map((op, j) => {
+                        const sel = selectedVariantes[v.nombre] === op
+                        return (
+                          <button key={j}
+                            onClick={() => setSelectedVariantes(prev => ({ ...prev, [v.nombre]: sel ? '' : op }))}
+                            style={{
+                              padding: '0.45rem 1.1rem',
+                              border: sel ? '2px solid #D4AF37' : '1.5px solid #ddd',
+                              borderRadius: '8px',
+                              fontSize: '0.85rem',
+                              fontWeight: sel ? 700 : 500,
+                              color: sel ? '#0B0B0B' : '#444',
+                              background: sel ? '#D4AF37' : '#fff',
+                              cursor: 'pointer',
+                              transition: 'all 0.15s',
+                              minWidth: '42px',
+                              textAlign: 'center',
+                            }}>
+                            {op}
+                          </button>
+                        )
+                      })}
                     </div>
-                  )
-                })}
+                  </div>
+                ))}
               </div>
             )}
 
