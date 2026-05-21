@@ -21,6 +21,7 @@ export default function NewProductPage() {
   const [variantes, setVariantes] = useState<{ nombre: string; opciones: string }[]>([])
   const [description, setDescription] = useState("")
   const [generatingDesc, setGeneratingDesc] = useState(false)
+  const [generatingTitle, setGeneratingTitle] = useState(false)
   const [nameVal, setNameVal] = useState("")
   const [categoryVal, setCategoryVal] = useState("")
   const [priceVal, setPriceVal] = useState("")
@@ -81,6 +82,25 @@ export default function NewProductPage() {
 
   function updateVariante(i: number, field: "nombre" | "opciones", value: string) {
     setVariantes(prev => prev.map((v, j) => j === i ? { ...v, [field]: value } : v))
+  }
+
+  async function generateTitle() {
+    if (!nameVal.trim()) { setError("Escribe el nombre del producto primero"); return }
+    setError("")
+    setGeneratingTitle(true)
+    try {
+      const res = await fetch('/api/generate-title', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: nameVal, category: categoryVal }),
+      })
+      const data = await res.json()
+      if (data.title) setNameVal(data.title)
+      else setError("No se pudo generar el titulo. Escribelo manualmente.")
+    } catch {
+      setError("Error al conectar con IA.")
+    }
+    setGeneratingTitle(false)
   }
 
   async function generateDescription() {
@@ -162,9 +182,19 @@ export default function NewProductPage() {
 
             <div className="np-card">
               <div style={{ marginBottom: 16 }}>
-                <label className="np-label">Nombre del producto *</label>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+                  <label className="np-label" style={{ margin: 0 }}>Nombre del producto *</label>
+                  <button type="button" className="np-btn-ia" onClick={generateTitle} disabled={generatingTitle}>
+                    {generatingTitle ? "Generando..." : "Mejorar titulo con IA"}
+                  </button>
+                </div>
                 <input name="name" type="text" required placeholder="Nombre del producto" className="np-input"
                   value={nameVal} onChange={e => setNameVal(e.target.value)} />
+                {nameVal && !generatingTitle && (
+                  <p style={{ fontSize: 11, color: "#888", marginTop: 6, fontFamily: "'Poppins',sans-serif" }}>
+                    Puedes editar el titulo libremente.
+                  </p>
+                )}
               </div>
               <div>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
