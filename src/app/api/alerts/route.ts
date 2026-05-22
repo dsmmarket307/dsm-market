@@ -53,13 +53,22 @@ export async function POST() {
         }
       }
 
-      const { data: topCat } = await admin.from("orders").select("products(category)").order("created_at", { ascending: false }).limit(50)
+      const { data: topCat } = await admin
+        .from("orders")
+        .select("products(category)")
+        .order("created_at", { ascending: false })
+        .limit(50)
+
       if (topCat && topCat.length > 0) {
-        const catCount = {}
-        topCat.forEach((o) => { const cat = o.products?.category; if (cat) catCount[cat] = (catCount[cat] ?? 0) + 1 })
-        const topCategory = Object.entries(catCount).sort((a, b) => b[1] - a[1])[0]
-        if (topCategory) {
-          newAlerts.push({ user_id: user.id, type: "trending", title: "Categoria en tendencia", message: "La categoria " + topCategory[0] + " esta siendo muy demandada." })
+        const catCount: Record<string, number> = {}
+        topCat.forEach((o: any) => {
+          const prod = o.products as any
+          const cat = Array.isArray(prod) ? prod[0]?.category : prod?.category
+          if (cat) catCount[cat] = (catCount[cat] ?? 0) + 1
+        })
+        const entries = Object.entries(catCount).sort((a, b) => b[1] - a[1])
+        if (entries.length > 0) {
+          newAlerts.push({ user_id: user.id, type: "trending", title: "Categoria en tendencia", message: "La categoria " + entries[0][0] + " esta siendo muy demandada." })
         }
       }
     }
@@ -77,7 +86,7 @@ export async function POST() {
 
     const today = new Date().toISOString().split("T")[0]
     const { data: existing } = await admin.from("alerts").select("type").eq("user_id", user.id).gte("created_at", today)
-    const existingTypes = new Set(existing?.map((a) => a.type) ?? [])
+    const existingTypes = new Set(existing?.map((a: any) => a.type) ?? [])
     const toInsert = newAlerts.filter(a => !existingTypes.has(a.type))
     if (toInsert.length > 0) await admin.from("alerts").insert(toInsert)
 
@@ -87,7 +96,7 @@ export async function POST() {
   }
 }
 
-export async function PATCH(request) {
+export async function PATCH(request: Request) {
   try {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
