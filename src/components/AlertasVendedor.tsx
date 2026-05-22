@@ -25,13 +25,13 @@ export default function AlertasVendedor() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id }),
     })
-    setAlerts(prev => prev.map(a => a.id === id ? { ...a, is_read: true } : a))
+    setAlerts((prev: any[]) => prev.map((a: any) => a.id === id ? { ...a, is_read: true } : a))
   }
 
-  const unread = alerts.filter(a => !a.is_read)
+  const unread = alerts.filter((a: any) => !a.is_read)
   if (loading || unread.length === 0) return null
 
-  const borderColors = {
+  const borderColor: Record<string, string> = {
     stock_low: "#f59e0b",
     no_sales: "#ef4444",
     selling_fast: "#1D9E75",
@@ -40,7 +40,7 @@ export default function AlertasVendedor() {
     almost_out: "#f59e0b",
   }
 
-  const bgColors = {
+  const bgColor: Record<string, string> = {
     stock_low: "rgba(245,158,11,.08)",
     no_sales: "rgba(239,68,68,.08)",
     selling_fast: "rgba(29,158,117,.08)",
@@ -55,11 +55,11 @@ export default function AlertasVendedor() {
         Alertas inteligentes
       </p>
       <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-        {unread.map(alert => (
+        {unread.map((alert: any) => (
           <div key={alert.id} style={{
-            background: bgColors[alert.type] ?? "rgba(212,175,55,.06)",
-            border: "1px solid " + (borderColors[alert.type] ?? "#D4AF37"),
-            borderLeft: "3px solid " + (borderColors[alert.type] ?? "#D4AF37"),
+            background: bgColor[alert.type as string] ?? "rgba(212,175,55,.06)",
+            border: "1px solid " + (borderColor[alert.type as string] ?? "#D4AF37"),
+            borderLeft: "3px solid " + (borderColor[alert.type as string] ?? "#D4AF37"),
             borderRadius: 12,
             padding: "1rem 1.25rem",
             display: "flex",
