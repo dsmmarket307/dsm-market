@@ -3,6 +3,7 @@ import { createClient as createAdmin } from "@supabase/supabase-js"
 import { redirect } from "next/navigation"
 import Link from "next/link"
 import ReporteIA from "@/components/ReporteIA"
+import AlertasVendedor from "@/components/AlertasVendedor"
 
 export default async function VendorDashboard() {
   const supabase = await createClient()
@@ -229,7 +230,8 @@ export default async function VendorDashboard() {
             )}
           </div>
 
-                  <ReporteIA type="vendor" />
+                  <AlertasVendedor />
+          <ReporteIA type="vendor" />
         </div>
       </div>
     </>
