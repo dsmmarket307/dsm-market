@@ -19,7 +19,7 @@ export default function AlertasVendedor() {
     load()
   }, [])
 
-  async function markRead(id) {
+  async function markRead(id: string) {
     await fetch("/api/alerts", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
