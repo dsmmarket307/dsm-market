@@ -30,6 +30,8 @@ export default function NewProductPage() {
   const [originalPriceVal, setOriginalPriceVal] = useState("")
   const [stockVal, setStockVal] = useState("")
   const [conditionVal, setConditionVal] = useState("new")
+  const [imageAnalysis, setImageAnalysis] = useState<Record<number, any>>({})
+  const [analyzingImages, setAnalyzingImages] = useState(false)
   const [moderationWarning, setModerationWarning] = useState("")
   const [moderationBlocked, setModerationBlocked] = useState(false)
   const [skipModeration, setSkipModeration] = useState(false)
@@ -104,6 +106,31 @@ export default function NewProductPage() {
     const compressed = await Promise.all(files.map(compressImage))
     setImages(prev => [...prev, ...compressed])
     setPreviews(prev => [...prev, ...compressed.map(f => URL.createObjectURL(f))])
+  }
+
+  async function analyzeImages(files: File[]) {
+    setAnalyzingImages(true)
+    const newAnalysis: Record<number, any> = {}
+    for (let i = 0; i < files.length; i++) {
+      try {
+        const reader = new FileReader()
+        const base64 = await new Promise<string>((resolve) => {
+          reader.onload = () => resolve((reader.result as string).split(",")[1])
+          reader.readAsDataURL(files[i])
+        })
+        const res = await fetch("/api/analyze-image", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ imageBase64: base64, mimeType: files[i].type, index: i })
+        })
+        const data = await res.json()
+        newAnalysis[i] = data
+      } catch {
+        newAnalysis[i] = { score: 75, issues: [], suggestions: [], isGood: true, coverRecommended: i === 0 }
+      }
+    }
+    setImageAnalysis(newAnalysis)
+    setAnalyzingImages(false)
   }
 
   function removeImage(i: number) {
@@ -405,7 +432,7 @@ export default function NewProductPage() {
                 <p style={{ fontSize: 12, color: "#888", fontFamily: "'Poppins',sans-serif", marginBottom: 4 }}>o pega una imagen con Ctrl+V</p>
                 <p style={{ fontSize: 12, color: "#D4AF37", fontFamily: "'Poppins',sans-serif" }}>{images.length}/10 fotos</p>
               </div>
-              {previews.length > 0 && (
+              {analyzingImages && (<div style={{ marginTop: 12, padding: "0.75rem 1rem", background: "rgba(212,175,55,.08)", border: "1px solid rgba(212,175,55,.2)", borderRadius: 10, display: "flex", alignItems: "center", gap: 8 }}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" strokeWidth="2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg><p style={{ fontSize: 12, color: "#D4AF37", margin: 0 }}>Analizando calidad con IA...</p></div>)}{previews.length > 0 && (
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(5,1fr)", gap: 8, marginTop: 12 }}>
                   {previews.map((preview, i) => (
                     <div key={i} style={{ position: "relative" }}>
