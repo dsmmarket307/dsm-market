@@ -1,4 +1,4 @@
-﻿import { NextResponse } from "next/server"
+import { NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
 import { createClient as createAdmin } from "@supabase/supabase-js"
 
@@ -6,9 +6,7 @@ function getAdmin() {
   return createAdmin(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
 }
 
-export async function GET(request: Request) {
-  const { searchParams } = new URL(request.url)
-  const uid = searchParams.get("uid")
+export async function GET() {
   try {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
@@ -17,7 +15,7 @@ export async function GET(request: Request) {
     const { data: alerts } = await admin
       .from("alerts")
       .select("*")
-      .eq("user_id", userId)
+      .eq("user_id", user.id)
       .order("created_at", { ascending: false })
       .limit(10)
     return NextResponse.json({ alerts: alerts ?? [] })
@@ -87,7 +85,7 @@ export async function POST() {
     }
 
     const today = new Date().toISOString().split("T")[0]
-    const { data: existing } = await admin.from("alerts").select("type").eq("user_id", userId).gte("created_at", today)
+    const { data: existing } = await admin.from("alerts").select("type").eq("user_id", user.id).gte("created_at", today)
     const existingTypes = new Set(existing?.map((a: any) => a.type) ?? [])
     const toInsert = newAlerts.filter(a => !existingTypes.has(a.type))
     if (toInsert.length > 0) await admin.from("alerts").insert(toInsert)
@@ -105,7 +103,7 @@ export async function PATCH(request: Request) {
     if (!user) return NextResponse.json({ error: "No autenticado" }, { status: 401 })
     const { id } = await request.json()
     const admin = getAdmin()
-    await admin.from("alerts").update({ is_read: true }).eq("id", id).eq("user_id", userId)
+    await admin.from("alerts").update({ is_read: true }).eq("id", id).eq("user_id", user.id)
     return NextResponse.json({ success: true })
   } catch {
     return NextResponse.json({ error: "Error interno" }, { status: 500 })
