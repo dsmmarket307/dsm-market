@@ -1,31 +1,25 @@
 ﻿"use client"
 
 import { useEffect, useState } from "react"
-import { createClient } from "@/lib/supabase/client"
 
-export default function AlertasVendedor() {
+export default function AlertasVendedor({ userId }: { userId: string }) {
   const [alerts, setAlerts] = useState<any[]>([])
 
   useEffect(() => {
     async function load() {
-      const supabase = createClient()
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) return
-      const { data } = await supabase
-        .from("alerts")
-        .select("*")
-        .eq("user_id", user.id)
-        .eq("is_read", false)
-        .order("created_at", { ascending: false })
-        .limit(10)
-      setAlerts(data ?? [])
+      const res = await fetch("/api/alerts?uid=" + userId)
+      const data = await res.json()
+      setAlerts(data.alerts ?? [])
     }
     load()
-  }, [])
+  }, [userId])
 
   async function markRead(id: string) {
-    const supabase = createClient()
-    await supabase.from("alerts").update({ is_read: true }).eq("id", id)
+    await fetch("/api/alerts", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id }),
+    })
     setAlerts((prev: any[]) => prev.filter((a: any) => a.id !== id))
   }
 
@@ -73,8 +67,7 @@ export default function AlertasVendedor() {
             </div>
             <button onClick={() => markRead(alert.id)} style={{
               background: "transparent", border: "none", color: "#555",
-              cursor: "pointer", fontSize: 18, flexShrink: 0,
-              padding: "0 4px",
+              cursor: "pointer", fontSize: 18, flexShrink: 0, padding: "0 4px",
             }}>x</button>
           </div>
         ))}

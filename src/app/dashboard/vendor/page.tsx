@@ -230,7 +230,7 @@ export default async function VendorDashboard() {
             )}
           </div>
 
-                  <AlertasVendedor />
+                  <AlertasVendedor userId={user.id} />
           <ReporteIA type="vendor" />
         </div>
       </div>
