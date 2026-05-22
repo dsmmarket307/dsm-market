@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 
 export default function AlertasVendedor() {
-  const [alerts, setAlerts] = useState([])
+  const [alerts, setAlerts] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
