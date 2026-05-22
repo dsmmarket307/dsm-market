@@ -1,35 +1,35 @@
 ﻿"use client"
 
 import { useEffect, useState } from "react"
+import { createClient } from "@/lib/supabase/client"
 
 export default function AlertasVendedor() {
   const [alerts, setAlerts] = useState<any[]>([])
-  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     async function load() {
-      try {
-        await fetch("/api/alerts", { method: "POST" })
-        const res = await fetch("/api/alerts")
-        const data = await res.json()
-        setAlerts(data.alerts ?? [])
-      } catch {}
-      setLoading(false)
+      const supabase = createClient()
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) return
+      const { data } = await supabase
+        .from("alerts")
+        .select("*")
+        .eq("user_id", user.id)
+        .eq("is_read", false)
+        .order("created_at", { ascending: false })
+        .limit(10)
+      setAlerts(data ?? [])
     }
     load()
   }, [])
 
   async function markRead(id: string) {
-    await fetch("/api/alerts", {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id }),
-    })
-    setAlerts((prev: any[]) => prev.map((a: any) => a.id === id ? { ...a, is_read: true } : a))
+    const supabase = createClient()
+    await supabase.from("alerts").update({ is_read: true }).eq("id", id)
+    setAlerts((prev: any[]) => prev.filter((a: any) => a.id !== id))
   }
 
-  const unread = alerts.filter((a: any) => !a.is_read)
-  if (loading || unread.length === 0) return null
+  if (alerts.length === 0) return null
 
   const borderColor: Record<string, string> = {
     stock_low: "#f59e0b",
@@ -55,7 +55,7 @@ export default function AlertasVendedor() {
         Alertas inteligentes
       </p>
       <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-        {unread.map((alert: any) => (
+        {alerts.map((alert: any) => (
           <div key={alert.id} style={{
             background: bgColor[alert.type as string] ?? "rgba(212,175,55,.06)",
             border: "1px solid " + (borderColor[alert.type as string] ?? "#D4AF37"),
@@ -74,7 +74,7 @@ export default function AlertasVendedor() {
             <button onClick={() => markRead(alert.id)} style={{
               background: "transparent", border: "none", color: "#555",
               cursor: "pointer", fontSize: 18, flexShrink: 0,
-              padding: "0 4px", borderRadius: 4,
+              padding: "0 4px",
             }}>x</button>
           </div>
         ))}
