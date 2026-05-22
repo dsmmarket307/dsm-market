@@ -178,7 +178,7 @@ export default function ChatBot() {
         }}
         title="Asistente DMS Market"
       >
-        {open ? 'X' : 'Chat'}
+        {open ? (<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5"><line x1="18" y1="6" x2="6" y2="6"/><line x1="18" y1="12" x2="6" y2="12"/><line x1="12" y1="18" x2="6" y2="18"/></svg>) : (<svg width="22" height="22" viewBox="0 0 24 24" fill="#0B0B0B" stroke="#0B0B0B" strokeWidth="0"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" fill="#0B0B0B"/></svg>)}
       </button>
 
       {open && (
