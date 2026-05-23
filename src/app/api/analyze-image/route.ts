@@ -55,6 +55,6 @@ Ejemplos de suggestions: "Usa fondo blanco o neutro", "Mejora la iluminacion", "
     }
   } catch (error) {
     console.error('analyze-image error:', error)
-    return NextResponse.json({ score: 75, issues: [], suggestions: [], isGood: true, coverRecommended: false, index })
+    return NextResponse.json({ score: 75, issues: [], suggestions: [], isGood: true, coverRecommended: false, index: index })
   }
 }
