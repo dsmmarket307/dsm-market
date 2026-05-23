@@ -322,16 +322,16 @@ export default function LandingClient({ products, images, banners }: any) {
                 { label: 'Soporte', href: '/soporte' },
               ]},
               { title: 'Legal', links: [
-                { label: 'Politica de Privacidad', href: '/politica-privacidad' },
-                { label: 'Terminos y Condiciones', href: '/terminos-condiciones' },
-                { label: 'Politica de Devoluciones', href: '/politica-devoluciones' },
-                { label: 'Politica de Garantias', href: '/politica-garantias' },
+                { label: 'Politica de Privacidad', href: '/politicas#privacidad' },
+                { label: 'Terminos y Condiciones', href: '/politicas#terminos' },
+                { label: 'Politica de Devoluciones', href: '/politicas#devoluciones' },
+                { label: 'Politica de Envios', href: '/politicas#envios' },
               ]},
               { title: 'Empresa', links: [
                 { label: 'Sobre nosotros', href: '#' },
                 { label: 'Trabaja con nosotros', href: '#' },
                 { label: 'Contacto', href: '/soporte' },
-                { label: 'Politica Vendedores', href: '/politica-vendedores' },
+                { label: 'Politica Vendedores', href: '/politicas#vendedores' },
               ]},
             ].map(col => (
               <div key={col.title}>
@@ -364,8 +364,8 @@ export default function LandingClient({ products, images, banners }: any) {
           <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: '1.5rem', display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.5rem', alignItems: 'center' }}>
             <p style={{ fontSize: '0.75rem', color: '#666', margin: 0 }}>2025 DMS Market. Colombia. Todos los derechos reservados.</p>
             <div style={{ display: 'flex', gap: '1.5rem' }}>
-              <a href="/politica-privacidad" style={{ fontSize: '0.75rem', color: '#666', textDecoration: 'none' }}>Privacidad</a>
-              <a href="/terminos-condiciones" style={{ fontSize: '0.75rem', color: '#666', textDecoration: 'none' }}>Terminos</a>
+              <a href="/politicas#privacidad" style={{ fontSize: '0.75rem', color: '#666', textDecoration: 'none' }}>Privacidad</a>
+              <a href="/politicas#terminos" style={{ fontSize: '0.75rem', color: '#666', textDecoration: 'none' }}>Terminos</a>
               <a href="/auth/login" style={{ fontSize: '0.75rem', color: '#D4AF37', textDecoration: 'none', fontWeight: 600 }}>Ingresar</a>
             </div>
           </div>
