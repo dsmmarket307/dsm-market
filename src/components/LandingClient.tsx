@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
@@ -104,9 +104,8 @@ export default function LandingClient({ products, images, banners }: any) {
   return (
     <div style={{ background: '#fff', minHeight: '100vh', fontFamily: "'Segoe UI', sans-serif", color: '#111' }}>
 
-      {/* NAVBAR */}
       <nav style={{ padding: '0 clamp(1rem, 4vw, 2.5rem)', height: '68px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 0, background: '#0B0B0B', zIndex: 50, boxShadow: '0 2px 20px rgba(0,0,0,0.3)' }}>
-       <img src="https://awbepztacmvurjylfoas.supabase.co/storage/v1/object/public/assets/ChatGPT_Image_3_may_2026__21_13_12-removebg-preview.png" alt="DMS Market" style={{ height: '65px', width: 'auto', objectFit: 'contain' }} />
+        <img src="https://awbepztacmvurjylfoas.supabase.co/storage/v1/object/public/assets/ChatGPT_Image_3_may_2026__21_13_12-removebg-preview.png" alt="DMS Market" style={{ height: '65px', width: 'auto', objectFit: 'contain' }} />
         <div style={{ flex: 1, maxWidth: '500px', margin: '0 clamp(0.5rem, 2vw, 2rem)', display: 'flex', background: '#1a1a1a', borderRadius: '10px', overflow: 'hidden', border: '1px solid rgba(212,175,55,0.2)' }}>
           <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Buscar productos o servicios..."
             style={{ flex: 1, padding: '0.7rem 1rem', border: 'none', fontSize: '0.875rem', outline: 'none', color: '#fff', background: 'transparent' }} />
@@ -121,7 +120,6 @@ export default function LandingClient({ products, images, banners }: any) {
         </div>
       </nav>
 
-      {/* BANNER CARRUSEL */}
       {banners.length > 0 && (
         <div style={{ position: 'relative', width: '100%', height: 'clamp(280px, 45vw, 560px)', overflow: 'hidden', background: '#0B0B0B' }}>
           {banners.map((banner: any, i: number) => (
@@ -143,8 +141,6 @@ export default function LandingClient({ products, images, banners }: any) {
               )}
             </div>
           ))}
-
-          {/* BENEFICIOS RAPIDOS */}
           <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, background: 'rgba(11,11,11,0.85)', backdropFilter: 'blur(10px)', padding: '0.875rem clamp(1rem, 4vw, 3rem)', display: 'flex', justifyContent: 'center', gap: 'clamp(1.5rem, 4vw, 4rem)', flexWrap: 'wrap', zIndex: 5 }}>
             {[
               { icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" strokeWidth="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>, text: 'Compra segura' },
@@ -157,7 +153,6 @@ export default function LandingClient({ products, images, banners }: any) {
               </div>
             ))}
           </div>
-
           <div style={{ position: 'absolute', bottom: '3.5rem', left: '50%', transform: 'translateX(-50%)', display: 'flex', gap: '0.5rem', zIndex: 10 }}>
             {banners.map((_: any, i: number) => (
               <button key={i} onClick={() => setCurrentBanner(i)} style={{ width: i === currentBanner ? '28px' : '8px', height: '8px', borderRadius: '4px', background: i === currentBanner ? '#D4AF37' : 'rgba(255,255,255,0.3)', border: 'none', cursor: 'pointer', transition: 'all 0.3s' }} />
@@ -168,7 +163,6 @@ export default function LandingClient({ products, images, banners }: any) {
         </div>
       )}
 
-      {/* CATEGORIAS */}
       {categories.length > 0 && (
         <div style={{ background: '#fff', padding: 'clamp(1.5rem, 3vw, 2.5rem) clamp(1rem, 4vw, 2rem)', borderBottom: '1px solid #f0f0f0' }}>
           <div style={{ maxWidth: '1280px', margin: '0 auto' }}>
@@ -194,12 +188,11 @@ export default function LandingClient({ products, images, banners }: any) {
         </div>
       )}
 
-      {/* PRODUCTOS DESTACADOS */}
       <section style={{ background: '#F5F5F5', padding: 'clamp(2rem, 4vw, 3rem) clamp(1rem, 4vw, 2rem)' }}>
         <div style={{ maxWidth: '1280px', margin: '0 auto' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '0.5rem' }}>
             <h2 style={{ fontSize: 'clamp(1.1rem, 3vw, 1.4rem)', fontWeight: 700, color: '#0B0B0B', margin: 0 }}>
-              {search ? 'Resultados de bÃƒÂºsqueda' : selectedCategory ? selectedCategory : 'Productos destacados'}
+              {search ? 'Resultados de busqueda' : selectedCategory ? selectedCategory : 'Productos destacados'}
               <span style={{ fontSize: '0.8rem', color: '#aaa', fontWeight: 400, marginLeft: '0.5rem' }}>({filtered.length})</span>
             </h2>
             <a href="/auth/login" style={{ fontSize: '0.8rem', color: '#D4AF37', textDecoration: 'none', fontWeight: 600 }}>Ver todos</a>
@@ -219,7 +212,6 @@ export default function LandingClient({ products, images, banners }: any) {
         </div>
       </section>
 
-      {/* OFERTAS DEL MES */}
       {ofertasMes.length > 0 && (
         <section style={{ background: '#fff', padding: 'clamp(2rem, 4vw, 3rem) clamp(1rem, 4vw, 2rem)' }}>
           <div style={{ maxWidth: '1280px', margin: '0 auto' }}>
@@ -242,7 +234,6 @@ export default function LandingClient({ products, images, banners }: any) {
         </section>
       )}
 
-      {/* BENEFICIOS */}
       <section style={{ background: '#0B0B0B', padding: 'clamp(3rem, 5vw, 4rem) clamp(1rem, 4vw, 2rem)' }}>
         <div style={{ maxWidth: '1100px', margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '2rem' }}>
           {[
@@ -260,7 +251,6 @@ export default function LandingClient({ products, images, banners }: any) {
         </div>
       </section>
 
-      {/* COMO FUNCIONA */}
       <section style={{ background: '#F5F5F5', padding: 'clamp(3rem, 6vw, 5rem) clamp(1rem, 4vw, 2rem)' }}>
         <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
           <p style={{ color: '#D4AF37', fontSize: '0.7rem', letterSpacing: '4px', textTransform: 'uppercase', textAlign: 'center', marginBottom: '0.75rem', fontWeight: 600 }}>Simple y seguro</p>
@@ -281,7 +271,6 @@ export default function LandingClient({ products, images, banners }: any) {
         </div>
       </section>
 
-      {/* CTA */}
       <section style={{ background: '#151515', padding: 'clamp(3rem, 6vw, 5rem) clamp(1rem, 4vw, 2rem)' }}>
         <div style={{ maxWidth: '1100px', margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '2rem' }}>
           <div style={{ textAlign: 'center', padding: '2.5rem 2rem', border: '1px solid rgba(212,175,55,0.3)', borderRadius: '20px', background: 'rgba(212,175,55,0.04)' }}>
@@ -320,22 +309,63 @@ export default function LandingClient({ products, images, banners }: any) {
               </div>
             </div>
             {[
-              { title: 'Navegacion', links: ['Inicio', 'Categorias', 'Servicios', 'Vendedores'] },
-              { title: 'Ayuda', links: ['Centro de ayuda', 'Como comprar', 'Como vender', 'Politica de privacidad'] },
-              { title: 'Empresa', links: ['Sobre nosotros', 'Trabaja con nosotros', 'Contacto'] },
+              { title: 'Navegacion', links: [
+                { label: 'Inicio', href: '/' },
+                { label: 'Categorias', href: '/auth/login' },
+                { label: 'Servicios', href: '/servicios' },
+                { label: 'Vendedores', href: '/auth/register' },
+              ]},
+              { title: 'Ayuda', links: [
+                { label: 'Centro de ayuda', href: '/soporte' },
+                { label: 'Como comprar', href: '/soporte' },
+                { label: 'Como vender', href: '/soporte' },
+                { label: 'Soporte', href: '/soporte' },
+              ]},
+              { title: 'Legal', links: [
+                { label: 'Politica de Privacidad', href: '/politica-privacidad' },
+                { label: 'Terminos y Condiciones', href: '/terminos-condiciones' },
+                { label: 'Politica de Devoluciones', href: '/politica-devoluciones' },
+                { label: 'Politica de Garantias', href: '/politica-garantias' },
+              ]},
+              { title: 'Empresa', links: [
+                { label: 'Sobre nosotros', href: '#' },
+                { label: 'Trabaja con nosotros', href: '#' },
+                { label: 'Contacto', href: '/soporte' },
+                { label: 'Politica Vendedores', href: '/politica-vendedores' },
+              ]},
             ].map(col => (
               <div key={col.title}>
                 <p style={{ color: '#fff', fontWeight: 700, fontSize: '0.875rem', marginBottom: '1rem' }}>{col.title}</p>
                 {col.links.map(link => (
-                  <a key={link} href="#" style={{ display: 'block', fontSize: '0.8rem', color: '#D1D1D1', textDecoration: 'none', marginBottom: '0.5rem' }}>{link}</a>
+                  <a key={link.label} href={link.href} style={{ display: 'block', fontSize: '0.8rem', color: '#D1D1D1', textDecoration: 'none', marginBottom: '0.5rem' }}>{link.label}</a>
                 ))}
               </div>
             ))}
           </div>
+
+          {/* SELLOS DE CONFIANZA */}
+          <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: '1.5rem', marginBottom: '1.5rem' }}>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', justifyContent: 'center' }}>
+              {[
+                { icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" strokeWidth="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>, text: 'Pagos seguros' },
+                { icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" strokeWidth="2"><path d="M9 12l2 2 4-4"/><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20z"/></svg>, text: 'Marketplace protegido' },
+                { icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" strokeWidth="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>, text: 'Soporte disponible' },
+                { icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" strokeWidth="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>, text: 'Compra segura' },
+                { icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" strokeWidth="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>, text: 'Proteccion usuarios' },
+              ].map(item => (
+                <div key={item.text} style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', padding: '0.4rem 0.875rem', background: 'rgba(212,175,55,0.06)', border: '1px solid rgba(212,175,55,0.15)', borderRadius: '999px' }}>
+                  {item.icon}
+                  <span style={{ fontSize: '0.72rem', color: '#D1D1D1', fontWeight: 500 }}>{item.text}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
           <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: '1.5rem', display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.5rem', alignItems: 'center' }}>
-            <p style={{ fontSize: '0.75rem', color: '#666', margin: 0 }}> 2025 DMS Market. Colombia. Todos los derechos reservados.</p>
+            <p style={{ fontSize: '0.75rem', color: '#666', margin: 0 }}>2025 DMS Market. Colombia. Todos los derechos reservados.</p>
             <div style={{ display: 'flex', gap: '1.5rem' }}>
-              <a href="/politicas" style={{ fontSize: '0.75rem', color: '#666', textDecoration: 'none' }}>Politicas</a>
+              <a href="/politica-privacidad" style={{ fontSize: '0.75rem', color: '#666', textDecoration: 'none' }}>Privacidad</a>
+              <a href="/terminos-condiciones" style={{ fontSize: '0.75rem', color: '#666', textDecoration: 'none' }}>Terminos</a>
               <a href="/auth/login" style={{ fontSize: '0.75rem', color: '#D4AF37', textDecoration: 'none', fontWeight: 600 }}>Ingresar</a>
             </div>
           </div>
@@ -345,9 +375,3 @@ export default function LandingClient({ products, images, banners }: any) {
     </div>
   )
 }
-
-
-
-
-
-
