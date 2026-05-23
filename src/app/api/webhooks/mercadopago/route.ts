@@ -11,7 +11,6 @@ function getAdmin() {
 async function crearPedidoDropi(order: any, product: any) {
   const token = process.env.DROPI_TOKEN
   if (!token || !product?.codigo_dropi) return null
-
   try {
     const body = {
       external_order_id: String(order.id),
@@ -32,7 +31,6 @@ async function crearPedidoDropi(order: any, product: any) {
         },
       ],
     }
-
     const res = await fetch('https://app.dropi.co/api/v1/orders', {
       method: 'POST',
       headers: {
@@ -41,12 +39,48 @@ async function crearPedidoDropi(order: any, product: any) {
       },
       body: JSON.stringify(body),
     })
-
     const data = await res.json()
     return data
   } catch {
     return null
   }
+}
+
+async function procesarPedidoDropi(admin: any, order: any) {
+  if (!order?.product_id) return
+  const { data: product } = await admin
+    .from('products')
+    .select('id, name, es_dropi, codigo_dropi, price')
+    .eq('id', order.product_id)
+    .single()
+
+  if (!product?.es_dropi || !product?.codigo_dropi) return
+
+  const { data: existing } = await admin
+    .from('crm_pedidos')
+    .select('id')
+    .eq('order_id', String(order.id))
+    .single()
+
+  if (existing) return
+
+  const dropiResponse = await crearPedidoDropi(order, product)
+
+  await admin.from('crm_pedidos').insert({
+    codigo: 'DMS-' + Date.now().toString().slice(-6),
+    order_id: String(order.id),
+    cliente_nombre: order.buyer_name,
+    cliente_email: order.buyer_email,
+    cliente_telefono: order.buyer_phone,
+    cliente_direccion: order.buyer_address,
+    cliente_ciudad: order.buyer_city,
+    producto_nombre: product.name,
+    codigo_dropi: product.codigo_dropi,
+    precio_proveedor: 0,
+    precio_venta: order.total_price,
+    estado: 'pendiente',
+    notas: dropiResponse ? JSON.stringify(dropiResponse) : 'Sin respuesta de Dropi',
+  })
 }
 
 export async function POST(req: NextRequest) {
@@ -69,11 +103,35 @@ export async function POST(req: NextRequest) {
 
     const admin = getAdmin()
 
-    const { data: order } = await admin
+    // Buscar orden por preference_id
+    let { data: order } = await admin
       .from('orders')
       .select('*')
       .eq('preference_id', payment.preference_id)
       .single()
+
+    // Si no encuentra por preference_id busca por payment_id
+    if (!order) {
+      const { data: orderByPayment } = await admin
+        .from('orders')
+        .select('*')
+        .eq('payment_id', String(payment.id))
+        .single()
+      order = orderByPayment
+    }
+
+    // Si no encuentra busca ordenes paid recientes sin payment_id
+    if (!order) {
+      const { data: recentOrder } = await admin
+        .from('orders')
+        .select('*')
+        .eq('status', 'paid')
+        .is('payment_id', null)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .single()
+      order = recentOrder
+    }
 
     if (order) {
       await admin.from('orders').update({
@@ -83,33 +141,7 @@ export async function POST(req: NextRequest) {
         paid_at: new Date().toISOString(),
       }).eq('id', order.id)
 
-      if (order.product_id) {
-        const { data: product } = await admin
-          .from('products')
-          .select('id, name, es_dropi, codigo_dropi, price')
-          .eq('id', order.product_id)
-          .single()
-
-        if (product?.es_dropi && product?.codigo_dropi) {
-          const dropiResponse = await crearPedidoDropi(order, product)
-
-          await admin.from('crm_pedidos').insert({
-            codigo: 'DMS-' + Date.now().toString().slice(-6),
-            order_id: String(order.id),
-            cliente_nombre: order.buyer_name,
-            cliente_email: order.buyer_email,
-            cliente_telefono: order.buyer_phone,
-            cliente_direccion: order.buyer_address,
-            cliente_ciudad: order.buyer_city,
-            producto_nombre: product.name,
-            codigo_dropi: product.codigo_dropi,
-            precio_proveedor: 0,
-            precio_venta: order.total_price,
-            estado: 'pendiente',
-            notas: dropiResponse ? JSON.stringify(dropiResponse) : 'Pedido creado',
-          })
-        }
-      }
+      await procesarPedidoDropi(admin, order)
     } else {
       const subtotal = payment.metadata?.subtotal || payment.transaction_amount || 0
       const platformFee = payment.metadata?.platform_fee || Math.round(subtotal * 0.05)
