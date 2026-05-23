@@ -22,19 +22,11 @@
       <div style={{ maxWidth: '820px', margin: '3rem auto 0', padding: '0 2rem' }}>
         <div style={{ background: '#111', border: '1px solid #1e1e1e', borderLeft: '3px solid #D4AF37', borderRadius: '4px', padding: '1.5rem 2rem', marginBottom: '3.5rem' }}>
           <p style={{ fontSize: '0.7rem', letterSpacing: '3px', textTransform: 'uppercase', color: '#D4AF37', marginBottom: '1rem' }}>Contenido</p>
-          {[
-            { label: '1. Términos y Condiciones', anchor: '#terminos' },
-            { label: '2. Política de Privacidad', anchor: '#privacidad' },
-            { label: '3. Política de Devoluciones', anchor: '#devoluciones' },
-            { label: '4. Política de Envíos', anchor: '#envios' },
-            { label: '5. Política de Vendedores', anchor: '#vendedores' },
-          ].map((item) => (
-            <a key={item.anchor} href={item.anchor} style={{ display: 'block', fontSize: '0.85rem', color: '#aaa', marginBottom: '0.4rem', lineHeight: 1.6, textDecoration: 'none' }}
-              onMouseEnter={e => (e.currentTarget.style.color = '#D4AF37')}
-              onMouseLeave={e => (e.currentTarget.style.color = '#aaa')}>
-              {item.label}
-            </a>
-          ))}
+          <a href="#terminos" style={{ display: 'block', fontSize: '0.85rem', color: '#D4AF37', marginBottom: '0.4rem', lineHeight: 1.6, textDecoration: 'none' }}>1. Términos y Condiciones</a>
+          <a href="#privacidad" style={{ display: 'block', fontSize: '0.85rem', color: '#D4AF37', marginBottom: '0.4rem', lineHeight: 1.6, textDecoration: 'none' }}>2. Política de Privacidad</a>
+          <a href="#devoluciones" style={{ display: 'block', fontSize: '0.85rem', color: '#D4AF37', marginBottom: '0.4rem', lineHeight: 1.6, textDecoration: 'none' }}>3. Política de Devoluciones</a>
+          <a href="#envios" style={{ display: 'block', fontSize: '0.85rem', color: '#D4AF37', marginBottom: '0.4rem', lineHeight: 1.6, textDecoration: 'none' }}>4. Política de Envíos</a>
+          <a href="#vendedores" style={{ display: 'block', fontSize: '0.85rem', color: '#D4AF37', marginBottom: '0.4rem', lineHeight: 1.6, textDecoration: 'none' }}>5. Política de Vendedores</a>
         </div>
 
         {/* SECCIÓN 1 - TÉRMINOS */}
