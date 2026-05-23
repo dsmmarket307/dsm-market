@@ -30,11 +30,11 @@ export default function NewProductPage() {
   const [originalPriceVal, setOriginalPriceVal] = useState("")
   const [stockVal, setStockVal] = useState("")
   const [conditionVal, setConditionVal] = useState("new")
-  const [imageAnalysis, setImageAnalysis] = useState<Record<number, any>>({})
-  const [analyzingImages, setAnalyzingImages] = useState(false)
   const [moderationWarning, setModerationWarning] = useState("")
   const [moderationBlocked, setModerationBlocked] = useState(false)
   const [skipModeration, setSkipModeration] = useState(false)
+  const [imageAnalysis, setImageAnalysis] = useState<Record<number, any>>({})
+  const [analyzingImages, setAnalyzingImages] = useState(false)
 
   useEffect(() => {
     try {
@@ -95,6 +95,7 @@ export default function NewProductPage() {
     const compressed = await Promise.all(files.map(compressImage))
     setImages(prev => [...prev, ...compressed])
     setPreviews(prev => [...prev, ...compressed.map(f => URL.createObjectURL(f))])
+    setImageAnalysis({})
   }
 
   async function handlePaste(e: React.ClipboardEvent) {
@@ -106,22 +107,31 @@ export default function NewProductPage() {
     const compressed = await Promise.all(files.map(compressImage))
     setImages(prev => [...prev, ...compressed])
     setPreviews(prev => [...prev, ...compressed.map(f => URL.createObjectURL(f))])
+    setImageAnalysis({})
   }
 
-  async function analyzeImages(files: File[]) {
+  function removeImage(i: number) {
+    setImages(prev => prev.filter((_,j) => j !== i))
+    setPreviews(prev => prev.filter((_,j) => j !== i))
+    setImageAnalysis({})
+  }
+
+  async function analyzeImages() {
+    if (images.length === 0) return
     setAnalyzingImages(true)
+    setImageAnalysis({})
     const newAnalysis: Record<number, any> = {}
-    for (let i = 0; i < files.length; i++) {
+    for (let i = 0; i < images.length; i++) {
       try {
         const reader = new FileReader()
         const base64 = await new Promise<string>((resolve) => {
           reader.onload = () => resolve((reader.result as string).split(",")[1])
-          reader.readAsDataURL(files[i])
+          reader.readAsDataURL(images[i])
         })
         const res = await fetch("/api/analyze-image", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ imageBase64: base64, mimeType: files[i].type, index: i })
+          body: JSON.stringify({ imageBase64: base64, mimeType: images[i].type, index: i })
         })
         const data = await res.json()
         newAnalysis[i] = data
@@ -133,31 +143,14 @@ export default function NewProductPage() {
     setAnalyzingImages(false)
   }
 
-  function removeImage(i: number) {
-    setImages(prev => prev.filter((_,j) => j !== i))
-    setPreviews(prev => prev.filter((_,j) => j !== i))
-  }
-
-  function agregarVariante() {
-    setVariantes(prev => [...prev, { nombre: "", opciones: "" }])
-  }
-
-  function eliminarVariante(i: number) {
-    setVariantes(prev => prev.filter((_,j) => j !== i))
-  }
-
-  function updateVariante(i: number, field: "nombre" | "opciones", value: string) {
-    setVariantes(prev => prev.map((v, j) => j === i ? { ...v, [field]: value } : v))
-  }
-
   async function generateTitle() {
     if (!nameVal.trim()) { setError("Escribe el nombre del producto primero"); return }
     setError("")
     setGeneratingTitle(true)
     try {
-      const res = await fetch('/api/generate-title', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const res = await fetch("/api/generate-title", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name: nameVal, category: categoryVal }),
       })
       const data = await res.json()
@@ -174,9 +167,9 @@ export default function NewProductPage() {
     setError("")
     setGeneratingDesc(true)
     try {
-      const res = await fetch('/api/generate-description', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const res = await fetch("/api/generate-description", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name: nameVal, category: categoryVal }),
       })
       const data = await res.json()
@@ -195,19 +188,19 @@ export default function NewProductPage() {
 
     if (!force) {
       try {
-        const modRes = await fetch('/api/moderate-product', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+        const modRes = await fetch("/api/moderate-product", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ title: nameVal, description })
         })
         const modData = await modRes.json()
-        if (modData.status === 'blocked') {
+        if (modData.status === "blocked") {
           setModerationBlocked(true)
-          setError('No se puede publicar este producto porque infringe las politicas del marketplace. ' + (modData.reason ?? ''))
+          setError("No se puede publicar este producto porque infringe las politicas del marketplace. " + (modData.reason ?? ""))
           return
         }
-        if (modData.status === 'warning') {
-          setModerationWarning('Este producto podria contener contenido sospechoso: ' + (modData.reason ?? ''))
+        if (modData.status === "warning") {
+          setModerationWarning("Este producto podria contener contenido sospechoso: " + (modData.reason ?? ""))
           return
         }
       } catch {}
@@ -234,7 +227,7 @@ export default function NewProductPage() {
       const result = await createProduct(formData)
       if (result?.error) { setError(result.error); setLoading(false) }
       else { clearDraft(); router.push("/dashboard/vendor") }
-    } catch (err) {
+    } catch {
       setError("Error al publicar. Intenta de nuevo.")
       setLoading(false)
     }
@@ -382,7 +375,7 @@ export default function NewProductPage() {
             <div className="np-card">
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
                 <label className="np-label" style={{ margin: 0 }}>Variantes (opcional)</label>
-                <button type="button" onClick={agregarVariante}
+                <button type="button" onClick={() => setVariantes(prev => [...prev, { nombre: "", opciones: "" }])}
                   style={{ padding: "6px 14px", background: "rgba(212,175,55,.1)", border: "1px solid rgba(212,175,55,.3)", borderRadius: 8, color: "#D4AF37", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "'Poppins',sans-serif" }}>
                   + Agregar variante
                 </button>
@@ -392,11 +385,11 @@ export default function NewProductPage() {
               )}
               {variantes.map((v, i) => (
                 <div key={i} style={{ display: "grid", gridTemplateColumns: "1fr 2fr auto", gap: 10, marginBottom: 10, alignItems: "center" }}>
-                  <input value={v.nombre} onChange={e => updateVariante(i, "nombre", e.target.value)}
+                  <input value={v.nombre} onChange={e => setVariantes(prev => prev.map((vv, j) => j === i ? { ...vv, nombre: e.target.value } : vv))}
                     placeholder="Ej: Talla" className="np-input" />
-                  <input value={v.opciones} onChange={e => updateVariante(i, "opciones", e.target.value)}
+                  <input value={v.opciones} onChange={e => setVariantes(prev => prev.map((vv, j) => j === i ? { ...vv, opciones: e.target.value } : vv))}
                     placeholder="Ej: S, M, L, XL" className="np-input" />
-                  <button type="button" onClick={() => eliminarVariante(i)}
+                  <button type="button" onClick={() => setVariantes(prev => prev.filter((_,j) => j !== i))}
                     style={{ width: 36, height: 36, background: "rgba(220,38,38,.1)", border: "1px solid rgba(220,38,38,.2)", borderRadius: 8, color: "#ef4444", cursor: "pointer", fontSize: 16, display: "flex", alignItems: "center", justifyContent: "center" }}>
                     x
                   </button>
@@ -422,7 +415,14 @@ export default function NewProductPage() {
             </div>
 
             <div className="np-card">
-              <label className="np-label">Fotos del producto (maximo 10)</label>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+                <label className="np-label" style={{ margin: 0 }}>Fotos del producto (maximo 10)</label>
+                {images.length > 0 && (
+                  <button type="button" className="np-btn-ia" onClick={analyzeImages} disabled={analyzingImages}>
+                    {analyzingImages ? "Analizando..." : "Analizar con IA"}
+                  </button>
+                )}
+              </div>
               <div className="np-drop" onClick={() => document.getElementById("img-input")?.click()} onPaste={handlePaste} tabIndex={0}>
                 <input id="img-input" type="file" accept="image/*" multiple style={{ display: "none" }} onChange={handleImages} />
                 <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#666" strokeWidth="1.25" style={{ marginBottom: 10 }}>
@@ -432,13 +432,40 @@ export default function NewProductPage() {
                 <p style={{ fontSize: 12, color: "#888", fontFamily: "'Poppins',sans-serif", marginBottom: 4 }}>o pega una imagen con Ctrl+V</p>
                 <p style={{ fontSize: 12, color: "#D4AF37", fontFamily: "'Poppins',sans-serif" }}>{images.length}/10 fotos</p>
               </div>
-              {analyzingImages && (<div style={{ marginTop: 12, padding: "0.75rem 1rem", background: "rgba(212,175,55,.08)", border: "1px solid rgba(212,175,55,.2)", borderRadius: 10, display: "flex", alignItems: "center", gap: 8 }}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" strokeWidth="2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg><p style={{ fontSize: 12, color: "#D4AF37", margin: 0 }}>Analizando calidad con IA...</p></div>)}{previews.length > 0 && (
+
+              {previews.length > 0 && (
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(5,1fr)", gap: 8, marginTop: 12 }}>
                   {previews.map((preview, i) => (
                     <div key={i} style={{ position: "relative" }}>
-                      <img src={preview} style={{ width: "100%", aspectRatio: "1", objectFit: "cover", borderRadius: 10, border: "1px solid rgba(212,175,55,.1)" }} alt="" />
+                      <img src={preview} style={{ width: "100%", aspectRatio: "1", objectFit: "cover", borderRadius: 10, border: imageAnalysis[i] ? (imageAnalysis[i].isGood ? "2px solid #1D9E75" : "2px solid #f59e0b") : "1px solid rgba(212,175,55,.1)" }} alt="" />
                       <button type="button" onClick={() => removeImage(i)} style={{ position: "absolute", top: 4, right: 4, width: 22, height: 22, background: "#ef4444", color: "#fff", border: "none", cursor: "pointer", fontSize: 12, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center" }}>x</button>
+                      {imageAnalysis[i] && (
+                        <div style={{ position: "absolute", bottom: 4, left: 4, background: imageAnalysis[i].isGood ? "#1D9E75" : "#f59e0b", color: "#fff", fontSize: 9, fontWeight: 700, padding: "2px 5px", borderRadius: 4 }}>
+                          {imageAnalysis[i].score}
+                        </div>
+                      )}
+                      {imageAnalysis[i]?.coverRecommended && (
+                        <div style={{ position: "absolute", top: 4, left: 4, background: "#D4AF37", color: "#000", fontSize: 8, fontWeight: 700, padding: "2px 5px", borderRadius: 4 }}>
+                          PORTADA
+                        </div>
+                      )}
                     </div>
+                  ))}
+                </div>
+              )}
+
+              {Object.keys(imageAnalysis).length > 0 && !analyzingImages && (
+                <div style={{ marginTop: 12, display: "flex", flexDirection: "column", gap: 6 }}>
+                  {Object.entries(imageAnalysis).map(([idx, analysis]: [string, any]) => (
+                    analysis.issues?.length > 0 || analysis.suggestions?.length > 0 ? (
+                      <div key={idx} style={{ padding: "0.6rem 0.875rem", background: analysis.isGood ? "rgba(29,158,117,.08)" : "rgba(245,158,11,.08)", border: "1px solid " + (analysis.isGood ? "rgba(29,158,117,.2)" : "rgba(245,158,11,.2)"), borderRadius: 8, fontSize: 11, fontFamily: "'Poppins',sans-serif" }}>
+                        <p style={{ color: analysis.isGood ? "#1D9E75" : "#f59e0b", fontWeight: 600, margin: "0 0 3px" }}>
+                          Imagen {Number(idx) + 1} · {analysis.score}/100 {analysis.coverRecommended ? "· Portada sugerida" : ""}
+                        </p>
+                        {analysis.issues?.length > 0 && <p style={{ color: "#f59e0b", margin: "2px 0 0" }}>{analysis.issues.join(" · ")}</p>}
+                        {analysis.suggestions?.length > 0 && <p style={{ color: "#888", margin: "2px 0 0" }}>{analysis.suggestions.join(" · ")}</p>}
+                      </div>
+                    ) : null
                   ))}
                 </div>
               )}
