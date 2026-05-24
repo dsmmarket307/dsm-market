@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 import { useState } from "react"
 import { logout } from "@/lib/actions/auth"
 import Link from "next/link"
@@ -20,6 +20,8 @@ function Icon({ type }: { type: string }) {
     newproduct: <svg {...s}><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>,
     provider:   <svg {...s}><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>,
     heart:      <svg {...s}><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>,
+    billing:    <svg {...s}><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>,
+    saas:       <svg {...s}><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>,
   }
   return icons[type] ?? icons.home
 }
@@ -29,26 +31,28 @@ export default function DashboardNav({ role, name, email }: any) {
   const pathname = usePathname()
 
   const navItems = role === "admin" ? [
-    { href: "/dashboard/admin",          label: "Inicio",         icon: "home" },
-    { href: "/dashboard/admin/vendors",  label: "Vendedores",     icon: "vendors" },
-    { href: "/dashboard/admin/products", label: "Productos",      icon: "products" },
-    { href: "/dashboard/admin/orders",   label: "Ordenes y Pagos",icon: "orders" },
-    { href: "/dashboard/admin/disputes", label: "Disputas",       icon: "dispute" },
-    { href: "/crm",                      label: "CRM Dropi",      icon: "crm" },
+    { href: "/dashboard/admin",                      label: "Inicio",              icon: "home" },
+    { href: "/dashboard/admin/vendors",              label: "Vendedores",          icon: "vendors" },
+    { href: "/dashboard/admin/products",             label: "Productos",           icon: "products" },
+    { href: "/dashboard/admin/orders",               label: "Ordenes y Pagos",     icon: "orders" },
+    { href: "/dashboard/admin/disputes",             label: "Disputas",            icon: "dispute" },
+    { href: "/dashboard/admin/subscriptions",        label: "Suscripciones SaaS",  icon: "saas" },
+    { href: "/crm",                                  label: "CRM Dropi",           icon: "crm" },
   ] : role === "seller" ? [
-    { href: "/dashboard/vendor",                label: "Inicio",         icon: "home" },
-    { href: "/dashboard/vendor/orders",          label: "Mis Ordenes",    icon: "orders" },
-    { href: "/dashboard/vendor/products/new",    label: "Nuevo producto", icon: "newproduct" },
-    { href: "/dashboard/vendor/disputes",        label: "Disputas",       icon: "dispute" },
-    { href: "/dashboard/vendor/mi-tienda",         label: "Mi Tienda",        icon: "store" },
+    { href: "/dashboard/vendor",                     label: "Inicio",              icon: "home" },
+    { href: "/dashboard/vendor/orders",              label: "Mis Ordenes",         icon: "orders" },
+    { href: "/dashboard/vendor/products/new",        label: "Nuevo producto",      icon: "newproduct" },
+    { href: "/dashboard/vendor/disputes",            label: "Disputas",            icon: "dispute" },
+    { href: "/dashboard/vendor/mi-tienda",           label: "Mi Tienda",           icon: "store" },
   ] : role === "provider" ? [
-    { href: "/dashboard/provider",         label: "Inicio",      icon: "home" },
-    { href: "/dashboard/provider/servicio",label: "Mi servicio", icon: "provider" },
+    { href: "/dashboard/provider",                   label: "Inicio",              icon: "home" },
+    { href: "/dashboard/provider/servicio",          label: "Mi servicio",         icon: "provider" },
+    { href: "/dashboard/provider/suscripcion",       label: "Mi suscripcion",      icon: "billing" },
   ] : [
-    { href: "/dashboard/buyer",          label: "Inicio",        icon: "home" },
-    { href: "/dashboard/buyer/products", label: "Tienda",        icon: "store" },
-    { href: "/dashboard/buyer/disputes", label: "Abrir disputa", icon: "dispute" },
-    { href: "/dashboard/buyer/favorites", label: "Favoritos", icon: "heart" },
+    { href: "/dashboard/buyer",                      label: "Inicio",              icon: "home" },
+    { href: "/dashboard/buyer/products",             label: "Tienda",              icon: "store" },
+    { href: "/dashboard/buyer/disputes",             label: "Abrir disputa",       icon: "dispute" },
+    { href: "/dashboard/buyer/favorites",            label: "Favoritos",           icon: "heart" },
   ]
 
   const initials = name?.charAt(0)?.toUpperCase() ?? "U"
@@ -85,7 +89,7 @@ export default function DashboardNav({ role, name, email }: any) {
           <polyline points="16 17 21 12 16 7"/>
           <line x1="21" y1="12" x2="9" y2="12"/>
         </svg>
-        Cerrar sesión
+        Cerrar sesion
       </button>
     </form>
   )
@@ -121,7 +125,7 @@ export default function DashboardNav({ role, name, email }: any) {
       <div className="dms-mob-bar" style={{position:"fixed",top:0,left:0,right:0,height:56,background:"#0B0B0B",borderBottom:"1px solid rgba(212,175,55,.15)",zIndex:100,alignItems:"center",justifyContent:"space-between",padding:"0 16px"}}>
         <img src={LOGO} alt="DMS Market" style={{height:32,objectFit:"contain"}} />
         <button onClick={() => setOpen(!open)} style={{background:"rgba(212,175,55,.1)",border:"1px solid rgba(212,175,55,.2)",cursor:"pointer",color:"#D4AF37",padding:"6px 10px",borderRadius:8,fontSize:18,lineHeight:1}}>
-          {open ? "✕" : "☰"}
+          {open ? "X" : "Menu"}
         </button>
       </div>
 
