@@ -1,6 +1,7 @@
 ﻿import { NextRequest, NextResponse } from 'next/server'
 import { MercadoPagoConfig, Preference } from 'mercadopago'
 import { createClient } from '@supabase/supabase-js'
+import { notifyNuevaCompra } from '@/lib/notifications'
 
 const client = new MercadoPagoConfig({
   accessToken: process.env.MP_ACCESS_TOKEN!,
@@ -17,15 +18,12 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
     const { items, shipping_cost = 0, buyer_id, shipping_address } = body
-
     if (!items || items.length === 0) {
       return NextResponse.json({ error: 'No hay productos' }, { status: 400 })
     }
-
     const subtotal = items.reduce((acc: number, item: any) => acc + (item.price * item.quantity), 0)
     const platform_fee = Math.round(subtotal * 0.05)
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
-
     const preference = new Preference(client)
     const result = await preference.create({
       body: {
@@ -45,7 +43,6 @@ export async function POST(req: NextRequest) {
         metadata: { platform_fee, subtotal, shipping_cost },
       },
     })
-
     try {
       const admin = getAdmin()
       const item = items[0]
@@ -54,7 +51,6 @@ export async function POST(req: NextRequest) {
         .select('id, seller_id')
         .eq('id', item.id)
         .single()
-
       await admin.from('orders').insert({
         preference_id: result.id,
         product_id: item.id,
@@ -75,10 +71,16 @@ export async function POST(req: NextRequest) {
         buyer_notes: shipping_address?.notas || null,
         buyer_transportadora: shipping_address?.transportadora || null,
       })
+
+      notifyNuevaCompra(
+        shipping_address?.nombre || 'Cliente',
+        subtotal,
+        result.id || ''
+      ).catch(() => {})
+
     } catch (dbError) {
       console.error('Error creando orden:', dbError)
     }
-
     return NextResponse.json({
       init_point: result.init_point,
       preference_id: result.id,
