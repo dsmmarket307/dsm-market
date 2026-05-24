@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
 import { createClient as createAdmin } from '@supabase/supabase-js'
+import { notifyNuevoProducto } from '@/lib/notifications'
 
 function getAdminClient() {
   return createAdmin(
@@ -83,7 +84,6 @@ export async function createProduct(formData: FormData) {
   if (!name || !price || !category) return { error: 'Completa todos los campos requeridos' }
   if (images.length > 10) return { error: 'Maximo 10 fotos por producto' }
 
-  // Generar SEO automaticamente — si falla no bloquea la publicacion
   const seo = await generateSEO(name, category, description)
 
   const { data: product, error: productError } = await admin
@@ -110,6 +110,8 @@ export async function createProduct(formData: FormData) {
     const { data: urlData } = supabase.storage.from('products').getPublicUrl(path)
     await admin.from('product_images').insert({ product_id: product.id, url: urlData.publicUrl, position: i })
   }
+
+  notifyNuevoProducto(name, user.user_metadata?.name ?? 'Vendedor', price).catch(() => {})
 
   revalidatePath('/dashboard/vendor')
   return { success: true }
