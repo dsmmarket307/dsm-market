@@ -1,12 +1,17 @@
 export async function sendTelegramMessage(message: string): Promise<void> {
   try {
-    const token = process.env.TELEGRAM_BOT_TOKEN
-    const chatId = process.env.TELEGRAM_CHAT_ID
-    if (!token || !chatId) return
-    await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+
+    if (!supabaseUrl || !supabaseKey) return
+
+    await fetch(`${supabaseUrl}/functions/v1/notify-telegram`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ chat_id: chatId, text: message, parse_mode: 'HTML' }),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${supabaseKey}`,
+      },
+      body: JSON.stringify({ message }),
     })
   } catch (e) {
     console.error('Telegram error:', e)
