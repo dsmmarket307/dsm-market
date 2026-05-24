@@ -236,7 +236,7 @@ export default function ServiciosPage() {
           <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(135deg, #0a0a0a, #1c1c1c)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '2rem', textAlign: 'center' }}>
             <p style={{ color: '#D4AF37', fontSize: '0.65rem', letterSpacing: '4px', textTransform: 'uppercase', marginBottom: '1rem', fontWeight: 600 }}>DMS Market - Servicios</p>
             <h1 style={{ color: '#fff', fontSize: 'clamp(1.5rem, 4vw, 2.5rem)', fontWeight: 700, marginBottom: '1rem' }}>Profesionales verificados en Colombia</h1>
-            <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: '0.9rem', maxWidth: '480px', marginBottom: '2rem' }}>Encuentra el profesional ideal para tu proyecto. Diseño, tecnologia, salud, reparaciones y mucho mas.</p>
+            <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: '0.9rem', maxWidth: '480px', marginBottom: '2rem' }}>Encuentra el profesional ideal para tu proyecto. Diseno, tecnologia, salud, reparaciones y mucho mas.</p>
             <button onClick={handlePublicar} style={{ background: '#D4AF37', color: '#0B0B0B', padding: '0.875rem 2rem', border: 'none', fontSize: '0.85rem', fontWeight: 700, borderRadius: '999px', cursor: 'pointer' }}>
               Publica tu servicio gratis
             </button>
@@ -447,3 +447,4 @@ export default function ServiciosPage() {
     </div>
   )
 }
+
