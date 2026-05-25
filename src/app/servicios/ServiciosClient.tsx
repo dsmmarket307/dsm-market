@@ -184,7 +184,7 @@ export default function ServiciosClient({ services, banners, user, profile }: Pr
               <p style={{ fontSize: '0.65rem', color: '#9ca3af', margin: 0 }}>Desde</p>
               <p style={{ fontSize: '1rem', fontWeight: 800, color: isPremium ? '#92400e' : isPro ? '#1e40af' : '#111', margin: 0 }}>{service.price ?? 'Consultar'}</p>
             </div>
-            <a href={waUrl} target="_blank" rel="noopener noreferrer"
+            <a href={`/servicios/${service.id}`}
               style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', background: isPremium ? '#D4AF37' : isPro ? '#3b82f6' : '#111', color: '#fff', padding: '8px 14px', borderRadius: '8px', fontSize: '0.78rem', fontWeight: 700, textDecoration: 'none', whiteSpace: 'nowrap' }}>
               Ver servicio
               <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
@@ -431,3 +431,4 @@ export default function ServiciosClient({ services, banners, user, profile }: Pr
     </div>
   )
 }
+
