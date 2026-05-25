@@ -36,7 +36,7 @@ export default async function ServiceDetailPage({ params }: { params: { id: stri
     .from('subscriptions')
     .select('plan_type')
     .eq('user_id', service.provider_id)
-    .eq('status', 'active')
+    .eq('status', 'approved')
     .single()
 
   const plan = sub?.plan_type ?? null
@@ -174,5 +174,6 @@ export default async function ServiceDetailPage({ params }: { params: { id: stri
     </main>
   )
 }
+
 
 
