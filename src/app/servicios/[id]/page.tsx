@@ -1,8 +1,8 @@
-﻿import { createClient } from '@/lib/supabase/server'
+﻿import { createClient as createSupabaseClient } from '@supabase/supabase-js'
 import { notFound } from 'next/navigation'
 
 export async function generateMetadata({ params }: { params: { id: string } }) {
-  const supabase = await createClient()
+  const supabase = createSupabaseClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!)
   const { data } = await supabase.from('services').select('business_name, description, category').eq('id', params.id).single()
   if (!data) return { title: 'Servicio | DMS Market' }
   return {
@@ -13,7 +13,7 @@ export async function generateMetadata({ params }: { params: { id: string } }) {
 }
 
 export default async function ServiceDetailPage({ params }: { params: { id: string } }) {
-  const supabase = await createClient()
+  const supabase = createSupabaseClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!)
 
   const { data: service } = await supabase
     .from('services')
@@ -174,3 +174,4 @@ export default async function ServiceDetailPage({ params }: { params: { id: stri
     </main>
   )
 }
+
