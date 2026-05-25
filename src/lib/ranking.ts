@@ -1,4 +1,5 @@
 ﻿import { createClient } from '@/lib/supabase/server'
+import { createClient as createAdmin } from '@supabase/supabase-js'
 import { sortServicesByScore } from '@/lib/service-score'
 
 export interface RankedService {
@@ -29,9 +30,12 @@ export interface RankedService {
 }
 
 export async function getRankedServices(category?: string): Promise<RankedService[]> {
-  const supabase = await createClient()
+  const admin = createAdmin(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  )
 
-  const { data: subs } = await supabase
+  const { data: subs } = await admin
     .from('subscriptions')
     .select('user_id, plan_type')
     .eq('status', 'active')
@@ -43,7 +47,7 @@ export async function getRankedServices(category?: string): Promise<RankedServic
     })
   }
 
-  let query = supabase
+  let query = admin
     .from('services')
     .select('*')
     .eq('status', 'approved')
@@ -76,8 +80,11 @@ export async function getFeaturedServices(limit = 6): Promise<RankedService[]> {
 }
 
 export async function updateServiceScore(serviceId: string, score: number): Promise<void> {
-  const supabase = await createClient()
-  await supabase
+  const admin = createAdmin(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  )
+  await admin
     .from('services')
     .update({ score, last_active_at: new Date().toISOString() })
     .eq('id', serviceId)
