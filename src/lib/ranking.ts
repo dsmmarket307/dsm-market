@@ -31,31 +31,33 @@ export interface RankedService {
 export async function getRankedServices(category?: string): Promise<RankedService[]> {
   const supabase = await createClient()
 
-  const { data: subs } = await supabase
-    .from('subscriptions')
-    .select('user_id, plan_type')
-    .eq('status', 'active')
-
-  const subMap: Record<string, string> = {}
-  subs?.forEach((s: any) => { subMap[s.user_id] = s.plan_type })
-
   let query = supabase
     .from('services')
-    .select('*')
+    .select(`
+      *,
+      subscriptions!left(plan_type, status)
+    `)
     .eq('status', 'approved')
 
   if (category && category !== 'Todos') {
     query = query.eq('category', category)
   }
 
-  const { data: services } = await query
+  const { data: services, error } = await query
 
-  if (!services) return []
+  if (error || !services) return []
 
-  const enriched = services.map((s: any) => ({
-    ...s,
-    plan_type: subMap[s.provider_id] ?? null,
-  }))
+  const enriched = services.map((s: any) => {
+    const activeSub = Array.isArray(s.subscriptions)
+      ? s.subscriptions.find((sub: any) => sub.status === 'active')
+      : s.subscriptions?.status === 'active' ? s.subscriptions : null
+
+    return {
+      ...s,
+      plan_type: activeSub?.plan_type ?? null,
+      subscriptions: undefined,
+    }
+  })
 
   return sortServicesByScore(enriched) as RankedService[]
 }
