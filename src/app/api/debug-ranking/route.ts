@@ -1,15 +1,18 @@
 ﻿import { NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { createClient } from '@supabase/supabase-js'
 
 export async function GET() {
-  const supabase = await createClient()
+  const admin = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  )
 
-  const { data: subs } = await supabase
+  const { data: subs, error: subError } = await admin
     .from('subscriptions')
     .select('user_id, plan_type')
     .eq('status', 'active')
 
-  const { data: services } = await supabase
+  const { data: services } = await admin
     .from('services')
     .select('id, provider_id, business_name, status')
     .eq('status', 'approved')
@@ -29,8 +32,11 @@ export async function GET() {
   }))
 
   return NextResponse.json({
+    subError,
     subs,
     subMap,
     enriched,
+    url: process.env.NEXT_PUBLIC_SUPABASE_URL,
+    has_service_key: !!process.env.SUPABASE_SERVICE_ROLE_KEY,
   })
 }
