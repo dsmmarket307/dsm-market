@@ -19,7 +19,7 @@ export default async function ServiceDetailPage({ params }: { params: { id: stri
     .from('services')
     .select('*')
     .eq('id', params.id)
-    .eq('status', 'approved')
+    
     .single()
 
   if (!service) notFound()
@@ -28,7 +28,7 @@ export default async function ServiceDetailPage({ params }: { params: { id: stri
     .from('services')
     .select('id, business_name, category, price, avatar_url, service_image_url, city, avg_rating')
     .eq('category', service.category)
-    .eq('status', 'approved')
+    
     .neq('id', params.id)
     .limit(3)
 
@@ -174,4 +174,5 @@ export default async function ServiceDetailPage({ params }: { params: { id: stri
     </main>
   )
 }
+
 
