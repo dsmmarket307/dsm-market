@@ -94,7 +94,7 @@ export default function ServiciosClient({ services, banners, user, profile }: Pr
           )}
           {service.plan_type === 'premium' && (
             <div style={{ position: 'absolute', bottom: '0.75rem', left: '0.75rem', background: 'rgba(212,175,55,0.9)', color: '#0B0B0B', fontSize: '0.6rem', padding: '0.25rem 0.6rem', borderRadius: '999px', fontWeight: 700 }}>
-              Score {Math.round(service.score)}
+              Score {Math.round(service.computed_score)}
             </div>
           )}
         </div>
@@ -352,4 +352,3 @@ export default function ServiciosClient({ services, banners, user, profile }: Pr
     </div>
   )
 }
-
