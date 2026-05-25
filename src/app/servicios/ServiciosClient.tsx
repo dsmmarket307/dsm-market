@@ -1,28 +1,31 @@
 ﻿'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import type { RankedService } from '@/lib/ranking'
 
 const LOGO = 'https://awbepztacmvurjylfoas.supabase.co/storage/v1/object/public/assets/ChatGPT_Image_3_may_2026__21_13_12-removebg-preview.png'
 
-const categories = [
-  'Todos', 'Diseno y creatividad', 'Tecnologia y sistemas', 'Clases y tutorias',
-  'Belleza y bienestar', 'Reparaciones y mantenimiento', 'Eventos y fotografia',
-  'Juridico y contable', 'Salud y medicina', 'Construccion y remodelacion',
-  'Delivery y mandados', 'Marketing y publicidad', 'Otros',
+const CATEGORIES = [
+  'Todas las categorias',
+  'Diseno y creatividad',
+  'Tecnologia y sistemas',
+  'Clases y tutorias',
+  'Belleza y bienestar',
+  'Reparaciones y mantenimiento',
+  'Eventos y fotografia',
+  'Juridico y contable',
+  'Salud y medicina',
+  'Construccion y remodelacion',
+  'Delivery y mandados',
+  'Marketing y publicidad',
+  'Otros',
 ]
 
-const PLAN_CONFIG: Record<string, { badge: string; badgeColor: string; badgeBg: string; border: string; shadow: string }> = {
-  premium: { badge: 'Premium Partner', badgeColor: '#fff', badgeBg: '#0B0B0B', border: '2px solid #D4AF37', shadow: '0 8px 32px rgba(212,175,55,0.18)' },
-  pro:     { badge: 'Verificado',      badgeColor: '#0B0B0B', badgeBg: '#D4AF37', border: '2px solid #D4AF37', shadow: '0 6px 24px rgba(212,175,55,0.12)' },
-  basic:   { badge: 'Activo',          badgeColor: '#D4AF37', badgeBg: 'rgba(212,175,55,0.1)', border: '1px solid rgba(212,175,55,0.3)', shadow: '0 2px 12px rgba(0,0,0,0.06)' },
+const PLAN_CONFIG = {
+  premium: { label: 'PREMIUM PARTNER', color: '#92400e', bg: '#fef3c7', border: '#D4AF37', glow: 'rgba(212,175,55,0.15)', icon: 'M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z' },
+  pro: { label: 'PRO VERIFICADO', color: '#1e40af', bg: '#eff6ff', border: '#3b82f6', glow: 'rgba(59,130,246,0.1)', icon: 'M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z' },
+  basic: { label: 'PROVEEDOR ACTIVO', color: '#065f46', bg: '#ecfdf5', border: '#10b981', glow: 'rgba(16,185,129,0.08)', icon: 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z' },
 }
-
-const WA_ICON = (
-  <svg width="15" height="15" viewBox="0 0 32 32" fill="white">
-    <path d="M16 2C8.28 2 2 8.28 2 16c0 2.44.66 4.72 1.8 6.7L2 30l7.52-1.76A13.93 13.93 0 0016 30c7.72 0 14-6.28 14-14S23.72 2 16 2zm7.27 19.39c-.3.85-1.76 1.63-2.42 1.73-.62.1-1.4.13-2.26-.14-.52-.16-1.19-.38-2.05-.74-3.6-1.56-5.96-5.18-6.14-5.42-.18-.24-1.46-1.94-1.46-3.7s.92-2.63 1.25-2.99c.33-.36.72-.45.96-.45.24 0 .48.01.69.01.22.01.52-.08.81.62.3.72 1.02 2.49 1.11 2.67.09.18.15.39.03.63-.12.24-.18.39-.36.6-.18.21-.38.47-.54.63-.18.18-.37.38-.16.74.21.36.94 1.55 2.02 2.51 1.39 1.24 2.56 1.62 2.92 1.8.36.18.57.15.78-.09.21-.24.9-1.05 1.14-1.41.24-.36.48-.3.81-.18.33.12 2.1.99 2.46 1.17.36.18.6.27.69.42.09.15.09.87-.21 1.72z"/>
-  </svg>
-)
 
 interface Props {
   services: RankedService[]
@@ -31,9 +34,14 @@ interface Props {
   profile: any
 }
 
+type TabType = 'todos' | 'premium' | 'pro' | 'activos'
+type SortType = 'relevancia' | 'rating' | 'recientes'
+
 export default function ServiciosClient({ services, banners, user, profile }: Props) {
-  const [selectedCategory, setSelectedCategory] = useState('Todos')
+  const [selectedCategory, setSelectedCategory] = useState('Todas las categorias')
   const [search, setSearch] = useState('')
+  const [activeTab, setActiveTab] = useState<TabType>('todos')
+  const [sortBy, setSortBy] = useState<SortType>('relevancia')
   const [currentSlide, setCurrentSlide] = useState(0)
 
   useEffect(() => {
@@ -54,270 +62,349 @@ export default function ServiciosClient({ services, banners, user, profile }: Pr
     window.location.href = user ? '/auth/register-provider' : '/auth/login?redirect=/auth/register-provider'
   }
 
-  const filtered = services.filter(s => {
-    const matchCat = selectedCategory === 'Todos' || s.category === selectedCategory
-    const matchSearch = !search.trim() ||
-      s.business_name?.toLowerCase().includes(search.toLowerCase()) ||
-      s.description?.toLowerCase().includes(search.toLowerCase()) ||
-      s.category?.toLowerCase().includes(search.toLowerCase())
-    return matchCat && matchSearch
-  })
+  const filtered = useMemo(() => {
+    let result = services.filter(s => {
+      const matchCat = selectedCategory === 'Todas las categorias' || s.category === selectedCategory
+      const matchSearch = !search.trim() ||
+        s.business_name?.toLowerCase().includes(search.toLowerCase()) ||
+        s.description?.toLowerCase().includes(search.toLowerCase()) ||
+        s.category?.toLowerCase().includes(search.toLowerCase())
+      const matchTab =
+        activeTab === 'todos' ? true :
+        activeTab === 'premium' ? s.plan_type === 'premium' :
+        activeTab === 'pro' ? s.plan_type === 'pro' :
+        activeTab === 'activos' ? s.plan_type === 'basic' : true
+      return matchCat && matchSearch && matchTab
+    })
+    if (sortBy === 'rating') result = [...result].sort((a, b) => (b.avg_rating ?? 0) - (a.avg_rating ?? 0))
+    else if (sortBy === 'recientes') result = [...result].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+    return result
+  }, [services, selectedCategory, search, activeTab, sortBy])
 
-  const premium = filtered.filter(s => s.plan_type === 'premium')
-  const pro     = filtered.filter(s => s.plan_type === 'pro')
-  const basic   = filtered.filter(s => s.plan_type === 'basic')
-  const free    = filtered.filter(s => !s.plan_type)
+  const stats = useMemo(() => ({
+    total: services.length,
+    verified: services.filter(s => s.plan_type).length,
+    premium: services.filter(s => s.plan_type === 'premium').length,
+  }), [services])
+
+  const catCounts = useMemo(() => {
+    const counts: Record<string, number> = {}
+    services.forEach(s => { counts[s.category] = (counts[s.category] ?? 0) + 1 })
+    return counts
+  }, [services])
+
+  function PlanBadge({ plan }: { plan: string | null }) {
+    if (!plan || !PLAN_CONFIG[plan as keyof typeof PLAN_CONFIG]) return null
+    const cfg = PLAN_CONFIG[plan as keyof typeof PLAN_CONFIG]
+    return (
+      <div style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', background: cfg.bg, color: cfg.color, border: `1px solid ${cfg.border}`, borderRadius: '6px', padding: '3px 8px', fontSize: '0.6rem', fontWeight: 800, letterSpacing: '0.5px' }}>
+        <svg width="10" height="10" viewBox="0 0 24 24" fill={cfg.color}><path d={cfg.icon} /></svg>
+        {cfg.label}
+      </div>
+    )
+  }
+
+  function StarRating({ rating, count }: { rating?: number | null; count?: number | null }) {
+    const r = rating ?? 0
+    if (!r) return null
+    return (
+      <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="#f59e0b"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        <span style={{ fontSize: '0.82rem', fontWeight: 700, color: '#111' }}>{r.toFixed(1)}</span>
+        {count ? <span style={{ fontSize: '0.75rem', color: '#9ca3af' }}>({count})</span> : null}
+      </div>
+    )
+  }
 
   function ServiceCard({ service }: { service: RankedService }) {
-    const plan = service.plan_type ? PLAN_CONFIG[service.plan_type] : null
-    const isHighlighted = service.plan_type === 'premium' || service.plan_type === 'pro'
+    const plan = service.plan_type
+    const cfg = plan ? PLAN_CONFIG[plan as keyof typeof PLAN_CONFIG] : null
+    const isPremium = plan === 'premium'
+    const isPro = plan === 'pro'
+    const isHighlighted = isPremium || isPro
     const waUrl = `https://wa.me/57${(service.whatsapp || service.phone || '').replace(/\D/g, '')}?text=${encodeURIComponent('Hola, vi tu servicio en DMS Market y me interesa ' + service.business_name)}`
 
     return (
-      <div
-        style={{ border: plan?.border ?? '1px solid #f0f0f0', borderRadius: '16px', overflow: 'hidden', background: '#fff', boxShadow: plan?.shadow ?? '0 2px 8px rgba(0,0,0,0.06)', transition: 'all 0.25s', display: 'flex', flexDirection: 'column' }}
-        onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-4px)'; e.currentTarget.style.boxShadow = isHighlighted ? '0 20px 60px rgba(212,175,55,0.22)' : '0 12px 40px rgba(0,0,0,0.12)' }}
-        onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = plan?.shadow ?? '0 2px 8px rgba(0,0,0,0.06)' }}
+      <div style={{ background: '#fff', borderRadius: '16px', border: cfg ? `1.5px solid ${cfg.border}` : '1px solid #e5e7eb', boxShadow: cfg ? `0 4px 24px ${cfg.glow}` : '0 1px 4px rgba(0,0,0,0.06)', overflow: 'hidden', display: 'flex', flexDirection: 'column', transition: 'all 0.22s ease' }}
+        onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.boxShadow = cfg ? `0 12px 40px ${cfg.glow}` : '0 8px 24px rgba(0,0,0,0.1)' }}
+        onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = cfg ? `0 4px 24px ${cfg.glow}` : '0 1px 4px rgba(0,0,0,0.06)' }}
       >
-        <div style={{ position: 'relative', paddingBottom: '60%', background: '#f8f8f8', overflow: 'hidden' }}>
+        <div style={{ position: 'relative', paddingBottom: '56%', background: '#f3f4f6', overflow: 'hidden', flexShrink: 0 }}>
           {service.service_image_url
-            ? <img src={service.service_image_url} alt={service.business_name} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
-            : <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(135deg, #1c1c1c, #333)' }}>
-                <span style={{ fontSize: '3rem', color: '#D4AF37', fontWeight: 700 }}>{service.business_name?.charAt(0).toUpperCase()}</span>
+            ? <img src={service.service_image_url} alt={service.business_name} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
+            : <div style={{ position: 'absolute', inset: 0, background: isPremium ? 'linear-gradient(135deg, #1a0f00, #3d2200)' : isPro ? 'linear-gradient(135deg, #0f172a, #1e3a5f)' : 'linear-gradient(135deg, #1f2937, #374151)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <span style={{ fontSize: '3rem', fontWeight: 800, color: isPremium ? '#D4AF37' : isPro ? '#60a5fa' : '#6b7280' }}>{service.business_name?.charAt(0).toUpperCase()}</span>
               </div>
           }
-          <div style={{ position: 'absolute', top: '0.75rem', left: '0.75rem', background: 'rgba(0,0,0,0.7)', color: '#fff', fontSize: '0.65rem', padding: '0.3rem 0.75rem', borderRadius: '999px', fontWeight: 600 }}>{service.category}</div>
-          {plan && (
-            <div style={{ position: 'absolute', top: '0.75rem', right: '0.75rem', background: plan.badgeBg, color: plan.badgeColor, fontSize: '0.6rem', padding: '0.3rem 0.75rem', borderRadius: '999px', fontWeight: 800, letterSpacing: '0.5px' }}>
-              {plan.badge}
-            </div>
-          )}
-          {service.plan_type === 'premium' && (
-            <div style={{ position: 'absolute', bottom: '0.75rem', left: '0.75rem', background: 'rgba(212,175,55,0.9)', color: '#0B0B0B', fontSize: '0.6rem', padding: '0.25rem 0.6rem', borderRadius: '999px', fontWeight: 700 }}>
+          {cfg && <div style={{ position: 'absolute', top: '10px', left: '10px' }}><PlanBadge plan={plan} /></div>}
+          {isPremium && (
+            <div style={{ position: 'absolute', top: '10px', right: '10px', background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)', borderRadius: '6px', padding: '3px 8px', fontSize: '0.65rem', fontWeight: 700, color: '#D4AF37' }}>
               Score {Math.round(service.computed_score)}
             </div>
           )}
         </div>
 
-        <div style={{ padding: '1.25rem', display: 'flex', flexDirection: 'column', flex: 1 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.75rem' }}>
-            <div style={{ width: '46px', height: '46px', borderRadius: '50%', background: 'linear-gradient(135deg, #D4AF37, #f0d060)', overflow: 'hidden', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', border: isHighlighted ? '2px solid #D4AF37' : '2px solid #f0f0f0', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
+        <div style={{ padding: '1rem', display: 'flex', flexDirection: 'column', flex: 1, gap: '0.5rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <div style={{ width: '36px', height: '36px', borderRadius: '50%', flexShrink: 0, overflow: 'hidden', border: `2px solid ${cfg?.border ?? '#e5e7eb'}`, background: 'linear-gradient(135deg, #D4AF37, #f0d060)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               {service.avatar_url
                 ? <img src={service.avatar_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                : <span style={{ color: '#fff', fontWeight: 700, fontSize: '1.1rem' }}>{service.business_name?.charAt(0).toUpperCase()}</span>
+                : <span style={{ fontSize: '0.9rem', fontWeight: 700, color: '#fff' }}>{service.business_name?.charAt(0).toUpperCase()}</span>
               }
             </div>
             <div style={{ flex: 1, minWidth: 0 }}>
-              <p style={{ fontSize: '0.95rem', fontWeight: 700, color: '#111', marginBottom: '0.1rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{service.business_name}</p>
-              {service.profession && <p style={{ fontSize: '0.72rem', color: '#D4AF37', fontWeight: 600, marginBottom: '0.1rem' }}>{service.profession}</p>}
-              <p style={{ fontSize: '0.7rem', color: '#aaa', margin: 0 }}>{service.city}</p>
+              <p style={{ fontSize: '0.875rem', fontWeight: 700, color: '#111', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{service.business_name}</p>
+              <p style={{ fontSize: '0.72rem', color: '#9ca3af', margin: 0 }}>{service.city}</p>
             </div>
           </div>
 
-          {service.experience && (
-            <div style={{ background: '#f8f8f8', borderRadius: '6px', padding: '0.35rem 0.6rem', marginBottom: '0.6rem', display: 'inline-block' }}>
-              <p style={{ fontSize: '0.68rem', color: '#555', margin: 0 }}>Experiencia: <span style={{ fontWeight: 700, color: '#111' }}>{service.experience}</span></p>
-            </div>
-          )}
+          {service.avg_rating ? <StarRating rating={service.avg_rating} count={service.review_count} /> : null}
+          {service.profession && <p style={{ fontSize: '0.82rem', fontWeight: 600, color: '#374151', margin: 0 }}>{service.profession}</p>}
 
-          <p style={{ fontSize: '0.83rem', color: '#555', lineHeight: 1.65, marginBottom: '0.75rem', overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', flex: 1 }}>
+          <p style={{ fontSize: '0.8rem', color: '#6b7280', lineHeight: 1.6, margin: 0, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', flex: 1 }}>
             {service.description}
           </p>
 
-          {service.price && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', marginBottom: '0.875rem', paddingTop: '0.75rem', borderTop: '1px solid #f5f5f5' }}>
-              <span style={{ fontSize: '0.7rem', color: '#aaa' }}>Desde</span>
-              <span style={{ fontSize: '1.05rem', fontWeight: 700, color: '#111' }}>{service.price}</span>
-            </div>
-          )}
+          <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
+            <span style={{ fontSize: '0.65rem', background: '#f3f4f6', color: '#6b7280', padding: '2px 8px', borderRadius: '4px', fontWeight: 500 }}>{service.category}</span>
+            {service.experience && <span style={{ fontSize: '0.65rem', background: '#f3f4f6', color: '#6b7280', padding: '2px 8px', borderRadius: '4px', fontWeight: 500 }}>{service.experience}</span>}
+          </div>
 
-          <a href={waUrl} target="_blank" rel="noopener noreferrer"
-            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', padding: '0.75rem', background: '#25D366', color: '#fff', textDecoration: 'none', fontSize: '0.82rem', fontWeight: 700, borderRadius: '999px' }}>
-            {WA_ICON}
-            Contactar por WhatsApp
-          </a>
+          <div style={{ display: 'flex', gap: '12px', borderTop: '1px solid #f3f4f6', paddingTop: '0.5rem' }}>
+            {[['Respuesta', '24h'], ['Proyectos', String(service.sale_count ?? 0)], ['Satisfaccion', '98%']].map(([label, val]) => (
+              <div key={label} style={{ textAlign: 'center' }}>
+                <p style={{ fontSize: '0.65rem', color: '#9ca3af', margin: '0 0 1px' }}>{label}</p>
+                <p style={{ fontSize: '0.75rem', fontWeight: 700, color: '#374151', margin: 0 }}>{val}</p>
+              </div>
+            ))}
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div>
+              <p style={{ fontSize: '0.65rem', color: '#9ca3af', margin: 0 }}>Desde</p>
+              <p style={{ fontSize: '1rem', fontWeight: 800, color: isPremium ? '#92400e' : isPro ? '#1e40af' : '#111', margin: 0 }}>{service.price ?? 'Consultar'}</p>
+            </div>
+            <a href={waUrl} target="_blank" rel="noopener noreferrer"
+              style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', background: isPremium ? '#D4AF37' : isPro ? '#3b82f6' : '#111', color: '#fff', padding: '8px 14px', borderRadius: '8px', fontSize: '0.78rem', fontWeight: 700, textDecoration: 'none', whiteSpace: 'nowrap' }}>
+              Ver servicio
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </a>
+          </div>
         </div>
       </div>
     )
   }
 
-  return (
-    <div style={{ minHeight: '100vh', background: '#fff', fontFamily: "'Segoe UI', sans-serif", color: '#111' }}>
+  const tabs: { key: TabType; label: string; count: number }[] = [
+    { key: 'todos', label: 'Todos los servicios', count: services.length },
+    { key: 'premium', label: 'Premium Partner', count: services.filter(s => s.plan_type === 'premium').length },
+    { key: 'pro', label: 'Pro Verificados', count: services.filter(s => s.plan_type === 'pro').length },
+    { key: 'activos', label: 'Proveedores Activos', count: services.filter(s => s.plan_type === 'basic').length },
+  ]
 
-      <nav style={{ padding: '0 clamp(1rem, 4vw, 2.5rem)', height: '68px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 0, background: '#0B0B0B', zIndex: 50, boxShadow: '0 2px 20px rgba(0,0,0,0.3)' }}>
-        <a href="/" style={{ textDecoration: 'none' }}>
-          <img src={LOGO} alt="DMS Market" style={{ height: '52px', objectFit: 'contain' }} />
+  return (
+    <div style={{ minHeight: '100vh', background: '#f9fafb', fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif', color: '#111' }}>
+
+      {/* NAV */}
+      <nav style={{ position: 'sticky', top: 0, zIndex: 100, background: '#fff', borderBottom: '1px solid #e5e7eb', padding: '0 clamp(1rem, 4vw, 2rem)', height: '64px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+        <a href="/" style={{ textDecoration: 'none', flexShrink: 0 }}>
+          <img src={LOGO} alt="DMS Market" style={{ height: '44px', objectFit: 'contain' }} />
         </a>
-        <div style={{ flex: 1, maxWidth: '500px', margin: '0 clamp(0.5rem, 2vw, 2rem)', display: 'flex', background: '#1a1a1a', borderRadius: '10px', overflow: 'hidden', border: '1px solid rgba(212,175,55,0.2)' }}>
-          <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Buscar servicios profesionales..."
-            style={{ flex: 1, padding: '0.7rem 1rem', border: 'none', fontSize: '0.875rem', outline: 'none', color: '#fff', background: 'transparent' }} />
-          <button style={{ padding: '0.7rem 1.25rem', background: '#D4AF37', color: '#0B0B0B', border: 'none', cursor: 'pointer' }}>
+        <div style={{ flex: 1, maxWidth: '520px', display: 'flex', background: '#f9fafb', border: '1.5px solid #e5e7eb', borderRadius: '10px', overflow: 'hidden' }}>
+          <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Buscar servicios, habilidades o proveedores..."
+            style={{ flex: 1, padding: '0.625rem 1rem', border: 'none', fontSize: '0.875rem', outline: 'none', background: 'transparent', color: '#111' }} />
+          <button style={{ padding: '0.625rem 1rem', background: '#D4AF37', color: '#fff', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
           </button>
         </div>
-        <div style={{ display: 'flex', gap: '0.25rem', alignItems: 'center', flexShrink: 0 }}>
-          <a href="/" style={{ fontSize: '0.8rem', color: '#D1D1D1', textDecoration: 'none', padding: '0.5rem 0.75rem' }}>Productos</a>
+        <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', flexShrink: 0 }}>
+          <a href="/" style={{ fontSize: '0.85rem', color: '#6b7280', textDecoration: 'none', padding: '0.5rem 0.75rem' }}>Productos</a>
           {user ? (
-            <a href={getDashboardUrl()} style={{ fontSize: '0.8rem', background: '#D4AF37', color: '#0B0B0B', padding: '0.6rem 1.25rem', textDecoration: 'none', borderRadius: '8px', fontWeight: 700 }}>Mi panel</a>
+            <a href={getDashboardUrl()} style={{ fontSize: '0.85rem', background: '#111', color: '#fff', padding: '0.5rem 1.25rem', textDecoration: 'none', borderRadius: '8px', fontWeight: 600 }}>Mi panel</a>
           ) : (
             <>
-              <a href="/auth/login" style={{ fontSize: '0.8rem', color: '#D1D1D1', textDecoration: 'none', padding: '0.5rem 0.75rem' }}>Ingresar</a>
-              <a href="/auth/register" style={{ fontSize: '0.8rem', background: '#D4AF37', color: '#0B0B0B', padding: '0.6rem 1.25rem', textDecoration: 'none', borderRadius: '8px', fontWeight: 700 }}>Registrarse</a>
+              <a href="/auth/login" style={{ fontSize: '0.85rem', color: '#374151', textDecoration: 'none', padding: '0.5rem 0.75rem' }}>Ingresar</a>
+              <a href="/auth/register" style={{ fontSize: '0.85rem', background: '#D4AF37', color: '#fff', padding: '0.5rem 1.25rem', textDecoration: 'none', borderRadius: '8px', fontWeight: 700 }}>Registrarse</a>
             </>
           )}
         </div>
       </nav>
 
-      <div style={{ position: 'relative', width: '100%', height: 'clamp(280px, 45vw, 500px)', overflow: 'hidden', background: '#111' }}>
-        {banners.length > 0 ? banners.map((banner, i) => (
-          <div key={banner.id} style={{ position: 'absolute', inset: 0, transition: 'opacity 0.8s ease', opacity: i === currentSlide ? 1 : 0, overflow: 'hidden' }}>
-            {banner.image_url && <img src={banner.image_url} alt={banner.title} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />}
-            <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.3) 50%, transparent 100%)' }} />
-            <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 'clamp(1.5rem, 6vw, 5rem)', textAlign: 'center', zIndex: 1 }}>
-              <p style={{ color: '#D4AF37', fontSize: '0.65rem', letterSpacing: '4px', textTransform: 'uppercase', marginBottom: '1rem', fontWeight: 600 }}>DMS Market - Servicios</p>
-              {banner.title && <h1 style={{ color: '#fff', fontSize: 'clamp(1.5rem, 4vw, 3rem)', fontWeight: 700, marginBottom: '1rem', lineHeight: 1.2, maxWidth: '700px' }}>{banner.title}</h1>}
-              {banner.subtitle && <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: 'clamp(0.875rem, 2vw, 1rem)', maxWidth: '480px', margin: '0 auto 2rem', lineHeight: 1.7 }}>{banner.subtitle}</p>}
-              <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
-                <button onClick={handlePublicar} style={{ background: '#D4AF37', color: '#0B0B0B', padding: '0.875rem 2rem', border: 'none', fontSize: '0.85rem', fontWeight: 700, borderRadius: '999px', cursor: 'pointer' }}>Publica tu servicio gratis</button>
-                <a href="#servicios" style={{ background: 'transparent', color: '#fff', padding: '0.875rem 2rem', border: '1px solid rgba(255,255,255,0.3)', fontSize: '0.85rem', fontWeight: 600, borderRadius: '999px', textDecoration: 'none' }}>Ver servicios</a>
+      {/* CARRUSEL */}
+      {banners.length > 0 && (
+        <div style={{ position: 'relative', width: '100%', height: 'clamp(220px, 35vw, 400px)', overflow: 'hidden', background: '#111' }}>
+          {banners.map((banner, i) => (
+            <div key={banner.id} style={{ position: 'absolute', inset: 0, transition: 'opacity 0.8s ease', opacity: i === currentSlide ? 1 : 0, overflow: 'hidden' }}>
+              {banner.image_url && <img src={banner.image_url} alt={banner.title} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />}
+              <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.2) 60%, transparent 100%)' }} />
+              <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 'clamp(1.5rem, 6vw, 5rem)', textAlign: 'center', zIndex: 1 }}>
+                <p style={{ color: '#D4AF37', fontSize: '0.65rem', letterSpacing: '4px', textTransform: 'uppercase', marginBottom: '0.75rem', fontWeight: 600 }}>DMS Market - Servicios</p>
+                {banner.title && <h2 style={{ color: '#fff', fontSize: 'clamp(1.25rem, 3.5vw, 2.5rem)', fontWeight: 800, marginBottom: '0.75rem', lineHeight: 1.2, maxWidth: '700px' }}>{banner.title}</h2>}
+                {banner.subtitle && <p style={{ color: 'rgba(255,255,255,0.75)', fontSize: 'clamp(0.8rem, 1.5vw, 1rem)', maxWidth: '480px', margin: '0 auto 1.5rem', lineHeight: 1.7 }}>{banner.subtitle}</p>}
+                <button onClick={handlePublicar} style={{ background: '#D4AF37', color: '#fff', padding: '0.75rem 2rem', border: 'none', fontSize: '0.85rem', fontWeight: 700, borderRadius: '999px', cursor: 'pointer' }}>
+                  Publica tu servicio gratis
+                </button>
               </div>
             </div>
+          ))}
+          {banners.length > 1 && (
+            <>
+              <div style={{ position: 'absolute', bottom: '1rem', left: '50%', transform: 'translateX(-50%)', display: 'flex', gap: '0.5rem', zIndex: 10 }}>
+                {banners.map((_, i) => (<button key={i} onClick={() => setCurrentSlide(i)} style={{ width: i === currentSlide ? '24px' : '7px', height: '7px', borderRadius: '4px', background: i === currentSlide ? '#D4AF37' : 'rgba(255,255,255,0.4)', border: 'none', cursor: 'pointer', transition: 'all 0.3s' }} />))}
+              </div>
+              <button onClick={() => setCurrentSlide(p => (p - 1 + banners.length) % banners.length)} style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', background: 'rgba(212,175,55,0.15)', color: '#D4AF37', border: '1px solid rgba(212,175,55,0.3)', width: '40px', height: '40px', borderRadius: '50%', cursor: 'pointer', fontSize: '1.2rem', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10 }}>&#8249;</button>
+              <button onClick={() => setCurrentSlide(p => (p + 1) % banners.length)} style={{ position: 'absolute', right: '1rem', top: '50%', transform: 'translateY(-50%)', background: 'rgba(212,175,55,0.15)', color: '#D4AF37', border: '1px solid rgba(212,175,55,0.3)', width: '40px', height: '40px', borderRadius: '50%', cursor: 'pointer', fontSize: '1.2rem', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10 }}>&#8250;</button>
+            </>
+          )}
+        </div>
+      )}
+
+      {/* HERO STATS */}
+      <div style={{ background: '#fff', borderBottom: '1px solid #e5e7eb', padding: '1.25rem clamp(1rem, 4vw, 2rem)' }}>
+        <div style={{ maxWidth: '1280px', margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem' }}>
+          <div>
+            <h1 style={{ fontSize: 'clamp(1.1rem, 2.5vw, 1.5rem)', fontWeight: 800, color: '#111', margin: '0 0 0.2rem' }}>Encuentra los mejores servicios profesionales</h1>
+            <p style={{ fontSize: '0.85rem', color: '#6b7280', margin: 0 }}>Conecta con expertos verificados listos para tu proyecto</p>
           </div>
-        )) : (
-          <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(135deg, #0a0a0a, #1c1c1c)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '2rem', textAlign: 'center' }}>
-            <p style={{ color: '#D4AF37', fontSize: '0.65rem', letterSpacing: '4px', textTransform: 'uppercase', marginBottom: '1rem', fontWeight: 600 }}>DMS Market - Servicios</p>
-            <h1 style={{ color: '#fff', fontSize: 'clamp(1.5rem, 4vw, 2.5rem)', fontWeight: 700, marginBottom: '1rem' }}>Profesionales verificados en Colombia</h1>
-            <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: '0.9rem', maxWidth: '480px', marginBottom: '2rem' }}>Encuentra el profesional ideal para tu proyecto.</p>
-            <button onClick={handlePublicar} style={{ background: '#D4AF37', color: '#0B0B0B', padding: '0.875rem 2rem', border: 'none', fontSize: '0.85rem', fontWeight: 700, borderRadius: '999px', cursor: 'pointer' }}>Publica tu servicio gratis</button>
+          <div style={{ display: 'flex', gap: '1.5rem', flexWrap: 'wrap' }}>
+            {[
+              { value: `${stats.total}`, label: 'Servicios activos', color: '#D4AF37' },
+              { value: `${stats.verified}`, label: 'Proveedores verificados', color: '#3b82f6' },
+              { value: '4.9', label: 'Calificacion promedio', color: '#f59e0b' },
+              { value: '100%', label: 'Pago seguro', color: '#10b981' },
+            ].map(s => (
+              <div key={s.label} style={{ textAlign: 'center' }}>
+                <p style={{ fontSize: '1.1rem', fontWeight: 800, color: s.color, margin: 0 }}>{s.value}</p>
+                <p style={{ fontSize: '0.7rem', color: '#9ca3af', margin: 0 }}>{s.label}</p>
+              </div>
+            ))}
           </div>
-        )}
-        {banners.length > 1 && (
-          <>
-            <div style={{ position: 'absolute', bottom: '1.25rem', left: '50%', transform: 'translateX(-50%)', display: 'flex', gap: '0.5rem', zIndex: 10 }}>
-              {banners.map((_, i) => (<button key={i} onClick={() => setCurrentSlide(i)} style={{ width: i === currentSlide ? '28px' : '8px', height: '8px', borderRadius: '4px', background: i === currentSlide ? '#D4AF37' : 'rgba(255,255,255,0.4)', border: 'none', cursor: 'pointer', transition: 'all 0.3s' }} />))}
+        </div>
+      </div>
+
+      {/* TABS */}
+      <div style={{ background: '#fff', borderBottom: '1px solid #e5e7eb', padding: '0 clamp(1rem, 4vw, 2rem)' }}>
+        <div style={{ maxWidth: '1280px', margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', overflowX: 'auto' }}>
+            {tabs.map(tab => (
+              <button key={tab.key} onClick={() => setActiveTab(tab.key)}
+                style={{ padding: '0.875rem 1.1rem', border: 'none', borderBottom: activeTab === tab.key ? '2px solid #D4AF37' : '2px solid transparent', background: 'transparent', color: activeTab === tab.key ? '#111' : '#6b7280', fontWeight: activeTab === tab.key ? 700 : 400, fontSize: '0.85rem', cursor: 'pointer', whiteSpace: 'nowrap', transition: 'all 0.2s', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                {tab.label}
+                <span style={{ fontSize: '0.68rem', background: activeTab === tab.key ? '#D4AF37' : '#f3f4f6', color: activeTab === tab.key ? '#fff' : '#6b7280', padding: '1px 6px', borderRadius: '999px', transition: 'all 0.2s' }}>{tab.count}</span>
+              </button>
+            ))}
+          </div>
+          <select value={sortBy} onChange={e => setSortBy(e.target.value as SortType)}
+            style={{ fontSize: '0.82rem', border: '1px solid #e5e7eb', borderRadius: '8px', padding: '0.375rem 0.75rem', background: '#fff', color: '#374151', cursor: 'pointer', outline: 'none', margin: '0.5rem 0' }}>
+            <option value="relevancia">Ordenar: Relevancia</option>
+            <option value="rating">Mejor rating</option>
+            <option value="recientes">Mas recientes</option>
+          </select>
+        </div>
+      </div>
+
+      {/* LAYOUT */}
+      <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '1.5rem clamp(1rem, 4vw, 2rem)' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '240px 1fr', gap: '1.5rem', alignItems: 'start' }}>
+
+          {/* SIDEBAR */}
+          <aside style={{ background: '#fff', borderRadius: '12px', border: '1px solid #e5e7eb', overflow: 'hidden', position: 'sticky', top: '80px' }}>
+            <div style={{ padding: '0.875rem 1.1rem', borderBottom: '1px solid #f3f4f6' }}>
+              <p style={{ fontSize: '0.75rem', fontWeight: 700, color: '#374151', margin: 0, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Categorias</p>
             </div>
-            <button onClick={() => setCurrentSlide(p => (p - 1 + banners.length) % banners.length)} style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', background: 'rgba(212,175,55,0.15)', color: '#D4AF37', border: '1px solid rgba(212,175,55,0.3)', width: '44px', height: '44px', borderRadius: '50%', cursor: 'pointer', fontSize: '1.4rem', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10 }}>&#8249;</button>
-            <button onClick={() => setCurrentSlide(p => (p + 1) % banners.length)} style={{ position: 'absolute', right: '1rem', top: '50%', transform: 'translateY(-50%)', background: 'rgba(212,175,55,0.15)', color: '#D4AF37', border: '1px solid rgba(212,175,55,0.3)', width: '44px', height: '44px', borderRadius: '50%', cursor: 'pointer', fontSize: '1.4rem', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10 }}>&#8250;</button>
-          </>
-        )}
-        <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, background: 'rgba(11,11,11,0.85)', backdropFilter: 'blur(10px)', padding: '0.875rem clamp(1rem, 4vw, 3rem)', display: 'flex', justifyContent: 'center', gap: 'clamp(1.5rem, 4vw, 4rem)', flexWrap: 'wrap', zIndex: 5 }}>
-          {['Profesionales verificados', 'Perfiles con respaldo', 'Soporte 24/7'].map(t => (
-            <div key={t} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#D4AF37' }} />
-              <span style={{ fontSize: '0.8rem', color: '#D1D1D1', fontWeight: 500 }}>{t}</span>
+            <div style={{ padding: '0.4rem' }}>
+              {CATEGORIES.map(cat => {
+                const count = cat === 'Todas las categorias' ? services.length : (catCounts[cat] ?? 0)
+                const isActive = selectedCategory === cat
+                return (
+                  <button key={cat} onClick={() => setSelectedCategory(cat)}
+                    style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.45rem 0.7rem', border: 'none', borderRadius: '7px', background: isActive ? '#fef9ec' : 'transparent', color: isActive ? '#92400e' : '#374151', fontWeight: isActive ? 600 : 400, fontSize: '0.8rem', cursor: 'pointer', textAlign: 'left', transition: 'all 0.15s', gap: '0.5rem', marginBottom: '1px' }}>
+                    <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{cat}</span>
+                    <span style={{ fontSize: '0.68rem', background: isActive ? '#D4AF37' : '#f3f4f6', color: isActive ? '#fff' : '#9ca3af', padding: '1px 6px', borderRadius: '999px', flexShrink: 0 }}>{count}</span>
+                  </button>
+                )
+              })}
+            </div>
+
+            <div style={{ padding: '0.875rem 1.1rem', borderTop: '1px solid #f3f4f6', marginTop: '0.25rem' }}>
+              <p style={{ fontSize: '0.75rem', fontWeight: 700, color: '#374151', margin: '0 0 0.6rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Nivel del proveedor</p>
+              {[
+                { label: 'Premium Partner', color: '#92400e', bg: '#fef3c7', count: stats.premium },
+                { label: 'Pro Verificado', color: '#1e40af', bg: '#eff6ff', count: services.filter(s => s.plan_type === 'pro').length },
+                { label: 'Proveedor Activo', color: '#065f46', bg: '#ecfdf5', count: services.filter(s => s.plan_type === 'basic').length },
+              ].map(item => (
+                <div key={item.label} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.35rem' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <div style={{ width: '7px', height: '7px', borderRadius: '50%', background: item.color }} />
+                    <span style={{ fontSize: '0.78rem', color: '#374151' }}>{item.label}</span>
+                  </div>
+                  <span style={{ fontSize: '0.68rem', background: item.bg, color: item.color, padding: '1px 6px', borderRadius: '999px', fontWeight: 600 }}>{item.count}</span>
+                </div>
+              ))}
+            </div>
+
+            <div style={{ padding: '0.875rem 1.1rem', borderTop: '1px solid #f3f4f6' }}>
+              <button onClick={handlePublicar}
+                style={{ width: '100%', padding: '0.7rem', background: '#D4AF37', color: '#fff', border: 'none', borderRadius: '9px', fontWeight: 700, fontSize: '0.82rem', cursor: 'pointer' }}>
+                Publicar mi servicio
+              </button>
+            </div>
+          </aside>
+
+          {/* GRID */}
+          <div>
+            <p style={{ fontSize: '0.875rem', color: '#6b7280', margin: '0 0 1rem' }}>
+              <span style={{ fontWeight: 700, color: '#111' }}>{filtered.length}</span> servicios encontrados
+              {selectedCategory !== 'Todas las categorias' && <span> en <span style={{ fontWeight: 600, color: '#D4AF37' }}>{selectedCategory}</span></span>}
+            </p>
+
+            {filtered.length === 0 ? (
+              <div style={{ background: '#fff', borderRadius: '16px', border: '1px solid #e5e7eb', padding: '4rem 2rem', textAlign: 'center' }}>
+                <p style={{ color: '#374151', fontWeight: 600, marginBottom: '0.5rem' }}>No hay servicios disponibles</p>
+                <p style={{ color: '#9ca3af', fontSize: '0.875rem', marginBottom: '1.5rem' }}>Intenta con otra categoria o busqueda</p>
+                <button onClick={() => { setSelectedCategory('Todas las categorias'); setSearch(''); setActiveTab('todos') }}
+                  style={{ background: '#D4AF37', color: '#fff', padding: '0.625rem 1.5rem', border: 'none', borderRadius: '8px', fontWeight: 600, cursor: 'pointer', fontSize: '0.875rem' }}>
+                  Ver todos
+                </button>
+              </div>
+            ) : (
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(270px, 1fr))', gap: '1.25rem' }}>
+                {filtered.map(s => <ServiceCard key={s.id} service={s} />)}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* BENEFICIOS */}
+      <div style={{ background: '#fff', borderTop: '1px solid #e5e7eb', padding: 'clamp(2rem, 4vw, 3rem) clamp(1rem, 4vw, 2rem)', marginTop: '1rem' }}>
+        <div style={{ maxWidth: '1280px', margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '2rem' }}>
+          {[
+            { title: 'Proveedores Verificados', desc: 'Todos nuestros proveedores pasan por un proceso de verificacion', color: '#3b82f6' },
+            { title: 'Pago Seguro', desc: 'Tu dinero esta protegido con nuestro sistema de seguridad', color: '#10b981' },
+            { title: 'Calidad Garantizada', desc: 'Trabajos de calidad o te devolvemos tu dinero', color: '#D4AF37' },
+            { title: 'Soporte 24/7', desc: 'Estamos aqui para ayudarte en todo momento', color: '#8b5cf6' },
+          ].map(b => (
+            <div key={b.title} style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start' }}>
+              <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: b.color + '15', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: b.color }} />
+              </div>
+              <div>
+                <p style={{ fontSize: '0.875rem', fontWeight: 700, color: '#111', marginBottom: '0.25rem' }}>{b.title}</p>
+                <p style={{ fontSize: '0.8rem', color: '#6b7280', lineHeight: 1.6, margin: 0 }}>{b.desc}</p>
+              </div>
             </div>
           ))}
         </div>
       </div>
 
-      <div style={{ background: '#fafafa', borderBottom: '1px solid #f0f0f0', padding: '1.5rem clamp(1rem, 4vw, 2rem)' }}>
-        <div style={{ maxWidth: '1280px', margin: '0 auto', display: 'flex', justifyContent: 'center', gap: 'clamp(2rem, 6vw, 5rem)', flexWrap: 'wrap' }}>
-          {[['500+', 'Profesionales'], ['98%', 'Satisfaccion'], ['24h', 'Respuesta'], ['13', 'Categorias']].map(([n, l]) => (
-            <div key={l} style={{ textAlign: 'center' }}>
-              <p style={{ color: '#D4AF37', fontSize: 'clamp(1.25rem, 3vw, 1.75rem)', fontWeight: 700, margin: 0 }}>{n}</p>
-              <p style={{ color: '#888', fontSize: '0.75rem', margin: 0 }}>{l}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <div style={{ borderBottom: '1px solid #f0f0f0', padding: '1rem clamp(1rem, 4vw, 2rem)', overflowX: 'auto' }}>
-        <div style={{ display: 'flex', gap: '0.5rem', minWidth: 'max-content' }}>
-          {categories.map(cat => (
-            <button key={cat} onClick={() => setSelectedCategory(cat)}
-              style={{ padding: '0.375rem 1rem', border: '1px solid ' + (selectedCategory === cat ? '#D4AF37' : '#eee'), background: selectedCategory === cat ? '#D4AF37' : '#fff', color: selectedCategory === cat ? '#0B0B0B' : '#555', fontSize: '0.75rem', cursor: 'pointer', borderRadius: '999px', fontWeight: 500, whiteSpace: 'nowrap', transition: 'all 0.2s' }}>
-              {cat}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      <div id="servicios" style={{ maxWidth: '1280px', margin: '0 auto', padding: 'clamp(2rem, 4vw, 3rem) clamp(1rem, 4vw, 2rem)' }}>
-
-        {premium.length > 0 && (
-          <section style={{ marginBottom: '3rem' }}>
-            <div style={{ background: 'linear-gradient(135deg, #0B0B0B, #1a1200)', borderRadius: '16px', padding: '1.25rem 1.5rem', marginBottom: '1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
-              <div>
-                <p style={{ fontSize: '0.65rem', color: '#D4AF37', letterSpacing: '3px', textTransform: 'uppercase', fontWeight: 700, margin: '0 0 0.2rem' }}>Maxima visibilidad</p>
-                <h2 style={{ fontSize: 'clamp(1.1rem, 3vw, 1.4rem)', fontWeight: 700, color: '#fff', margin: 0 }}>Premium Partners <span style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.4)', fontWeight: 400 }}>({premium.length})</span></h2>
-              </div>
-              <button onClick={handlePublicar} style={{ fontSize: '0.8rem', color: '#D4AF37', background: 'none', border: '1px solid rgba(212,175,55,0.4)', padding: '0.4rem 1rem', borderRadius: '999px', cursor: 'pointer', fontWeight: 600 }}>Ser Premium Partner</button>
-            </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1.5rem' }}>
-              {premium.map(s => <ServiceCard key={s.id} service={s} />)}
-            </div>
-          </section>
-        )}
-
-        {pro.length > 0 && (
-          <section style={{ marginBottom: '3rem' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '0.5rem' }}>
-              <div>
-                <p style={{ fontSize: '0.65rem', color: '#D4AF37', letterSpacing: '3px', textTransform: 'uppercase', fontWeight: 700, margin: '0 0 0.25rem' }}>Profesionales verificados</p>
-                <h2 style={{ fontSize: 'clamp(1.1rem, 3vw, 1.4rem)', fontWeight: 700, color: '#0B0B0B', margin: 0 }}>Servicios Pro <span style={{ fontSize: '0.8rem', color: '#aaa', fontWeight: 400 }}>({pro.length})</span></h2>
-              </div>
-              <button onClick={handlePublicar} style={{ fontSize: '0.8rem', color: '#D4AF37', background: 'none', border: '1px solid #D4AF37', padding: '0.4rem 1rem', borderRadius: '999px', cursor: 'pointer', fontWeight: 600 }}>+ Destacar mi servicio</button>
-            </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1.5rem' }}>
-              {pro.map(s => <ServiceCard key={s.id} service={s} />)}
-            </div>
-          </section>
-        )}
-
-        {basic.length > 0 && (
-          <section style={{ marginBottom: '3rem' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '0.5rem' }}>
-              <div>
-                <p style={{ fontSize: '0.65rem', color: '#888', letterSpacing: '3px', textTransform: 'uppercase', fontWeight: 700, margin: '0 0 0.25rem' }}>Plan basico</p>
-                <h2 style={{ fontSize: 'clamp(1.1rem, 3vw, 1.4rem)', fontWeight: 700, color: '#0B0B0B', margin: 0 }}>Profesionales activos <span style={{ fontSize: '0.8rem', color: '#aaa', fontWeight: 400 }}>({basic.length})</span></h2>
-              </div>
-            </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(290px, 1fr))', gap: '1.25rem' }}>
-              {basic.map(s => <ServiceCard key={s.id} service={s} />)}
-            </div>
-          </section>
-        )}
-
-        {free.length > 0 && (premium.length > 0 || pro.length > 0 || basic.length > 0) && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', margin: '1rem 0 2rem' }}>
-            <div style={{ flex: 1, height: '1px', background: '#f0f0f0' }} />
-            <span style={{ color: '#ccc', fontSize: '0.78rem', fontWeight: 600, whiteSpace: 'nowrap' }}>Otros servicios disponibles</span>
-            <div style={{ flex: 1, height: '1px', background: '#f0f0f0' }} />
-          </div>
-        )}
-
-        {free.length > 0 && (
-          <section style={{ marginBottom: '3rem' }}>
-            <h2 style={{ fontSize: 'clamp(1rem, 3vw, 1.2rem)', fontWeight: 600, color: '#aaa', margin: '0 0 1.5rem' }}>
-              Todos los servicios <span style={{ fontSize: '0.8rem', color: '#ccc', fontWeight: 400 }}>({free.length})</span>
-            </h2>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(270px, 1fr))', gap: '1rem', opacity: 0.85 }}>
-              {free.map(s => <ServiceCard key={s.id} service={s} />)}
-            </div>
-          </section>
-        )}
-
-        {filtered.length === 0 && (
-          <div style={{ textAlign: 'center', padding: '5rem 2rem' }}>
-            <p style={{ color: '#aaa', fontSize: '0.95rem', marginBottom: '1.5rem' }}>No hay servicios en esta categoria.</p>
-            <button onClick={() => { setSelectedCategory('Todos'); setSearch('') }} style={{ background: '#D4AF37', color: '#0B0B0B', padding: '0.875rem 2rem', border: 'none', fontSize: '0.8rem', fontWeight: 700, borderRadius: '999px', cursor: 'pointer' }}>Ver todos</button>
-          </div>
-        )}
-      </div>
-
-      <div style={{ background: 'linear-gradient(135deg, #0a0a0a, #1c1c1c)', padding: 'clamp(3rem, 5vw, 4rem) clamp(1rem, 4vw, 2rem)', textAlign: 'center' }}>
-        <p style={{ fontSize: '0.65rem', letterSpacing: '3px', textTransform: 'uppercase', color: '#D4AF37', marginBottom: '0.75rem', fontWeight: 600 }}>3 meses gratis</p>
-        <h2 style={{ fontSize: 'clamp(1.25rem, 4vw, 1.75rem)', fontWeight: 700, color: '#fff', marginBottom: '0.75rem' }}>Ofreces un servicio profesional?</h2>
-        <p style={{ fontSize: '0.875rem', color: 'rgba(255,255,255,0.5)', marginBottom: '1.75rem' }}>Publica gratis y llega a miles de clientes en Colombia.</p>
-        <button onClick={handlePublicar} style={{ background: '#D4AF37', color: '#0B0B0B', padding: '0.9rem 2.25rem', border: 'none', fontSize: '0.85rem', fontWeight: 700, borderRadius: '999px', cursor: 'pointer' }}>Publicar mi servicio gratis</button>
-      </div>
-
-      <footer style={{ background: '#0B0B0B', borderTop: '1px solid rgba(255,255,255,0.06)', padding: 'clamp(2rem, 4vw, 3.5rem) clamp(1rem, 4vw, 2rem)' }}>
-        <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '2rem', marginBottom: '2.5rem' }}>
+      {/* FOOTER */}
+      <footer style={{ background: '#111', padding: 'clamp(2rem, 4vw, 3rem) clamp(1rem, 4vw, 2rem)' }}>
+        <div style={{ maxWidth: '1280px', margin: '0 auto' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '2rem', marginBottom: '2rem' }}>
             <div>
-              <img src={LOGO} alt="DMS Market" style={{ height: '60px', objectFit: 'contain', marginBottom: '0.75rem' }} />
-              <p style={{ fontSize: '0.8rem', color: '#D1D1D1', lineHeight: 1.7, marginBottom: '1rem' }}>Conectamos profesionales con clientes en toda Colombia.</p>
+              <img src={LOGO} alt="DMS Market" style={{ height: '48px', objectFit: 'contain', marginBottom: '0.75rem' }} />
+              <p style={{ fontSize: '0.8rem', color: '#9ca3af', lineHeight: 1.7, margin: 0 }}>Conectamos profesionales con clientes en toda Colombia.</p>
             </div>
             {[
               { title: 'Navegacion', links: [{ label: 'Inicio', href: '/' }, { label: 'Productos', href: '/' }, { label: 'Servicios', href: '/servicios' }, { label: 'Publicar servicio', href: '/auth/register-provider' }] },
@@ -325,24 +412,16 @@ export default function ServiciosClient({ services, banners, user, profile }: Pr
               { title: 'Legal', links: [{ label: 'Privacidad', href: '/politicas#privacidad' }, { label: 'Terminos', href: '/politicas#terminos' }, { label: 'Devoluciones', href: '/politicas#devoluciones' }] },
             ].map(col => (
               <div key={col.title}>
-                <p style={{ color: '#fff', fontWeight: 700, fontSize: '0.875rem', marginBottom: '1rem' }}>{col.title}</p>
-                {col.links.map(link => (<a key={link.label} href={link.href} style={{ display: 'block', fontSize: '0.8rem', color: '#D1D1D1', textDecoration: 'none', marginBottom: '0.5rem' }}>{link.label}</a>))}
+                <p style={{ color: '#fff', fontWeight: 700, fontSize: '0.875rem', marginBottom: '0.75rem' }}>{col.title}</p>
+                {col.links.map(link => (<a key={link.label} href={link.href} style={{ display: 'block', fontSize: '0.8rem', color: '#9ca3af', textDecoration: 'none', marginBottom: '0.4rem' }}>{link.label}</a>))}
               </div>
             ))}
           </div>
-          <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: '1.5rem', marginBottom: '1.5rem', display: 'flex', flexWrap: 'wrap', gap: '1rem', justifyContent: 'center' }}>
-            {['Profesionales verificados', 'Perfiles con respaldo', 'Soporte disponible', 'Plataforma segura'].map(text => (
-              <div key={text} style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', padding: '0.4rem 0.875rem', background: 'rgba(212,175,55,0.06)', border: '1px solid rgba(212,175,55,0.15)', borderRadius: '999px' }}>
-                <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#D4AF37' }} />
-                <span style={{ fontSize: '0.72rem', color: '#D1D1D1', fontWeight: 500 }}>{text}</span>
-              </div>
-            ))}
-          </div>
-          <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: '1.5rem', display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.5rem', alignItems: 'center' }}>
-            <p style={{ fontSize: '0.75rem', color: '#666', margin: 0 }}>2025 DMS Market. Colombia. Todos los derechos reservados.</p>
+          <div style={{ borderTop: '1px solid #1f2937', paddingTop: '1.5rem', display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.5rem', alignItems: 'center' }}>
+            <p style={{ fontSize: '0.75rem', color: '#6b7280', margin: 0 }}>2025 DMS Market. Colombia. Todos los derechos reservados.</p>
             <div style={{ display: 'flex', gap: '1.5rem' }}>
-              <a href="/politicas#privacidad" style={{ fontSize: '0.75rem', color: '#666', textDecoration: 'none' }}>Privacidad</a>
-              <a href="/politicas#terminos" style={{ fontSize: '0.75rem', color: '#666', textDecoration: 'none' }}>Terminos</a>
+              <a href="/politicas#privacidad" style={{ fontSize: '0.75rem', color: '#6b7280', textDecoration: 'none' }}>Privacidad</a>
+              <a href="/politicas#terminos" style={{ fontSize: '0.75rem', color: '#6b7280', textDecoration: 'none' }}>Terminos</a>
               <a href="/auth/login" style={{ fontSize: '0.75rem', color: '#D4AF37', textDecoration: 'none', fontWeight: 600 }}>Ingresar</a>
             </div>
           </div>
