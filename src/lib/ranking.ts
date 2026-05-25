@@ -31,33 +31,39 @@ export interface RankedService {
 export async function getRankedServices(category?: string): Promise<RankedService[]> {
   const supabase = await createClient()
 
+  const { data: subs } = await supabase
+    .from('subscriptions')
+    .select('user_id, plan_type')
+    .eq('status', 'active')
+
+  const subMap: Record<string, string> = {}
+  if (subs) {
+    subs.forEach((s: any) => {
+      subMap[s.user_id] = s.plan_type
+    })
+  }
+
   let query = supabase
     .from('services')
-    .select(`
-      *,
-      subscriptions!left(plan_type, status)
-    `)
+    .select('*')
     .eq('status', 'approved')
 
   if (category && category !== 'Todos') {
     query = query.eq('category', category)
   }
 
-  const { data: services, error } = await query
+  const { data: services } = await query
 
-  if (error || !services) return []
+  if (!services || services.length === 0) return []
 
-  const enriched = services.map((s: any) => {
-    const activeSub = Array.isArray(s.subscriptions)
-      ? s.subscriptions.find((sub: any) => sub.status === 'active')
-      : s.subscriptions?.status === 'active' ? s.subscriptions : null
-
-    return {
-      ...s,
-      plan_type: activeSub?.plan_type ?? null,
-      subscriptions: undefined,
-    }
-  })
+  const enriched = services.map((s: any) => ({
+    ...s,
+    plan_type: subMap[s.provider_id] ?? null,
+    avg_rating: s.avg_rating ?? 0,
+    review_count: s.review_count ?? 0,
+    sale_count: s.sale_count ?? 0,
+    last_active_at: s.last_active_at ?? s.created_at,
+  }))
 
   return sortServicesByScore(enriched) as RankedService[]
 }
