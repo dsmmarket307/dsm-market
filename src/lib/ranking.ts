@@ -1,90 +1,152 @@
-﻿import { createClient } from '@/lib/supabase/server'
-import { sortServicesByScore } from '@/lib/service-score'
+import { createClient } from '@/lib/supabase/server'
+
+const PLAN_SCORE: Record<string, number> = {
+  premium: 100,
+  pro: 50,
+  basic: 10,
+}
 
 export interface RankedService {
   id: string
-  provider_id: string
+  user_id: string
   business_name: string
-  description: string
   category: string
+  description: string
   city: string
-  phone: string | null
-  whatsapp: string | null
-  price: string | null
-  service_image_url: string | null
-  avatar_url: string | null
-  profession: string | null
-  experience: string | null
-  status: string
+  phone: string
+  whatsapp: string
+  price: string
+  service_image_url: string
+  avatar_url: string
+  rating: number
+  review_count: number
+  sales_count: number
+  last_active_at: string
   plan_type: string | null
-  avg_rating: number | null
-  review_count: number | null
-  sale_count: number | null
-  last_active_at: string | null
-  created_at: string
-  computed_score: number
-  plan_boost: number
-  reputation_score: number
-  activity_score: number
+  score: number
+  badge: 'premium' | 'pro' | 'verified' | 'active' | null
 }
 
-export async function getRankedServices(category?: string): Promise<RankedService[]> {
+export async function getRankedServices(): Promise<RankedService[]> {
   const supabase = await createClient()
 
-  const { data: subs } = await supabase
-    .from('subscriptions')
-    .select('user_id, plan_type')
+  const { data: services, error } = await supabase
+    .from('provider_profiles')
+    .select(`
+      id,
+      user_id,
+      business_name,
+      category,
+      description,
+      city,
+      phone,
+      whatsapp,
+      price,
+      service_image_url,
+      avatar_url,
+      rating,
+      review_count,
+      sales_count,
+      last_active_at,
+      status
+    `)
     .eq('status', 'active')
 
-  const subMap: Record<string, string> = {}
-  subs?.forEach((s: any) => { subMap[s.user_id] = s.plan_type })
+  if (error || !services) return []
 
-  let query = supabase
-    .from('services')
-    .select('*')
-    .eq('status', 'approved')
+  const userIds = services.map((s: any) => s.user_id).filter(Boolean)
 
-  if (category && category !== 'Todos') {
-    query = query.eq('category', category)
+  const { data: subscriptions } = await supabase
+    .from('subscriptions')
+    .select('user_id, plan_type')
+    .in('user_id', userIds)
+    .eq('status', 'active')
+
+  const planMap: Record<string, string> = {}
+  if (subscriptions) {
+    for (const sub of subscriptions) {
+      planMap[sub.user_id] = sub.plan_type
+    }
   }
 
-  const { data: services } = await query
+  const ranked = services.map((service: any) => {
+    const plan = planMap[service.user_id] ?? null
+    const score = calculateServiceScore(service, plan)
+    const badge = getBadge(plan, service)
 
-  if (!services) return []
+    return {
+      ...service,
+      plan_type: plan,
+      score,
+      badge,
+    }
+  })
 
-  const enriched = services.map((s: any) => ({
-    ...s,
-    plan_type: subMap[s.provider_id] ?? null,
-  }))
+  ranked.sort((a: any, b: any) => b.score - a.score)
 
-  return sortServicesByScore(enriched) as RankedService[]
+  return ranked
 }
 
-export async function getFeaturedServices(limit = 6): Promise<RankedService[]> {
-  const all = await getRankedServices()
-  return all
-    .filter(s => s.plan_type === 'premium' || s.plan_type === 'pro')
-    .slice(0, limit)
+export function calculateServiceScore(service: any, plan: string | null): number {
+  let score = 0
+
+  // Plan score
+  score += PLAN_SCORE[plan ?? ''] ?? 0
+
+  // Rating score (max 50 pts)
+  const rating = parseFloat(service.rating) || 0
+  score += rating * 10
+
+  // Reviews score (max 30 pts)
+  const reviews = parseInt(service.review_count) || 0
+  score += Math.min(reviews * 2, 30)
+
+  // Sales score (max 20 pts)
+  const sales = parseInt(service.sales_count) || 0
+  score += Math.min(sales, 20)
+
+  // Actividad reciente (max 20 pts)
+  if (service.last_active_at) {
+    const daysSinceActive =
+      (Date.now() - new Date(service.last_active_at).getTime()) /
+      (1000 * 60 * 60 * 24)
+    if (daysSinceActive < 1) score += 20
+    else if (daysSinceActive < 7) score += 15
+    else if (daysSinceActive < 30) score += 8
+  }
+
+  return Math.round(score)
 }
 
-export async function updateServiceScore(serviceId: string, score: number): Promise<void> {
-  const supabase = await createClient()
-  await supabase
-    .from('services')
-    .update({ score, last_active_at: new Date().toISOString() })
-    .eq('id', serviceId)
+export function getBadge(
+  plan: string | null,
+  service: any
+): 'premium' | 'pro' | 'verified' | 'active' | null {
+  if (plan === 'premium') return 'premium'
+  if (plan === 'pro') return 'pro'
+  const rating = parseFloat(service.rating) || 0
+  const reviews = parseInt(service.review_count) || 0
+  if (rating >= 4.5 && reviews >= 5) return 'verified'
+  if (service.last_active_at) {
+    const days =
+      (Date.now() - new Date(service.last_active_at).getTime()) /
+      (1000 * 60 * 60 * 24)
+    if (days < 7) return 'active'
+  }
+  return null
 }
 
-export function groupServicesByPlan(services: RankedService[]): {
+export async function getFeaturedServices(): Promise<{
   premium: RankedService[]
   pro: RankedService[]
-  basic: RankedService[]
-  free: RankedService[]
-} {
+}> {
+  const all = await getRankedServices()
   return {
-    premium: services.filter(s => s.plan_type === 'premium'),
-    pro:     services.filter(s => s.plan_type === 'pro'),
-    basic:   services.filter(s => s.plan_type === 'basic'),
-    free:    services.filter(s => !s.plan_type),
+    premium: all.filter((s) => s.plan_type === 'premium').slice(0, 6),
+    pro: all.filter((s) => s.plan_type === 'pro').slice(0, 6),
   }
+}
+
+export function sortServicesByPriority(services: RankedService[]): RankedService[] {
+  return [...services].sort((a, b) => b.score - a.score)
 }
