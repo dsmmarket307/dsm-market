@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server'
+﻿import { createClient } from '@/lib/supabase/server'
 
 const PLAN_SCORE: Record<string, number> = {
   premium: 100,
@@ -22,6 +22,8 @@ export interface RankedService {
   review_count: number
   sales_count: number
   last_active_at: string
+  profession: string | null
+  experience: string | null
   plan_type: string | null
   score: number
   badge: 'premium' | 'pro' | 'verified' | 'active' | null
@@ -48,6 +50,8 @@ export async function getRankedServices(): Promise<RankedService[]> {
       review_count,
       sales_count,
       last_active_at,
+      profession,
+      experience,
       status
     `)
     .eq('status', 'active')
@@ -90,22 +94,17 @@ export async function getRankedServices(): Promise<RankedService[]> {
 export function calculateServiceScore(service: any, plan: string | null): number {
   let score = 0
 
-  // Plan score
   score += PLAN_SCORE[plan ?? ''] ?? 0
 
-  // Rating score (max 50 pts)
   const rating = parseFloat(service.rating) || 0
   score += rating * 10
 
-  // Reviews score (max 30 pts)
   const reviews = parseInt(service.review_count) || 0
   score += Math.min(reviews * 2, 30)
 
-  // Sales score (max 20 pts)
   const sales = parseInt(service.sales_count) || 0
   score += Math.min(sales, 20)
 
-  // Actividad reciente (max 20 pts)
   if (service.last_active_at) {
     const daysSinceActive =
       (Date.now() - new Date(service.last_active_at).getTime()) /
