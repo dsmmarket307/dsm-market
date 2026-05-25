@@ -1,58 +1,37 @@
-﻿export interface ServiceForScore {
-  id: string
-  provider_id: string
-  plan_type: string | null
-  avg_rating: number | null
-  review_count: number | null
-  sale_count: number | null
-  last_active_at: string | null
-  created_at: string | null
-}
-
-export interface ScoredService extends ServiceForScore {
-  computed_score: number
-  plan_boost: number
-  reputation_score: number
-  activity_score: number
-}
-
 const PLAN_BOOST: Record<string, number> = {
   premium: 100,
   pro: 50,
-  basic: 20,
+  basic: 10,
 }
 
-export function calculateServiceScore(service: ServiceForScore): ScoredService {
-  const planBoost = PLAN_BOOST[service.plan_type ?? ''] ?? 0
+export function sortServicesByScore(services: any[]): any[] {
+  const scored = services.map((s) => {
+    const plan_boost = PLAN_BOOST[s.plan_type ?? ''] ?? 0
+    const reputation_score =
+      (parseFloat(s.avg_rating) || 0) * 10 +
+      Math.min((parseInt(s.review_count) || 0) * 2, 30)
+    const activity_score = getActivityScore(s.last_active_at)
+    const sale_score = Math.min(parseInt(s.sale_count) || 0, 20)
+    const computed_score = plan_boost + reputation_score + activity_score + sale_score
 
-  const rating = Math.min(service.avg_rating ?? 0, 5)
-  const reviews = Math.min(service.review_count ?? 0, 100)
-  const sales = Math.min(service.sale_count ?? 0, 200)
-  const reputationScore = (rating / 5) * 30 + (reviews / 100) * 20 + (sales / 200) * 20
+    return {
+      ...s,
+      computed_score,
+      plan_boost,
+      reputation_score,
+      activity_score,
+    }
+  })
 
-  const now = Date.now()
-  const lastActive = service.last_active_at
-    ? new Date(service.last_active_at).getTime()
-    : service.created_at
-    ? new Date(service.created_at).getTime()
-    : now
-
-  const daysSinceActive = Math.max(0, (now - lastActive) / (1000 * 60 * 60 * 24))
-  const activityScore = Math.max(0, 30 - daysSinceActive * 0.5)
-
-  const computedScore = planBoost + reputationScore + activityScore
-
-  return {
-    ...service,
-    computed_score: Math.round(computedScore * 100) / 100,
-    plan_boost: planBoost,
-    reputation_score: Math.round(reputationScore * 100) / 100,
-    activity_score: Math.round(activityScore * 100) / 100,
-  }
+  return scored.sort((a, b) => b.computed_score - a.computed_score)
 }
 
-export function sortServicesByScore<T extends ServiceForScore>(services: T[]): (T & ScoredService)[] {
-  return services
-    .map(s => ({ ...s, ...calculateServiceScore(s) }))
-    .sort((a, b) => b.computed_score - a.computed_score)
+function getActivityScore(last_active_at: string | null): number {
+  if (!last_active_at) return 0
+  const days =
+    (Date.now() - new Date(last_active_at).getTime()) / (1000 * 60 * 60 * 24)
+  if (days < 1) return 20
+  if (days < 7) return 15
+  if (days < 30) return 8
+  return 0
 }
