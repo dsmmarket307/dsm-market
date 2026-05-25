@@ -2,7 +2,7 @@
 import { createClient } from '@/lib/supabase/server'
 import ServiciosClient from './ServiciosClient'
 
-export const revalidate = 60
+export const revalidate = 0
 
 export default async function ServiciosPage() {
   const supabase = await createClient()
@@ -36,3 +36,4 @@ export default async function ServiciosPage() {
     />
   )
 }
+
