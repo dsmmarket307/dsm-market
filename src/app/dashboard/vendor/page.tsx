@@ -18,7 +18,7 @@ export default async function VendorDashboard() {
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   )
 
-  const { data: profile } = await admin.from("profiles").select("seller_status").eq("id", user.id).single()
+  const { data: profile } = await admin.from("profiles").select("seller_status, documento_url, politicas_aceptadas").eq("id", user.id).single()
   const { data: products } = await admin.from("products").select("id, name, category, price, status").eq("seller_id", user.id).order("created_at", { ascending: false })
   const productIds = products?.map(p => p.id) ?? []
   const { data: images } = productIds.length > 0 ? await admin.from("product_images").select("product_id, url, position").in("product_id", productIds).order("position", { ascending: true }) : { data: [] }
@@ -29,6 +29,7 @@ export default async function VendorDashboard() {
   const pending  = products?.filter(p => p.status === "pending").length ?? 0
   const rejected = products?.filter(p => p.status === "rejected").length ?? 0
   const isApproved = profile?.seller_status === "approved"
+  const tieneDocumento = !!profile?.documento_url
   const totalVentas = orders?.filter(o => o.status !== "cancelled").reduce((acc, o) => acc + Number(o.seller_earnings), 0) ?? 0
   const ordenesPendientes = orders?.filter(o => o.status === "paid" || o.status === "processing").length ?? 0
   const saldoPendiente = payouts?.filter(p => p.status === "held").reduce((acc, p) => acc + Number(p.amount), 0) ?? 0
@@ -96,6 +97,26 @@ export default async function VendorDashboard() {
             </div>
           </div>
 
+          {/* BANNER DOCUMENTO REQUERIDO */}
+          {!tieneDocumento && (
+            <div style={{ background: '#1a0a0a', border: '1px solid rgba(239,68,68,0.4)', borderLeft: '4px solid #ef4444', borderRadius: '12px', padding: '1.25rem 1.5rem', marginBottom: '1.25rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem' }}>
+                <div>
+                  <p style={{ fontSize: 15, color: '#ef4444', fontWeight: 700, marginBottom: 4, fontFamily: "'Poppins',sans-serif" }}>Documento de identidad requerido</p>
+                  <p style={{ fontSize: 13, color: '#888', marginBottom: 10, fontFamily: "'Poppins',sans-serif" }}>Sube tu documento para que el administrador pueda aprobar tu cuenta y puedas publicar productos.</p>
+                  <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                    <span style={{ fontSize: 11, background: 'rgba(239,68,68,0.15)', color: '#ef4444', padding: '3px 10px', borderRadius: '999px', fontWeight: 600 }}>1. Subir documento</span>
+                    <span style={{ fontSize: 11, background: 'rgba(212,175,55,0.1)', color: '#D4AF37', padding: '3px 10px', borderRadius: '999px', fontWeight: 600 }}>2. Revision admin</span>
+                    <span style={{ fontSize: 11, background: 'rgba(29,158,117,0.1)', color: '#1D9E75', padding: '3px 10px', borderRadius: '999px', fontWeight: 600 }}>3. Publicar productos</span>
+                  </div>
+                </div>
+                <Link href="/dashboard/vendor/verificacion" style={{ background: '#ef4444', color: '#fff', padding: '10px 20px', borderRadius: '10px', textDecoration: 'none', fontSize: 13, fontWeight: 700, whiteSpace: 'nowrap', fontFamily: "'Poppins',sans-serif" }}>
+                  Subir documento
+                </Link>
+              </div>
+            </div>
+          )}
+
           {/* ALERTA GUIA */}
           {ordenesNecesitanGuia > 0 && (
             <div className="vd-alert-red">
@@ -108,20 +129,20 @@ export default async function VendorDashboard() {
           )}
 
           {/* ALERTA PENDIENTE */}
-          {!isApproved && (
+          {tieneDocumento && !isApproved && (
             <div className="vd-alert-yellow">
-              <p style={{ fontSize: 14, color: "#D4AF37", fontWeight: 600, marginBottom: 4, fontFamily: "'Poppins',sans-serif" }}>Cuenta pendiente de aprobacion</p>
-              <p style={{ fontSize: 13, color: "#888", fontFamily: "'Poppins',sans-serif" }}>El admin debe aprobar tu perfil antes de publicar productos.</p>
+              <p style={{ fontSize: 14, color: "#D4AF37", fontWeight: 600, marginBottom: 4, fontFamily: "'Poppins',sans-serif" }}>Documento recibido - Cuenta pendiente de aprobacion</p>
+              <p style={{ fontSize: 13, color: "#888", fontFamily: "'Poppins',sans-serif" }}>El admin esta revisando tu documento. Te notificaremos cuando tu cuenta este aprobada.</p>
             </div>
           )}
 
           {/* METRICAS VENTAS */}
           <div className="vd-metrics">
             {[
-              { label: "Total ventas",      value: "$" + totalVentas.toLocaleString("es-CO"),       color: "#1D9E75" },
-              { label: "Ordenes",           value: totalOrdenes,                                     color: "#D4AF37" },
-              { label: "Pendientes envio",  value: ordenesPendientes,                               color: "#f59e0b" },
-              { label: "Saldo retenido",    value: "$" + saldoPendiente.toLocaleString("es-CO"),    color: "#a78bfa" },
+              { label: "Total ventas",      value: "$" + totalVentas.toLocaleString("es-CO"),    color: "#1D9E75" },
+              { label: "Ordenes",           value: totalOrdenes,                                  color: "#D4AF37" },
+              { label: "Pendientes envio",  value: ordenesPendientes,                            color: "#f59e0b" },
+              { label: "Saldo retenido",    value: "$" + saldoPendiente.toLocaleString("es-CO"), color: "#a78bfa" },
             ].map(item => (
               <div key={item.label} className="vd-metric">
                 <p className="vd-metric-label">{item.label}</p>
@@ -230,13 +251,10 @@ export default async function VendorDashboard() {
             )}
           </div>
 
-                  <AlertasVendedor />
+          <AlertasVendedor />
           <ReporteIA type="vendor" />
         </div>
       </div>
     </>
   )
 }
-
-
-
