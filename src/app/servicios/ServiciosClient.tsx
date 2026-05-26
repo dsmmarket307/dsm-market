@@ -206,13 +206,13 @@ export default function ServiciosClient({ services, banners, user, profile }: Pr
     <div style={{ minHeight: '100vh', background: '#f9fafb', fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif', color: '#111' }}>
 
       {/* NAV */}
-      <nav style={{ position: 'sticky', top: 0, zIndex: 100, background: '#fff', borderBottom: '1px solid #e5e7eb', padding: '0 clamp(1rem, 4vw, 2rem)', height: '64px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+      <nav style={{ position: 'sticky', top: 0, zIndex: 100, background: '#0B0B0B', borderBottom: '1px solid rgba(212,175,55,0.15)', padding: '0 clamp(1rem, 4vw, 2rem)', height: '64px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
         <a href="/" style={{ textDecoration: 'none', flexShrink: 0 }}>
           <img src={LOGO} alt="DMS Market" style={{ height: '44px', objectFit: 'contain' }} />
         </a>
-        <div style={{ flex: 1, maxWidth: '520px', display: 'flex', background: '#f9fafb', border: '1.5px solid #e5e7eb', borderRadius: '10px', overflow: 'hidden' }}>
+        <div style={{ flex: 1, maxWidth: '520px', display: 'flex', background: '#1a1a1a', border: '1.5px solid rgba(212,175,55,0.2)', borderRadius: '10px', overflow: 'hidden' }}>
           <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Buscar servicios, habilidades o proveedores..."
-            style={{ flex: 1, padding: '0.625rem 1rem', border: 'none', fontSize: '0.875rem', outline: 'none', background: 'transparent', color: '#111' }} />
+            style={{ flex: 1, padding: '0.625rem 1rem', border: 'none', fontSize: '0.875rem', outline: 'none', background: 'transparent', color: '#fff' }} />
           <button style={{ padding: '0.625rem 1rem', background: '#D4AF37', color: '#fff', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
           </button>
@@ -431,4 +431,5 @@ export default function ServiciosClient({ services, banners, user, profile }: Pr
     </div>
   )
 }
+
 
