@@ -386,8 +386,8 @@ export default function ServiciosClient({ services, banners, user, profile }: Pr
             { title: 'Soporte 24/7', desc: 'Estamos aqui para ayudarte en todo momento', color: '#8b5cf6', icon: 'M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z' },
           ].map(b => (
             <div key={b.title} style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start' }}>
-              <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: b.color + '15', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={b.color} strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d={b.icon} /></svg>
+              <div style={{ width: '52px', height: '52px', borderRadius: '12px', background: b.color + '15', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke={b.color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d={b.icon} /></svg>
               </div>
               <div>
                 <p style={{ fontSize: '0.875rem', fontWeight: 700, color: '#111', marginBottom: '0.25rem' }}>{b.title}</p>
@@ -431,6 +431,7 @@ export default function ServiciosClient({ services, banners, user, profile }: Pr
     </div>
   )
 }
+
 
 
 
