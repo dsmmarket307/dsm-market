@@ -1,11 +1,11 @@
-﻿import { createClient } from '@/lib/supabase/server'
+﻿import { createClient as createAdmin } from '@supabase/supabase-js'
+import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import AdminSubscriptionsClient from './AdminSubscriptionsClient'
 
 export default async function AdminSubscriptionsPage() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-
   if (!user) redirect('/auth/login')
 
   const { data: profile } = await supabase
@@ -13,14 +13,18 @@ export default async function AdminSubscriptionsPage() {
     .select('role')
     .eq('id', user.id)
     .single()
-
   if (profile?.role !== 'admin') redirect('/dashboard')
 
-  const { data: summary } = await supabase
+  const admin = createAdmin(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  )
+
+  const { data: summary } = await admin
     .from('admin_subscription_summary')
     .select('*')
 
-  const { data: payments } = await supabase
+  const { data: payments } = await admin
     .from('payment_history')
     .select('*')
     .order('created_at', { ascending: false })
@@ -33,7 +37,7 @@ export default async function AdminSubscriptionsPage() {
 
   const mrr = summary
     ?.filter(s => s.provider_status === 'subscribed' && s.plan_type)
-    .reduce((acc, s) => {
+    .reduce((acc: number, s: any) => {
       const prices: Record<string, number> = { basic: 29900, pro: 59900, premium: 99900 }
       const amount = s.billing_cycle === 'annual'
         ? (prices[s.plan_type] * 12 * 0.8) / 12
@@ -41,7 +45,7 @@ export default async function AdminSubscriptionsPage() {
       return acc + amount
     }, 0) || 0
 
-  const expiringIn7Days = summary?.filter(s => {
+  const expiringIn7Days = summary?.filter((s: any) => {
     if (!s.subscription_expires) return false
     const exp = new Date(s.subscription_expires)
     const now = new Date()
