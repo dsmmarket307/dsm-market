@@ -1,4 +1,4 @@
-ï»¿import { notFound } from "next/navigation"
+import { notFound } from "next/navigation"
 import { createClient } from "@supabase/supabase-js"
 
 export default async function ServiceDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -41,10 +41,10 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
   const memberSince = new Date(service.created_at).toLocaleDateString("es-CO", { month: "short", year: "numeric" })
   const benefits = [
     "Compra y venta de propiedades",
-    "InversiÃ³n inmobiliaria",
-    "AvalÃºos y asesorÃ­a",
-    "GestiÃ³n de proyectos",
-    "ConsultorÃ­a personalizada",
+    "Inversión inmobiliaria",
+    "Avalúos y asesoría",
+    "Gestión de proyectos",
+    "Consultoría personalizada",
   ]
 
   return (
@@ -665,9 +665,9 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
               </svg>
               Servicios
             </a>
-            <span className="bc-sep">â€º</span>
+            <span className="bc-sep">›</span>
             <span>{service.category}</span>
-            <span className="bc-sep">â€º</span>
+            <span className="bc-sep">›</span>
             <span className="bc-cur">{service.business_name}</span>
           </div>
         </nav>
@@ -704,16 +704,16 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
 
             <h1 className="sd-title">{service.business_name}</h1>
             <p className="sd-subtitle">
-              {service.description?.slice(0, 180)}{service.description?.length > 180 ? "â€¦" : ""}
+              {service.description?.slice(0, 180)}{service.description?.length > 180 ? "…" : ""}
             </p>
 
             <div className="sd-meta">
               {reviewCount > 0 && (
                 <>
                   <div className="sd-meta-item">
-                    <span className="sd-meta-stars">{"â˜…".repeat(Math.floor(rating))}{"â˜†".repeat(5 - Math.floor(rating))}</span>
+                    <span className="sd-meta-stars">{"?".repeat(Math.floor(rating))}{"?".repeat(5 - Math.floor(rating))}</span>
                     <span className="sd-meta-score">{Number(rating).toFixed(1)}</span>
-                    <span className="sd-meta-count">({reviewCount} reseÃ±as)</span>
+                    <span className="sd-meta-count">({reviewCount} reseñas)</span>
                   </div>
                   <div className="sd-divider" />
                 </>
@@ -757,8 +757,7 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
             <div className="sd-img-wrap">
               <img
                 src={imageUrl}
-                alt={service.business_name}
-                onError={(e: any) => { e.target.src = "https://images.unsplash.com/photo-1486325212027-8081e485255e?w=1400&q=85" }}
+                alt={service.business_name}}
               />
               <div className="sd-img-overlay" />
               {(isPremium || isPro) && (
@@ -783,9 +782,9 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
             <div className="sd-card">
               <div className="sd-card-body">
                 <div className="sd-gold-line" />
-                <p className="sd-sec-title">DescripciÃ³n del servicio</p>
+                <p className="sd-sec-title">Descripción del servicio</p>
                 <p className="sd-desc">
-                  {service.description || "Este proveedor ofrece servicios de alta calidad. ContÃ¡ctanos para conocer mÃ¡s detalles."}
+                  {service.description || "Este proveedor ofrece servicios de alta calidad. Contáctanos para conocer más detalles."}
                 </p>
                 <p className="sd-spec-label">Especialistas en</p>
                 <div className="sd-benefits">
@@ -804,7 +803,7 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
                   </div>
                   <p className="sd-commit-text">
                     <strong>Nuestro compromiso:</strong> brindarte seguridad, transparencia y las mejores oportunidades
-                    con acompaÃ±amiento personalizado y atenciÃ³n confiable en cada etapa del proceso.
+                    con acompañamiento personalizado y atención confiable en cada etapa del proceso.
                   </p>
                 </div>
               </div>
@@ -813,7 +812,7 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
             <div className="sd-card">
               <div className="sd-card-body">
                 <div className="sd-gold-line" />
-                <p className="sd-sec-title">Â¿Por quÃ© elegir DMS Market?</p>
+                <p className="sd-sec-title">¿Por qué elegir DMS Market?</p>
                 <div className="sd-trust-grid">
                   <div className="sd-trust-item">
                     <div className="sd-trust-icon" style={{background:"#EFF6FF"}}>
@@ -846,7 +845,7 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
                     </div>
                     <div>
                       <div className="sd-trust-label">Calidad garantizada</div>
-                      <div className="sd-trust-desc">SatisfacciÃ³n asegurada</div>
+                      <div className="sd-trust-desc">Satisfacción asegurada</div>
                     </div>
                   </div>
                   <div className="sd-trust-item">
@@ -875,12 +874,11 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
                         <img
                           className="sd-rel-img"
                           src={r.service_image_url || "https://images.unsplash.com/photo-1486325212027-8081e485255e?w=400&q=70"}
-                          alt={r.business_name}
-                          onError={(e: any) => { e.target.src = "https://images.unsplash.com/photo-1486325212027-8081e485255e?w=400&q=70" }}
+                          alt={r.business_name}}
                         />
                         <div className="sd-rel-info">
                           <div className="sd-rel-name">{r.business_name}</div>
-                          {r.avg_rating && <div className="sd-rel-stars">{"â˜…".repeat(Math.floor(r.avg_rating))} {Number(r.avg_rating).toFixed(1)}</div>}
+                          {r.avg_rating && <div className="sd-rel-stars">{"?".repeat(Math.floor(r.avg_rating))} {Number(r.avg_rating).toFixed(1)}</div>}
                           {r.price && <div className="sd-rel-price">Desde {r.price}</div>}
                         </div>
                       </a>
@@ -901,7 +899,7 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>
                   </svg>
-                  Precio estimado segÃºn alcance del proyecto
+                  Precio estimado según alcance del proyecto
                 </div>
               </div>
 
@@ -920,7 +918,7 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
                     <line x1="16" y1="13" x2="8" y2="13"/>
                     <line x1="16" y1="17" x2="8" y2="17"/>
                   </svg>
-                  Solicitar cotizaciÃ³n
+                  Solicitar cotización
                 </button>
                 <div className="sd-btn-row">
                   <button className="sd-btn-sm">
@@ -954,7 +952,7 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
                   </div>
                   <div>
                     <div className="sd-prov-name">{service.business_name}</div>
-                    <div className="sd-prov-stars">{"â˜…".repeat(Math.floor(rating))} {Number(rating).toFixed(1)} ({reviewCount} reseÃ±as)</div>
+                    <div className="sd-prov-stars">{"?".repeat(Math.floor(rating))} {Number(rating).toFixed(1)} ({reviewCount} reseñas)</div>
                   </div>
                 </div>
                 <div className="sd-stats">
@@ -984,19 +982,19 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
                       </svg>
                       Proyectos completados
                     </span>
-                    <span className="sd-stat-value">{saleCount > 0 ? saleCount : "â€”"}</span>
+                    <span className="sd-stat-value">{saleCount > 0 ? saleCount : "—"}</span>
                   </div>
                   <div className="sd-stat-row">
                     <span className="sd-stat-label">
                       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                         <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
                       </svg>
-                      SatisfacciÃ³n del cliente
+                      Satisfacción del cliente
                     </span>
                     <span className="sd-stat-value">98%</span>
                   </div>
                 </div>
-                <button className="sd-btn-profile">Ver perfil del proveedor â†’</button>
+                <button className="sd-btn-profile">Ver perfil del proveedor ?</button>
               </div>
 
               <div className="sd-trust-sidebar">
@@ -1006,7 +1004,7 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                       <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
                     </svg>
-                    Tu pago estÃ¡ protegido con DMS Market
+                    Tu pago está protegido con DMS Market
                   </div>
                   <div className="sd-trust-sb-item">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -1024,7 +1022,7 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                       <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
                     </svg>
-                    GarantÃ­a de satisfacciÃ³n DMS
+                    Garantía de satisfacción DMS
                   </div>
                 </div>
               </div>
