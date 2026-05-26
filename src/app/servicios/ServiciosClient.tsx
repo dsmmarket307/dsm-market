@@ -110,7 +110,7 @@ function PremiumCard({ service }: { service: RankedService }) {
             <p style={{ fontSize: '0.65rem', color: '#9ca3af', margin: 0 }}>Desde</p>
             <p style={{ fontSize: '0.95rem', fontWeight: 800, color: '#92400e', margin: 0 }}>{service.price ?? 'Consultar'}</p>
           </div>
-          <a href={waUrl} target="_blank" rel="noopener noreferrer"
+          <a href={`/servicios/${service.id}`}
             style={{ background: '#D4AF37', color: '#fff', padding: '7px 14px', borderRadius: '8px', fontSize: '0.78rem', fontWeight: 700, textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '4px' }}>
             Ver servicio
             <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
@@ -160,7 +160,7 @@ function ProCard({ service }: { service: RankedService }) {
             <p style={{ fontSize: '0.62rem', color: '#9ca3af', margin: 0 }}>Respuesta</p>
             <p style={{ fontSize: '0.75rem', fontWeight: 700, color: '#374151', margin: 0 }}>24h</p>
           </div>
-          <a href={waUrl} target="_blank" rel="noopener noreferrer"
+          <a href={`/servicios/${service.id}`}
             style={{ background: '#3b82f6', color: '#fff', padding: '6px 12px', borderRadius: '7px', fontSize: '0.75rem', fontWeight: 700, textDecoration: 'none' }}>
             Ver servicio
           </a>
@@ -208,7 +208,7 @@ function NormalCard({ service }: { service: RankedService }) {
         <p style={{ fontSize: '0.75rem', color: '#6b7280', lineHeight: 1.5, margin: '0.4rem 0', overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>{service.description}</p>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: '0.5rem', borderTop: '1px solid #f3f4f6' }}>
           <p style={{ fontSize: '0.88rem', fontWeight: 800, color: '#111', margin: 0 }}>{service.price ?? 'Consultar'}</p>
-          <a href={waUrl} target="_blank" rel="noopener noreferrer"
+          <a href={`/servicios/${service.id}`}
             style={{ background: '#111', color: '#fff', padding: '6px 12px', borderRadius: '7px', fontSize: '0.72rem', fontWeight: 700, textDecoration: 'none' }}>
             Ver servicio
           </a>
@@ -557,3 +557,4 @@ export default function ServiciosClient({ services, banners, user, profile }: Pr
     </div>
   )
 }
+
