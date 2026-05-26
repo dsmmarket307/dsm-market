@@ -20,9 +20,12 @@ export default async function AdminSubscriptionsPage() {
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   )
 
-  const { data: summary } = await admin
+  const { data: summary, error: summaryError } = await admin
     .from('admin_subscription_summary')
     .select('*')
+
+  console.log('SUMMARY:', JSON.stringify(summary))
+  console.log('SUMMARY ERROR:', JSON.stringify(summaryError))
 
   const { data: payments } = await admin
     .from('payment_history')
@@ -31,12 +34,12 @@ export default async function AdminSubscriptionsPage() {
     .limit(20)
 
   const totalProviders = summary?.length || 0
-  const activeSubscriptions = summary?.filter(s => s.provider_status === 'subscribed').length || 0
-  const activeTrial = summary?.filter(s => s.provider_status === 'trial').length || 0
-  const expired = summary?.filter(s => s.provider_status === 'trial_expired' || s.provider_status === 'no_plan').length || 0
+  const activeSubscriptions = summary?.filter((s:any) => s.provider_status === 'subscribed').length || 0
+  const activeTrial = summary?.filter((s:any) => s.provider_status === 'trial').length || 0
+  const expired = summary?.filter((s:any) => s.provider_status === 'trial_expired' || s.provider_status === 'no_plan').length || 0
 
   const mrr = summary
-    ?.filter(s => s.provider_status === 'subscribed' && s.plan_type)
+    ?.filter((s:any) => s.provider_status === 'subscribed' && s.plan_type)
     .reduce((acc: number, s: any) => {
       const prices: Record<string, number> = { basic: 29900, pro: 59900, premium: 99900 }
       const amount = s.billing_cycle === 'annual'
