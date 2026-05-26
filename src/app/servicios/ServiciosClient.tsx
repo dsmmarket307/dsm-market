@@ -206,7 +206,7 @@ export default function ServiciosClient({ services, banners, user, profile }: Pr
     <div style={{ minHeight: '100vh', background: '#f9fafb', fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif', color: '#111' }}>
 
       {/* NAV */}
-      <nav style={{ position: 'sticky', top: 0, zIndex: 100, background: '#0B0B0B', borderBottom: '1px solid rgba(212,175,55,0.15)', padding: '0 clamp(1rem, 4vw, 2rem)', height: '64px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+      <nav style={{ position: 'relative', zIndex: 10, background: '#0B0B0B', borderBottom: '1px solid rgba(212,175,55,0.15)', padding: '0 clamp(1rem, 4vw, 2rem)', height: '64px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
         <a href="/" style={{ textDecoration: 'none', flexShrink: 0 }}>
           <img src={LOGO} alt="DMS Market" style={{ height: '44px', objectFit: 'contain' }} />
         </a>
@@ -236,7 +236,7 @@ export default function ServiciosClient({ services, banners, user, profile }: Pr
           {banners.map((banner, i) => (
             <div key={banner.id} style={{ position: 'absolute', inset: 0, transition: 'opacity 0.8s ease', opacity: i === currentSlide ? 1 : 0, overflow: 'hidden' }}>
               {banner.image_url && <img src={banner.image_url} alt={banner.title} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />}
-              <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.2) 60%, transparent 100%)' }} />
+              <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.3) 0%, transparent 60%)' }} />
               <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 'clamp(1.5rem, 6vw, 5rem)', textAlign: 'center', zIndex: 1 }}>
                 <p style={{ color: '#D4AF37', fontSize: '0.65rem', letterSpacing: '4px', textTransform: 'uppercase', marginBottom: '0.75rem', fontWeight: 600 }}>DMS Market - Servicios</p>
                 {banner.title && <h2 style={{ color: '#fff', fontSize: 'clamp(1.25rem, 3.5vw, 2.5rem)', fontWeight: 800, marginBottom: '0.75rem', lineHeight: 1.2, maxWidth: '700px' }}>{banner.title}</h2>}
@@ -380,14 +380,14 @@ export default function ServiciosClient({ services, banners, user, profile }: Pr
       <div style={{ background: '#fff', borderTop: '1px solid #e5e7eb', padding: 'clamp(2rem, 4vw, 3rem) clamp(1rem, 4vw, 2rem)', marginTop: '1rem' }}>
         <div style={{ maxWidth: '1280px', margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '2rem' }}>
           {[
-            { title: 'Proveedores Verificados', desc: 'Todos nuestros proveedores pasan por un proceso de verificacion', color: '#3b82f6' },
-            { title: 'Pago Seguro', desc: 'Tu dinero esta protegido con nuestro sistema de seguridad', color: '#10b981' },
-            { title: 'Calidad Garantizada', desc: 'Trabajos de calidad o te devolvemos tu dinero', color: '#D4AF37' },
-            { title: 'Soporte 24/7', desc: 'Estamos aqui para ayudarte en todo momento', color: '#8b5cf6' },
+            { title: 'Proveedores Verificados', desc: 'Todos nuestros proveedores pasan por un proceso de verificacion', color: '#3b82f6', icon: 'M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z' },
+            { title: 'Pago Seguro', desc: 'Tu dinero esta protegido con nuestro sistema de seguridad', color: '#10b981', icon: 'M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z' },
+            { title: 'Calidad Garantizada', desc: 'Trabajos de calidad o te devolvemos tu dinero', color: '#D4AF37', icon: 'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z' },
+            { title: 'Soporte 24/7', desc: 'Estamos aqui para ayudarte en todo momento', color: '#8b5cf6', icon: 'M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z' },
           ].map(b => (
             <div key={b.title} style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start' }}>
               <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: b.color + '15', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: b.color }} />
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={b.color} strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d={b.icon} /></svg>
               </div>
               <div>
                 <p style={{ fontSize: '0.875rem', fontWeight: 700, color: '#111', marginBottom: '0.25rem' }}>{b.title}</p>
@@ -431,5 +431,6 @@ export default function ServiciosClient({ services, banners, user, profile }: Pr
     </div>
   )
 }
+
 
 
