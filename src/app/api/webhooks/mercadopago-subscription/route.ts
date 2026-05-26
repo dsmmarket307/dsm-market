@@ -1,100 +1,78 @@
-﻿import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
-import type { PlanType, BillingCycle } from '@/types'
-import { PLAN_LIMITS } from '@/types'
+﻿import { NextRequest, NextResponse } from "next/server"
+import { createClient } from "@supabase/supabase-js"
 
-export async function POST(request: NextRequest) {
+function getAdmin() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  )
+}
+
+export async function POST(req: NextRequest) {
   try {
-    const body = await request.json()
-    const topic = body.type || body.topic
-    const resourceId = body.data?.id || body.id
+    const body = await req.json()
+    const topic = body.topic || body.type
+    const resourceId = body.id || body.data?.id
+    if (topic !== "payment" || !resourceId) return NextResponse.json({ ok: true })
 
-    if (!topic || !resourceId) {
-      return NextResponse.json({ received: true }, { status: 200 })
-    }
+    const mpRes = await fetch("https://api.mercadopago.com/v1/payments/" + resourceId, {
+      headers: { Authorization: "Bearer " + process.env.MERCADOPAGO_ACCESS_TOKEN },
+    })
+    if (!mpRes.ok) return NextResponse.json({ ok: true })
+    const payment = await mpRes.json()
+    if (payment.status !== "approved") return NextResponse.json({ ok: true })
 
-    if (topic !== 'payment') {
-      return NextResponse.json({ received: true }, { status: 200 })
-    }
+    const externalRef = payment.external_reference
+    if (!externalRef) return NextResponse.json({ ok: true })
 
-    const paymentResponse = await fetch(
-      `https://api.mercadopago.com/v1/payments/${resourceId}`,
-      {
-        headers: {
-          Authorization: `Bearer ${process.env.MERCADOPAGO_ACCESS_TOKEN}`,
-        },
-      }
-    )
+    const parts = externalRef.split("|")
+    if (parts.length < 3) return NextResponse.json({ ok: true })
 
-    if (!paymentResponse.ok) {
-      return NextResponse.json({ error: 'Error fetching payment' }, { status: 400 })
-    }
+    const [userId, planType, billingCycle] = parts
+    const amount = payment.transaction_amount
 
-    const payment = await paymentResponse.json()
+    const admin = getAdmin()
 
-    if (payment.status !== 'approved') {
-      return NextResponse.json({ received: true }, { status: 200 })
-    }
-
-    const externalReference = payment.external_reference
-    if (!externalReference) {
-      return NextResponse.json({ error: 'No external reference' }, { status: 400 })
-    }
-
-    const parts = externalReference.split('|')
-    if (parts.length !== 3) {
-      return NextResponse.json({ error: 'Invalid external reference' }, { status: 400 })
-    }
-
-    const [userId, planType, billingCycle] = parts as [string, PlanType, BillingCycle]
-    const limits = PLAN_LIMITS[planType]
-    const amount = billingCycle === 'annual' ? limits.price_annual : limits.price_monthly
-    const daysToAdd = billingCycle === 'annual' ? 365 : 30
+    const daysToAdd = billingCycle === "annual" ? 365 : 30
     const expiresAt = new Date(Date.now() + daysToAdd * 24 * 60 * 60 * 1000)
 
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
-    )
+    await admin
+      .from("subscriptions")
+      .update({ status: "expired" })
+      .eq("user_id", userId)
+      .eq("status", "active")
 
-    await supabase
-      .from('subscriptions')
-      .update({ status: 'expired' })
-      .eq('user_id', userId)
-      .eq('status', 'active')
-
-    const { error: subError } = await supabase.from('subscriptions').insert({
+    await admin.from("subscriptions").insert({
       user_id: userId,
       plan_type: planType,
       billing_cycle: billingCycle,
-      status: 'active',
+      status: "active",
       starts_at: new Date().toISOString(),
       expires_at: expiresAt.toISOString(),
     })
 
-    if (subError) {
-      return NextResponse.json({ error: subError.message }, { status: 500 })
-    }
-
-    await supabase.from('payment_history').insert({
+    await admin.from("payment_history").insert({
       user_id: userId,
       plan: planType,
       amount,
       billing_cycle: billingCycle,
-      payment_provider: 'mercadopago',
-      payment_status: 'approved',
+      payment_provider: "mercadopago",
+      payment_status: "approved",
       transaction_id: String(payment.id),
-      mp_preference_id: payment.order?.id ? String(payment.order.id) : '',
+      mp_preference_id: payment.preference_id,
     })
 
-    await supabase
-      .from('trial_periods')
+    await admin
+      .from("trial_periods")
       .update({ active: false })
-      .eq('user_id', userId)
+      .eq("user_id", userId)
 
-    return NextResponse.json({ success: true }, { status: 200 })
-  } catch (err) {
-    console.error('Webhook error:', err)
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    return NextResponse.json({ ok: true })
+  } catch (err: any) {
+    return NextResponse.json({ error: err.message }, { status: 500 })
   }
+}
+
+export async function GET() {
+  return NextResponse.json({ ok: true })
 }
