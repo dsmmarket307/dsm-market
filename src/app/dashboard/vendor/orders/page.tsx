@@ -25,16 +25,21 @@ export default async function VendorOrdersPage() {
 
   const { data: orders } = await admin
     .from("orders")
-    .select("*, products(id, name, price, category), product_images(url, position)")
+    .select("*, products(id, name, price, category)")
     .eq("seller_id", user.id)
     .order("created_at", { ascending: false })
 
-  const enriched = (orders || []).map((order: any) => {
-    const imgs = Array.isArray(order.product_images)
-      ? order.product_images.sort((a: any, b: any) => a.position - b.position)
-      : []
-    return { ...order, mainImage: imgs[0]?.url || null }
-  })
+  const productIds = (orders || []).map((o: any) => o.product_id).filter(Boolean)
+  const { data: allImages } = productIds.length > 0
+    ? await admin.from("product_images").select("product_id, url, position").in("product_id", productIds).eq("position", 1)
+    : { data: [] }
+
+  const imageMap: Record<string, string> = {}
+  ;(allImages || []).forEach((img: any) => { imageMap[img.product_id] = img.url })
+  const enriched = (orders || []).map((order: any) => ({
+    ...order,
+    mainImage: order.product_id ? imageMap[order.product_id] || null : null
+  }))
 
   const css = `
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
@@ -202,5 +207,7 @@ export default async function VendorOrdersPage() {
     </>
   )
 }
+
+
 
 
