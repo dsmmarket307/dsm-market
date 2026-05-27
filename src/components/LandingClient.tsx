@@ -275,7 +275,7 @@ export default function LandingClient({ products, images, banners }: any) {
         <div style={{ maxWidth: '1100px', margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '2rem' }}>
           <div style={{ textAlign: 'center', padding: '2.5rem 2rem', border: '1px solid rgba(212,175,55,0.3)', borderRadius: '20px', background: 'rgba(212,175,55,0.04)' }}>
             <p style={{ color: '#D4AF37', fontSize: '0.65rem', letterSpacing: '4px', textTransform: 'uppercase', marginBottom: '1rem', fontWeight: 600 }}>Para vendedores</p>
-            <h2 style={{ fontSize: 'clamp(1.25rem, 3vw, 1.75rem)', fontWeight: 700, color: '#fff', marginBottom: '1rem' }}>Vende productos en DSM</h2>
+            <h2 style={{ fontSize: 'clamp(1.25rem, 3vw, 1.75rem)', fontWeight: 700, color: '#fff', marginBottom: '1rem' }}>Vende productos en DMS</h2>
             <p style={{ fontSize: '0.875rem', color: 'rgba(255,255,255,0.5)', marginBottom: '2rem', lineHeight: 1.7 }}>Solo 5% de comision por venta. Sin mensualidades. Pagos protegidos con escrow.</p>
             <a href="/auth/register" style={{ display: 'inline-block', background: '#D4AF37', color: '#0B0B0B', padding: '0.875rem 2rem', textDecoration: 'none', fontSize: '0.85rem', fontWeight: 700, borderRadius: '10px' }}>Quiero ser vendedor</a>
           </div>
@@ -375,6 +375,7 @@ export default function LandingClient({ products, images, banners }: any) {
     </div>
   )
 }
+
 
 
 
