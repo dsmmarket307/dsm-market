@@ -2,6 +2,7 @@
 import { createClient as createAdmin } from "@supabase/supabase-js"
 import { redirect } from "next/navigation"
 import { uploadGuide } from "@/lib/actions/orders"
+import OrderSearch from "./OrderSearch"
 
 function calcComisiones(total: number) {
   const dsmFee = Math.round(total * 0.05)
@@ -80,23 +81,7 @@ export default async function VendorOrdersPage() {
             <p style={{color:"#888",fontSize:13,marginTop:6}}>{enriched.length} orden{enriched.length !== 1 ? "es" : ""} en total</p>
           </div>
 
-          {/* BUSCADOR */}
-          <div className="vo-search-wrap">
-            <svg className="vo-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
-            <input
-              className="vo-search"
-              type="text"
-              placeholder="Buscar por orden, producto o comprador..."
-              id="vo-search-input"
-              onInput={() => {
-                const q = (document.getElementById('vo-search-input') as HTMLInputElement)?.value?.toLowerCase() || ''
-                document.querySelectorAll('.vo-card').forEach((card: any) => {
-                  const text = card.innerText.toLowerCase()
-                  card.style.display = text.includes(q) ? 'block' : 'none'
-                })
-              }}
-            />
-          </div>
+          <OrderSearch />
 
           {enriched.length === 0 ? (
             <div className="no-orders">
@@ -217,3 +202,5 @@ export default async function VendorOrdersPage() {
     </>
   )
 }
+
+
