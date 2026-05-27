@@ -167,7 +167,7 @@ export default async function VendorOrdersPage() {
                     <p className="vo-section-title">Desglose de comisiones</p>
                     <div className="vo-fee-row"><span style={{color:"#ccc"}}>Valor del producto</span><span style={{fontWeight:600,color:"#fff"}}>${total.toLocaleString("es-CO")}</span></div>
                     <div className="vo-fee-row"><span style={{color:"#ef4444"}}>Comision DSM (5%)</span><span style={{color:"#ef4444"}}>- ${dsmFee.toLocaleString("es-CO")}</span></div>
-                    <div className="vo-fee-row"><span style={{color:"#ef4444"}}>Comision MP (3.29% + IVA + $952)</span><span style={{color:"#ef4444"}}>- ${mpTotal.toLocaleString("es-CO")}</span></div>
+                    <div className="vo-fee-row"><span style={{color:"#ef4444"}}>Comision Mercado Pago (3.29% + IVA)</span><span style={{color:"#ef4444"}}>- ${mpTotal.toLocaleString("es-CO")}</span></div>
                     <div className="vo-fee-row" style={{borderTop:"1px solid rgba(212,175,55,.1)",marginTop:6,paddingTop:8}}>
                       <span style={{fontWeight:700,color:"#fff"}}>Lo que recibes</span>
                       <span style={{fontWeight:700,color:"#1D9E75",fontSize:16}}>${neto.toLocaleString("es-CO")}</span>
@@ -214,3 +214,4 @@ export default async function VendorOrdersPage() {
     </>
   )
 }
+
