@@ -130,7 +130,7 @@ export default function CheckoutPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          items: [{ id: item.id, name: item.name, price: item.price, quantity: item.quantity }],
+          items: [{ id: item.id, name: item.name, price: item.price, quantity: item.quantity, variantes: variantesSeleccionadas }],
           shipping_cost: 0,
           shipping_address: { ...address, transportadora },
           buyer_id: userId,
@@ -301,3 +301,4 @@ export default function CheckoutPage() {
     </div>
   )
 }
+

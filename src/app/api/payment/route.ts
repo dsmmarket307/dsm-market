@@ -70,6 +70,7 @@ export async function POST(req: NextRequest) {
         buyer_department: shipping_address?.departamento || null,
         buyer_notes: shipping_address?.notas || null,
         buyer_transportadora: shipping_address?.transportadora || null,
+        variantes_seleccionadas: item.variantes || null,
       })
 
       notifyNuevaCompra(
