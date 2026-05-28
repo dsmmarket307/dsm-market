@@ -23,6 +23,7 @@ function Icon({ type }: { type: string }) {
     billing:    <svg {...s}><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>,
     marketing:  <svg {...s}><path d="M22 2L11 13M22 2L15 22L11 13M22 2L2 9L11 13"/></svg>,
     finanzas:   <svg {...s}><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>,
+    pagos:      <svg {...s}><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>,
     saas:       <svg {...s}><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>,
   }
   return icons[type] ?? icons.home
@@ -43,6 +44,7 @@ export default function DashboardNav({ role, name, email }: any) {
     { href: "/crm",                                  label: "CRM Dropi",           icon: "crm" },
     { href: "/dashboard/admin/marketing",            label: "Marketing IA",        icon: "marketing" },
     { href: "/dashboard/admin/finanzas",             label: "Finanzas",            icon: "finanzas" },
+    { href: "/dashboard/admin/pagos",                label: "Lib. Pagos",          icon: "pagos" },
   ] : role === "seller" ? [
     { href: "/dashboard/vendor",                     label: "Inicio",              icon: "home" },
     { href: "/dashboard/vendor/orders",              label: "Mis Ordenes",         icon: "orders" },
@@ -156,6 +158,8 @@ export default function DashboardNav({ role, name, email }: any) {
     </>
   )
 }
+
+
 
 
 
