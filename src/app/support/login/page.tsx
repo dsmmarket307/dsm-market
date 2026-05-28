@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import { useState, Suspense } from 'react'
 import { createClient } from '@/lib/supabase/client'
@@ -22,18 +22,21 @@ function SupportLoginForm() {
     setError('')
 
     const supabase = createClient()
+
     const { data, error: authError } = await supabase.auth.signInWithPassword({ email, password })
 
-    if (authError) {
+    if (authError || !data.user) {
       setError('Credenciales incorrectas. Verifica tu email y contrasena.')
       setLoading(false)
       return
     }
 
+    const userId = data.user.id
+
     const { data: profile } = await supabase
       .from('profiles')
       .select('role')
-      .eq('id', data.user.id)
+      .eq('id', userId)
       .single()
 
     if (profile?.role === 'admin') {
@@ -41,14 +44,14 @@ function SupportLoginForm() {
       return
     }
 
-    const { data: agent } = await supabase
+    const { data: agentList } = await supabase
       .from('support_agents')
-      .select('is_active, role')
-      .eq('user_id', data.user.id)
-      .eq('is_active', true)
-      .single()
+      .select('id, is_active, role')
+      .eq('user_id', userId)
 
-    if (!agent) {
+    const agent = agentList?.[0]
+
+    if (!agent || agent.is_active !== true) {
       await supabase.auth.signOut()
       setError('Sin acceso. Contacta al administrador para activar tu cuenta.')
       setLoading(false)
@@ -181,7 +184,7 @@ function SupportLoginForm() {
                   type="password"
                   value={password}
                   onChange={e => setPassword(e.target.value)}
-                  placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
+                  placeholder="••••••••"
                   required
                   style={{
                     width: '100%', boxSizing: 'border-box',
