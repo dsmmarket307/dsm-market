@@ -21,6 +21,7 @@ function Icon({ type }: { type: string }) {
     provider:   <svg {...s}><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>,
     heart:      <svg {...s}><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>,
     billing:    <svg {...s}><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>,
+    marketing:  <svg {...s}><path d="M22 2L11 13M22 2L15 22L11 13M22 2L2 9L11 13"/></svg>,
     saas:       <svg {...s}><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>,
   }
   return icons[type] ?? icons.home
@@ -39,6 +40,7 @@ export default function DashboardNav({ role, name, email }: any) {
     { href: "/dashboard/admin/subscriptions",        label: "Suscripciones SaaS",  icon: "saas" },
     { href: "/dashboard/admin/usuarios",             label: "Usuarios",            icon: "vendors" },
     { href: "/crm",                                  label: "CRM Dropi",           icon: "crm" },
+    { href: "/dashboard/admin/marketing",            label: "Marketing IA",        icon: "marketing" },
   ] : role === "seller" ? [
     { href: "/dashboard/vendor",                     label: "Inicio",              icon: "home" },
     { href: "/dashboard/vendor/orders",              label: "Mis Ordenes",         icon: "orders" },
@@ -152,4 +154,6 @@ export default function DashboardNav({ role, name, email }: any) {
     </>
   )
 }
+
+
 
