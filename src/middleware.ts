@@ -24,7 +24,7 @@ export async function middleware(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser()
   const { pathname } = request.nextUrl
 
-  if (pathname.startsWith('/support') && pathname !== '/support/login') {
+  if (pathname.startsWith('/support/dashboard') || (pathname.startsWith('/support') && pathname !== '/support/login')) {
     if (!user) {
       const url = request.nextUrl.clone()
       url.pathname = '/support/login'
@@ -106,3 +106,4 @@ export const config = {
     '/((?!_next/static|_next/image|favicon.ico|api/|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
 }
+
