@@ -26,14 +26,18 @@ export async function POST(req: NextRequest) {
 
     if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
-    await admin.from("payouts").insert({
-      seller_id: order.seller_id,
+    const now = new Date().toISOString();
+    const { error: payoutError } = await admin.from("payouts").insert({
       order_id: orderId,
+      seller_id: order.seller_id,
       amount: order.seller_earnings,
       platform_fee: order.platform_fee,
       status: "released",
-      released_at: new Date().toISOString(),
+      released_at: now,
+      created_at: now,
     });
+
+    if (payoutError) console.error("Error insertando payout:", payoutError.message);
 
     return NextResponse.json({ success: true });
   } catch (error) {
