@@ -37,6 +37,7 @@ export default function DashboardNav({ role, name, email }: any) {
     { href: "/dashboard/admin/orders",               label: "Ordenes y Pagos",     icon: "orders" },
     { href: "/dashboard/admin/disputes",             label: "Disputas",            icon: "dispute" },
     { href: "/dashboard/admin/subscriptions",        label: "Suscripciones SaaS",  icon: "saas" },
+    { href: "/dashboard/admin/usuarios",             label: "Usuarios",            icon: "vendors" },
     { href: "/crm",                                  label: "CRM Dropi",           icon: "crm" },
   ] : role === "seller" ? [
     { href: "/dashboard/vendor",                     label: "Inicio",              icon: "home" },
@@ -151,3 +152,4 @@ export default function DashboardNav({ role, name, email }: any) {
     </>
   )
 }
+
