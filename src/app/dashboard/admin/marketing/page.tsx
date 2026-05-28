@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { createClient } from "@supabase/supabase-js";
-import { SEGMENT_LABELS, Segment } from "@/lib/marketing/segments";
+import { SEGMENT_LABELS, Segment } from "@/lib/marketing/segments-client";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -397,3 +397,4 @@ export default function MarketingPage() {
     </div>
   );
 }
+
