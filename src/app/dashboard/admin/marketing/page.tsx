@@ -60,14 +60,10 @@ export default function MarketingPage() {
   const handleSaveDraft = async () => {
     if (!draft) return;
     const { data, error: dbError } = await supabase.from("email_campaigns").insert({
-      name: form.productName,
+      title: form.productName,
       subject: draft.subject,
-      preview_text: draft.preview,
-      body_html: draft.body,
-      cta_text: draft.cta,
+      content: draft.body,
       audience: form.audience,
-      tone: form.tone,
-      objective: form.objective,
       status: "draft",
       created_at: new Date().toISOString(),
     }).select().single();
@@ -338,3 +334,4 @@ export default function MarketingPage() {
     </div>
   );
 }
+
