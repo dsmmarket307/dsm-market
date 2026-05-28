@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useState, Suspense } from 'react'
 import { createClient } from '@/lib/supabase/client'
@@ -45,9 +45,10 @@ function SupportLoginForm() {
       .from('support_agents')
       .select('is_active, role')
       .eq('user_id', data.user.id)
+      .eq('is_active', true)
       .single()
 
-    if (!agent?.is_active) {
+    if (!agent) {
       await supabase.auth.signOut()
       setError('Sin acceso. Contacta al administrador para activar tu cuenta.')
       setLoading(false)
@@ -180,7 +181,7 @@ function SupportLoginForm() {
                   type="password"
                   value={password}
                   onChange={e => setPassword(e.target.value)}
-                  placeholder="••••••••"
+                  placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
                   required
                   style={{
                     width: '100%', boxSizing: 'border-box',
