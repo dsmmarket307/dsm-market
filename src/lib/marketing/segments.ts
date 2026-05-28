@@ -21,27 +21,63 @@ export const SEGMENT_LABELS: Record<Segment, string> = {
 };
 
 export async function getEmailsBySegment(segment: Segment): Promise<string[]> {
-  let roles: string[] = [];
+  if (segment === "all_buyers" || segment === "active_buyers") {
+    const { data, error } = await supabase
+      .from("orders")
+      .select("buyer_id")
+      .not("buyer_id", "is", null);
 
-  if (segment === "all_buyers")    roles = ["buyer"];
-  if (segment === "active_buyers") roles = ["buyer"];
-  if (segment === "sellers")       roles = ["seller"];
-  if (segment === "providers")     roles = ["provider"];
-  if (segment === "all_users")     roles = ["buyer", "seller", "provider"];
+    if (error || !data?.length) return [];
 
-  const { data: profiles, error } = await supabase
-    .from("profiles")
-    .select("id, role")
-    .in("role", roles);
+    const ids = [...new Set(data.map((o: any) => o.buyer_id))];
 
-  if (error || !profiles?.length) return [];
+    const { data: users, error: authError } = await supabase.auth.admin.listUsers({ perPage: 1000 });
+    if (authError || !users) return [];
 
-  const ids = profiles.map((p: any) => p.id);
+    return users.users
+      .filter((u: any) => ids.includes(u.id) && u.email)
+      .map((u: any) => u.email as string);
+  }
 
-  const { data: users, error: authError } = await supabase.auth.admin.listUsers();
-  if (authError || !users) return [];
+  if (segment === "sellers") {
+    const { data: profiles } = await supabase
+      .from("profiles")
+      .select("id")
+      .eq("role", "seller");
 
-  return users.users
-    .filter((u: any) => ids.includes(u.id) && u.email)
-    .map((u: any) => u.email as string);
+    if (!profiles?.length) return [];
+    const ids = profiles.map((p: any) => p.id);
+
+    const { data: users } = await supabase.auth.admin.listUsers({ perPage: 1000 });
+    if (!users) return [];
+
+    return users.users
+      .filter((u: any) => ids.includes(u.id) && u.email)
+      .map((u: any) => u.email as string);
+  }
+
+  if (segment === "providers") {
+    const { data: profiles } = await supabase
+      .from("profiles")
+      .select("id")
+      .eq("role", "provider");
+
+    if (!profiles?.length) return [];
+    const ids = profiles.map((p: any) => p.id);
+
+    const { data: users } = await supabase.auth.admin.listUsers({ perPage: 1000 });
+    if (!users) return [];
+
+    return users.users
+      .filter((u: any) => ids.includes(u.id) && u.email)
+      .map((u: any) => u.email as string);
+  }
+
+  if (segment === "all_users") {
+    const { data: users } = await supabase.auth.admin.listUsers({ perPage: 1000 });
+    if (!users) return [];
+    return users.users.filter((u: any) => u.email).map((u: any) => u.email as string);
+  }
+
+  return [];
 }
