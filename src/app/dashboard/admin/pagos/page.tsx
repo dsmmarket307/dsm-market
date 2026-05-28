@@ -33,9 +33,20 @@ export default function PagosPage() {
 
   const handleRelease = async (orderId: string) => {
     setReleasing(orderId);
-    await releasePayout(orderId);
-    load();
-    setReleasing(null);
+    try {
+      const res = await fetch("/api/admin/release-payout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ orderId }),
+      });
+      const data = await res.json();
+      if (!data.success) setError(data.error ?? "Error al liberar");
+      else load();
+    } catch {
+      setError("Error al liberar pago");
+    } finally {
+      setReleasing(null);
+    }
   };
 
   const filtered = data?.orders?.filter((o: any) => {
@@ -201,3 +212,4 @@ export default function PagosPage() {
     </div>
   );
 }
+
