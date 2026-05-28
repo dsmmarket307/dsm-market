@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
       .limit(1);
 
     const imageUrl = images?.[0]?.url ?? null;
-    const productUrl = `https://dsm-market.vercel.app/product/${product.slug ?? productId}`;
+    const productUrl = `https://dsm-market.vercel.app/producto/$productId`;
     const price = new Intl.NumberFormat("es-CO", { style: "currency", currency: "COP", maximumFractionDigits: 0 }).format(product.price);
 
     const prompt = `Eres un experto en email marketing para ecommerce latinoamericano. 
@@ -91,3 +91,4 @@ Responde UNICAMENTE con JSON valido sin markdown:
     return NextResponse.json({ error: "Error interno del servidor" }, { status: 500 });
   }
 }
+
