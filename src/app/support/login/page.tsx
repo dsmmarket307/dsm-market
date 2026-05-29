@@ -22,6 +22,7 @@ function SupportLoginForm() {
     setError('')
 
     const supabase = createClient()
+    await supabase.auth.signOut()
 
     const { data, error: authError } = await supabase.auth.signInWithPassword({ email, password })
 
@@ -239,3 +240,4 @@ export default function SupportLoginPage() {
     </Suspense>
   )
 }
+

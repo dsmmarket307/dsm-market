@@ -44,36 +44,12 @@ export default function SupportDashboard() {
   }, [])
 
   async function initAgent() {
-    const supabase = createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-
-    if (!user) { router.push('/support/login'); return }
-
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('role, name')
-      .eq('id', user.id)
-      .single()
-
-    if (profile?.role === 'admin') {
-      router.push('/dashboard/admin/soporte')
-      return
-    }
-
-    const { data: agentData } = await supabase
-      .from('support_agents')
-      .select('*')
-      .eq('user_id', user.id)
-      .eq('is_active', true)
-      .single()
-
-    if (!agentData) { router.push('/support/login?error=no_access'); return }
-
-    setAgent({
-      ...agentData,
-      display_name: agentData.display_name ?? profile?.name ?? 'Agente',
-      support_email: agentData.support_email ?? '',
-    })
+    const res = await fetch('/api/support/agent')
+    if (res.status === 401) { router.push('/support/login'); return }
+    const data = await res.json()
+    if (data.redirect) { router.push(data.redirect); return }
+    if (data.error) { router.push('/support/login?error=no_access'); return }
+    setAgent(data.agent)
     setLoadingAgent(false)
     loadConversations()
     loadCannedResponses()
@@ -658,6 +634,7 @@ export default function SupportDashboard() {
     </div>
   )
 }
+
 
 
 
