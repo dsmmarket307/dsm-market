@@ -51,7 +51,7 @@ export default function SupportDashboard() {
 
     const { data: profile } = await supabase
       .from('profiles')
-      .select('role, name, email')
+      .select('role, name')
       .eq('id', user.id)
       .single()
 
@@ -76,7 +76,7 @@ export default function SupportDashboard() {
     setAgent({
       ...agentData,
       display_name: agentData.display_name ?? profile?.name ?? 'Agente',
-      support_email: agentData.support_email ?? profile?.email ?? '',
+      support_email: agentData.support_email ?? '',
     })
     setLoadingAgent(false)
     loadConversations()
@@ -662,5 +662,6 @@ export default function SupportDashboard() {
     </div>
   )
 }
+
 
 
