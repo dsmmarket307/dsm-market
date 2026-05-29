@@ -34,6 +34,8 @@ export async function middleware(request: NextRequest) {
       url.pathname = '/support/login'
       return NextResponse.redirect(url)
     }
+    return supabaseResponse
+  }
 
     const { data: profile } = await supabase
       .from('profiles')
@@ -111,3 +113,4 @@ export const config = {
     '/((?!_next/static|_next/image|favicon.ico|api/|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
 }
+
