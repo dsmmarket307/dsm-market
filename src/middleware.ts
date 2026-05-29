@@ -24,7 +24,11 @@ export async function middleware(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser()
   const { pathname } = request.nextUrl
 
-  if (pathname.startsWith('/support/dashboard') || (pathname.startsWith('/support') && pathname !== '/support/login')) {
+  if (pathname === '/support/login') {
+    return supabaseResponse
+  }
+
+  if (pathname.startsWith('/support')) {
     if (!user) {
       const url = request.nextUrl.clone()
       url.pathname = '/support/login'
@@ -35,17 +39,18 @@ export async function middleware(request: NextRequest) {
       .from('profiles')
       .select('role')
       .eq('id', user.id)
-      .single()
+      .maybeSingle()
 
     if (profile?.role === 'admin') return supabaseResponse
 
-    const { data: agent } = await supabase
+    const { data: agents } = await supabase
       .from('support_agents')
       .select('is_active')
       .eq('user_id', user.id)
-      .single()
 
-    if (!agent?.is_active) {
+    const agent = agents?.[0]
+
+    if (!agent || agent.is_active !== true) {
       const url = request.nextUrl.clone()
       url.pathname = '/support/login'
       url.searchParams.set('error', 'no_access')
@@ -66,7 +71,7 @@ export async function middleware(request: NextRequest) {
       .from('profiles')
       .select('role')
       .eq('id', user.id)
-      .single()
+      .maybeSingle()
     if (profile?.role !== 'admin') {
       const url = request.nextUrl.clone()
       url.pathname = '/'
@@ -106,4 +111,3 @@ export const config = {
     '/((?!_next/static|_next/image|favicon.ico|api/|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
 }
-
