@@ -56,7 +56,7 @@ export default function SupportDashboard() {
       .single()
 
     if (profile?.role === 'admin') {
-      setAgent({ display_name: profile.name ?? 'Admin', role: 'admin', support_email: profile.email })
+      setAgent({ display_name: profile.name ?? 'Admin', role: 'admin', support_email: '' })
       setLoadingAgent(false)
       loadConversations()
       loadCannedResponses()
@@ -662,3 +662,4 @@ export default function SupportDashboard() {
     </div>
   )
 }
+
