@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useState, useEffect, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
@@ -51,7 +51,7 @@ export default function SupportDashboard() {
 
     const { data: profile } = await supabase
       .from('profiles')
-      .select('role, name, email')
+      .select('role, name')
       .eq('id', user.id)
       .single()
 
