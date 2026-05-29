@@ -23,7 +23,7 @@ export async function GET() {
       return NextResponse.json({ redirect: '/dashboard/admin/soporte' })
     }
 
-    if (profile?.role !== 'support_agent' && profile?.role !== 'support_supervisor') {
+    if (profile?.role !== 'support_agent' && profile?.role !== 'support_supervisor') { return NextResponse.json({ error: 'no_access', debug: 'wrong_role', role: profile?.role, userId: user.id }, { status: 403 })
       return NextResponse.json({ error: 'no_access' }, { status: 403 })
     }
 
@@ -34,7 +34,7 @@ export async function GET() {
       .eq('is_active', true)
       .single()
 
-    if (!agentData) return NextResponse.json({ error: 'no_access' }, { status: 403 })
+    if (!agentData) return NextResponse.json({ error: 'no_access', debug: 'agentData null', userId: user.id }, { status: 403 })
 
     return NextResponse.json({
       agent: {
@@ -48,3 +48,4 @@ export async function GET() {
     return NextResponse.json({ error: 'error' }, { status: 500 })
   }
 }
+
