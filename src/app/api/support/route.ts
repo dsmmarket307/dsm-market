@@ -39,7 +39,7 @@ export async function POST(req: NextRequest) {
     if (action === 'list') {
       const { data, error } = await service
         .from('conversations')
-        .select('*, profiles:user_id(id, name, role)')
+        .select('*, profiles!conversations_user_id_fkey(id, name, role)')
         .order('created_at', { ascending: false })
       if (error) return NextResponse.json({ error: error.message }, { status: 500 })
       return NextResponse.json({ conversations: data ?? [] })
@@ -113,3 +113,4 @@ export async function POST(req: NextRequest) {
 }
 
 // force-v2
+
