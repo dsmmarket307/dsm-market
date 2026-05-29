@@ -189,7 +189,7 @@ export default function SupportDashboard() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', background: '#080808', fontFamily: 'system-ui, sans-serif', display: 'flex', flexDirection: 'column' }}>
+    <div style={{ minHeight: '100vh', background: '#080808', fontFamily: 'system-ui, sans-serif', fontSize: '16px', display: 'flex', flexDirection: 'column' }}>
 
       {notification && (
         <div style={{ position: 'fixed', top: 16, right: 16, zIndex: 1000, background: '#1a1a1a', border: '1px solid rgba(212,175,55,0.3)', borderRadius: 10, padding: '0.625rem 1rem', color: '#fff', fontSize: 13 }}>
@@ -402,3 +402,4 @@ export default function SupportDashboard() {
     </div>
   )
 }
+
