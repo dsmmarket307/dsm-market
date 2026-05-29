@@ -1,5 +1,5 @@
-﻿import { createServerClient } from '@supabase/ssr'
-import { NextResponse, type NextRequest } from 'next/server'
+﻿import { createServerClient } from "@supabase/ssr"
+import { NextResponse, type NextRequest } from "next/server"
 
 export async function middleware(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request })
@@ -24,84 +24,59 @@ export async function middleware(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser()
   const { pathname } = request.nextUrl
 
-  if (pathname === '/support/login') {
+  if (pathname === "/support/login") {
     return supabaseResponse
   }
 
-  if (pathname.startsWith('/support')) {
+  if (pathname.startsWith("/support")) {
     if (!user) {
       const url = request.nextUrl.clone()
-      url.pathname = '/support/login'
+      url.pathname = "/support/login"
       return NextResponse.redirect(url)
     }
     return supabaseResponse
   }
 
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('role')
-      .eq('id', user.id)
-      .maybeSingle()
-
-    if (profile?.role === 'admin') return supabaseResponse
-
-    const { data: agents } = await supabase
-      .from('support_agents')
-      .select('is_active')
-      .eq('user_id', user.id)
-
-    const agent = agents?.[0]
-
-    if (!agent || agent.is_active !== true) {
-      const url = request.nextUrl.clone()
-      url.pathname = '/support/login'
-      url.searchParams.set('error', 'no_access')
-      return NextResponse.redirect(url)
-    }
-
-    return supabaseResponse
-  }
-
-  if (pathname.startsWith('/crm')) {
+  if (pathname.startsWith("/crm")) {
     if (!user) {
       const url = request.nextUrl.clone()
-      url.pathname = '/auth/login'
-      url.searchParams.set('redirectTo', pathname)
+      url.pathname = "/auth/login"
+      url.searchParams.set("redirectTo", pathname)
       return NextResponse.redirect(url)
     }
     const { data: profile } = await supabase
-      .from('profiles')
-      .select('role')
-      .eq('id', user.id)
+      .from("profiles")
+      .select("role")
+      .eq("id", user.id)
       .maybeSingle()
-    if (profile?.role !== 'admin') {
+    if (profile?.role !== "admin") {
       const url = request.nextUrl.clone()
-      url.pathname = '/'
+      url.pathname = "/"
       return NextResponse.redirect(url)
     }
     return supabaseResponse
   }
 
   const publicRoutes = [
-    '/auth/login',
-    '/auth/register',
-    '/auth/forgot-password',
-    '/auth/reset-password',
-    '/auth/callback',
-    '/support/login',
-    '/checkout',
-    '/producto',
-    '/politicas',
-    '/servicios',
-    '/dashboard/vendor/verificacion',
+    "/auth/login",
+    "/auth/register",
+    "/auth/forgot-password",
+    "/auth/reset-password",
+    "/auth/callback",
+    "/support/login",
+    "/checkout",
+    "/producto",
+    "/politicas",
+    "/servicios",
+    "/dashboard/vendor/verificacion",
   ]
 
   const isPublicRoute = publicRoutes.some(route => pathname.startsWith(route))
 
-  if (!user && !isPublicRoute && pathname !== '/') {
+  if (!user && !isPublicRoute && pathname !== "/") {
     const url = request.nextUrl.clone()
-    url.pathname = '/auth/login'
-    url.searchParams.set('redirectTo', pathname)
+    url.pathname = "/auth/login"
+    url.searchParams.set("redirectTo", pathname)
     return NextResponse.redirect(url)
   }
 
@@ -110,7 +85,6 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    '/((?!_next/static|_next/image|favicon.ico|api/|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    "/((?!_next/static|_next/image|favicon.ico|api/|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
   ],
 }
-
