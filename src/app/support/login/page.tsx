@@ -31,18 +31,7 @@ function SupportLoginForm() {
       return
     }
 
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('role')
-      .eq('id', data.user.id)
-      .maybeSingle()
-
-    if (profile?.role === 'admin') {
-      router.push('/support/dashboard')
-      return
-    }
-
-    router.push('/support/dashboard')
+    window.location.href = '/support/dashboard'
   }
 
   return (
