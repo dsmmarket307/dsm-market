@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
     if (action === 'list') {
       const { data } = await supabase
         .from('conversations')
-        .select('*, profiles:user_id(id, name, email)')
+        .select('*, profiles:user_id(id, name, role)')
         .order('created_at', { ascending: false })
       return NextResponse.json({ conversations: data ?? [] })
     }
@@ -104,3 +104,4 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Error interno' }, { status: 500 })
   }
 }
+
