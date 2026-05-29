@@ -1,5 +1,4 @@
 ﻿import { createClient } from '@/lib/supabase/server'
-import { createClient as createAdmin } from '@supabase/supabase-js'
 import { NextResponse } from 'next/server'
 
 export async function GET() {
@@ -8,12 +7,7 @@ export async function GET() {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return NextResponse.json({ error: 'no_auth' }, { status: 401 })
 
-    const admin = createAdmin(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
-    )
-
-    const { data: profile } = await admin
+    const { data: profile } = await supabase
       .from('profiles')
       .select('role, name')
       .eq('id', user.id)
@@ -27,7 +21,7 @@ export async function GET() {
       return NextResponse.json({ error: 'no_access', debug: 'wrong_role', role: profile?.role }, { status: 403 })
     }
 
-    const { data: agentData } = await admin
+    const { data: agentData, error: agentError } = await supabase
       .from('support_agents')
       .select('*')
       .eq('user_id', user.id)
@@ -35,7 +29,7 @@ export async function GET() {
       .single()
 
     if (!agentData) {
-      return NextResponse.json({ error: 'no_access', debug: 'no_agent_record', userId: user.id }, { status: 403 })
+      return NextResponse.json({ error: 'no_access', debug: 'no_agent_record', agentError: agentError?.message }, { status: 403 })
     }
 
     return NextResponse.json({
