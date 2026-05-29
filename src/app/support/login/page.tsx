@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useState, Suspense } from 'react'
 import { createClient } from '@/lib/supabase/client'
@@ -31,30 +31,14 @@ function SupportLoginForm() {
       return
     }
 
-    const userId = data.user.id
-
     const { data: profile } = await supabase
       .from('profiles')
       .select('role')
-      .eq('id', userId)
-      .single()
+      .eq('id', data.user.id)
+      .maybeSingle()
 
     if (profile?.role === 'admin') {
       router.push('/support/dashboard')
-      return
-    }
-
-    const { data: agentList } = await supabase
-      .from('support_agents')
-      .select('id, is_active, role')
-      .eq('user_id', userId)
-
-    const agent = agentList?.[0]
-
-    if (!agent || agent.is_active !== true) {
-      await supabase.auth.signOut()
-      setError('Sin acceso. Contacta al administrador para activar tu cuenta.')
-      setLoading(false)
       return
     }
 
