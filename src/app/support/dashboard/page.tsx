@@ -51,7 +51,7 @@ export default function SupportDashboard() {
 
     const { data: profile } = await supabase
       .from('profiles')
-      .select('role, name')
+      .select('role, name, email')
       .eq('id', user.id)
       .single()
 
@@ -662,4 +662,5 @@ export default function SupportDashboard() {
     </div>
   )
 }
+
 
