@@ -56,11 +56,7 @@ export default function SupportDashboard() {
       .single()
 
     if (profile?.role === 'admin') {
-      setAgent({ display_name: profile.name ?? 'Admin', role: 'admin', support_email: '' })
-      setLoadingAgent(false)
-      loadConversations()
-      loadCannedResponses()
-      setupRealtime()
+      router.push('/dashboard/admin/soporte')
       return
     }
 
@@ -662,6 +658,7 @@ export default function SupportDashboard() {
     </div>
   )
 }
+
 
 
 
