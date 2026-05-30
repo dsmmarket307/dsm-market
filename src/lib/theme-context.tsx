@@ -22,9 +22,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <ThemeContext.Provider value={{ theme, toggleTheme }}>
-      <div style={{ background: theme === 'dark' ? '#0B0B0B' : '#f0f0f0', minHeight: '100vh', transition: 'background 0.3s' }}>
-        {children}
-      </div>
+      {children}
     </ThemeContext.Provider>
   )
 }
