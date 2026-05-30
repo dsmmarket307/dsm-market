@@ -1,10 +1,14 @@
 ﻿'use client'
 
 import { useState } from 'react'
+import { useTheme } from '@/lib/theme-context'
 
-interface Props {
-  type: 'vendor' | 'admin'
+const THEMES = {
+  dark:  { bg: '#0B0B0B', card: '#151515', card2: '#0f0f0f', text: '#ffffff', text2: '#cccccc', text3: '#888888', text4: '#555555', text5: '#aaaaaa', border: 'rgba(255,255,255,0.05)', goldBg: 'rgba(212,175,55,0.06)', goldBorder: 'rgba(212,175,55,0.15)', goldBorder2: 'rgba(212,175,55,0.2)', gold: '#D4AF37' },
+  light: { bg: '#f0f0f0', card: '#ffffff', card2: '#f5f5f5', text: '#111111', text2: '#333333', text3: '#666666', text4: '#999999', text5: '#555555', border: 'rgba(0,0,0,0.08)', goldBg: 'rgba(184,150,12,0.06)', goldBorder: 'rgba(184,150,12,0.15)', goldBorder2: 'rgba(184,150,12,0.3)', gold: '#B8960C' },
 }
+
+interface Props { type: 'vendor' | 'admin' }
 
 function Icon({ name }: { name: string }) {
   const icons: any = {
@@ -32,6 +36,9 @@ function Icon({ name }: { name: string }) {
 }
 
 export default function ReporteIA({ type }: Props) {
+  const { theme } = useTheme()
+  const t = THEMES[theme]
+
   const [reporte, setReporte] = useState<any>(null)
   const [metrics, setMetrics] = useState<any>(null)
   const [loading, setLoading] = useState(false)
@@ -42,11 +49,7 @@ export default function ReporteIA({ type }: Props) {
     setLoading(true)
     setError('')
     try {
-      const res = await fetch('/api/report', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ type })
-      })
+      const res = await fetch('/api/report', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ type }) })
       const data = await res.json()
       if (data.error) { setError('No se pudo generar el reporte.'); setLoading(false); return }
       setRawReporte(data.reporte)
@@ -92,21 +95,21 @@ export default function ReporteIA({ type }: Props) {
   }
 
   const vendorCards = metrics && type === 'vendor' ? [
-    { label: 'Ventas Totales', value: '$' + (metrics.totalVentas ?? 0).toLocaleString('es-CO'), color: '#1D9E75', sub: 'COP bruto', icon: 'ventas' },
-    { label: 'Ingresos Netos', value: '$' + (metrics.ingresosNetos ?? 0).toLocaleString('es-CO'), color: '#D4AF37', sub: 'despues comision', icon: 'netos' },
-    { label: 'Comision (5%)', value: '$' + (metrics.comisionPlataforma ?? 0).toLocaleString('es-CO'), color: '#a78bfa', sub: 'plataforma', icon: 'comision' },
-    { label: 'Ticket Promedio', value: '$' + (metrics.ticketPromedio ?? 0).toLocaleString('es-CO'), color: '#38bdf8', sub: 'por orden', icon: 'ticket' },
-    { label: 'Conversion', value: (metrics.tasaConversion ?? 0) + '%', color: (metrics.tasaConversion ?? 0) > 70 ? '#1D9E75' : '#f59e0b', sub: 'ordenes entregadas', icon: 'conversion' },
-    { label: 'Esta Semana', value: '$' + (metrics.ventasSemana ?? 0).toLocaleString('es-CO'), color: '#fb923c', sub: (metrics.ordenesSemana ?? 0) + ' ordenes', icon: 'semana' },
+    { label: 'Ventas Totales',  value: '$' + (metrics.totalVentas ?? 0).toLocaleString('es-CO'),        color: '#1D9E75', sub: 'COP bruto',          icon: 'ventas' },
+    { label: 'Ingresos Netos',  value: '$' + (metrics.ingresosNetos ?? 0).toLocaleString('es-CO'),      color: t.gold,    sub: 'despues comision',   icon: 'netos' },
+    { label: 'Comision (5%)',   value: '$' + (metrics.comisionPlataforma ?? 0).toLocaleString('es-CO'), color: '#a78bfa', sub: 'plataforma',          icon: 'comision' },
+    { label: 'Ticket Promedio', value: '$' + (metrics.ticketPromedio ?? 0).toLocaleString('es-CO'),     color: '#38bdf8', sub: 'por orden',           icon: 'ticket' },
+    { label: 'Conversion',      value: (metrics.tasaConversion ?? 0) + '%',                              color: (metrics.tasaConversion ?? 0) > 70 ? '#1D9E75' : '#f59e0b', sub: 'ordenes entregadas', icon: 'conversion' },
+    { label: 'Esta Semana',     value: '$' + (metrics.ventasSemana ?? 0).toLocaleString('es-CO'),       color: '#fb923c', sub: (metrics.ordenesSemana ?? 0) + ' ordenes', icon: 'semana' },
   ] : []
 
   const adminCards = metrics && type === 'admin' ? [
-    { label: 'Ventas Totales', value: '$' + (metrics.totalVentas ?? 0).toLocaleString('es-CO'), color: '#1D9E75', sub: 'marketplace', icon: 'ventas' },
-    { label: 'Comisiones (5%)', value: '$' + (metrics.comisiones ?? 0).toLocaleString('es-CO'), color: '#D4AF37', sub: 'ganadas', icon: 'comision' },
-    { label: 'Vendedores', value: metrics.vendedores ?? 0, color: '#a78bfa', sub: 'activos', icon: 'vendedores' },
-    { label: 'Compradores', value: metrics.compradores ?? 0, color: '#38bdf8', sub: 'registrados', icon: 'compradores' },
-    { label: 'Ticket Promedio', value: '$' + (metrics.ticketPromedio ?? 0).toLocaleString('es-CO'), color: '#fb923c', sub: 'por orden', icon: 'ticket' },
-    { label: 'Nuevos/Semana', value: metrics.usuariosNuevosSemana ?? 0, color: '#1D9E75', sub: 'usuarios nuevos', icon: 'nuevos' },
+    { label: 'Ventas Totales',  value: '$' + (metrics.totalVentas ?? 0).toLocaleString('es-CO'),  color: '#1D9E75', sub: 'marketplace',    icon: 'ventas' },
+    { label: 'Comisiones (5%)', value: '$' + (metrics.comisiones ?? 0).toLocaleString('es-CO'),   color: t.gold,    sub: 'ganadas',         icon: 'comision' },
+    { label: 'Vendedores',      value: metrics.vendedores ?? 0,                                    color: '#a78bfa', sub: 'activos',         icon: 'vendedores' },
+    { label: 'Compradores',     value: metrics.compradores ?? 0,                                   color: '#38bdf8', sub: 'registrados',     icon: 'compradores' },
+    { label: 'Ticket Promedio', value: '$' + (metrics.ticketPromedio ?? 0).toLocaleString('es-CO'), color: '#fb923c', sub: 'por orden',     icon: 'ticket' },
+    { label: 'Nuevos/Semana',   value: metrics.usuariosNuevosSemana ?? 0,                          color: '#1D9E75', sub: 'usuarios nuevos', icon: 'nuevos' },
   ] : []
 
   const cards = type === 'vendor' ? vendorCards : adminCards
@@ -115,27 +118,27 @@ export default function ReporteIA({ type }: Props) {
   const barColors = ['#D4AF37', '#1D9E75', '#a78bfa', '#38bdf8', '#fb923c']
 
   return (
-    <div style={{ background: '#0B0B0B', borderRadius: 20, padding: '1.75rem', border: '1px solid rgba(212,175,55,.15)', marginBottom: '1.25rem', fontFamily: 'Poppins, sans-serif' }}>
+    <div style={{ background: t.bg, borderRadius: 20, padding: '1.75rem', border: `1px solid ${t.goldBorder}`, marginBottom: '1.25rem', fontFamily: 'Poppins, sans-serif' }}>
 
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: 10 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <div style={{ width: 44, height: 44, borderRadius: 12, background: 'rgba(212,175,55,.1)', border: '1px solid rgba(212,175,55,.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div style={{ width: 44, height: 44, borderRadius: 12, background: t.goldBg, border: `1px solid ${t.goldBorder2}`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <Icon name="ia" />
           </div>
           <div>
-            <p style={{ fontSize: 10, letterSpacing: 3, textTransform: 'uppercase', color: '#D4AF37', margin: 0 }}>Inteligencia Artificial</p>
-            <p style={{ fontSize: 17, fontWeight: 700, color: '#fff', margin: '2px 0 0' }}>
+            <p style={{ fontSize: 10, letterSpacing: 3, textTransform: 'uppercase', color: t.gold, margin: 0 }}>Inteligencia Artificial</p>
+            <p style={{ fontSize: 17, fontWeight: 700, color: t.text, margin: '2px 0 0' }}>
               {type === 'vendor' ? 'Centro de Inteligencia del Vendedor' : 'Centro de Inteligencia del Marketplace'}
             </p>
           </div>
         </div>
         <div style={{ display: 'flex', gap: 8 }}>
           {reporte && (
-            <button onClick={descargarTXT} style={{ padding: '10px 16px', background: 'transparent', border: '1px solid rgba(255,255,255,.12)', borderRadius: 10, color: '#ccc', fontSize: 12, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}>
+            <button onClick={descargarTXT} style={{ padding: '10px 16px', background: 'transparent', border: `1px solid ${t.border}`, borderRadius: 10, color: t.text2, fontSize: 12, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}>
               <Icon name="descargar" /> Descargar
             </button>
           )}
-          <button onClick={generarReporte} disabled={loading} style={{ padding: '10px 20px', background: loading ? '#222' : '#D4AF37', border: 'none', borderRadius: 10, color: loading ? '#555' : '#000', fontSize: 12, fontWeight: 700, cursor: loading ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}>
+          <button onClick={generarReporte} disabled={loading} style={{ padding: '10px 20px', background: loading ? t.card : t.gold, border: 'none', borderRadius: 10, color: loading ? t.text3 : '#000', fontSize: 12, fontWeight: 700, cursor: loading ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}>
             <Icon name="actualizar" /> {loading ? 'Analizando...' : reporte ? 'Actualizar' : 'Generar Reporte IA'}
           </button>
         </div>
@@ -144,17 +147,17 @@ export default function ReporteIA({ type }: Props) {
       {error && <p style={{ color: '#ef4444', fontSize: 13, marginBottom: '0.75rem' }}>{error}</p>}
 
       {!reporte && !loading && (
-        <div style={{ padding: '3rem', textAlign: 'center', border: '1px dashed rgba(212,175,55,.15)', borderRadius: 16 }}>
+        <div style={{ padding: '3rem', textAlign: 'center', border: `1px dashed ${t.goldBorder}`, borderRadius: 16 }}>
           <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 12 }}><Icon name="ia" /></div>
-          <p style={{ color: '#888', fontSize: 14, margin: '0 0 4px' }}>Analisis profundo con Inteligencia Artificial</p>
-          <p style={{ color: '#555', fontSize: 12 }}>Contabilidad, estrategia, metas y tareas semanales personalizadas</p>
+          <p style={{ color: t.text3, fontSize: 14, margin: '0 0 4px' }}>Analisis profundo con Inteligencia Artificial</p>
+          <p style={{ color: t.text4, fontSize: 12 }}>Contabilidad, estrategia, metas y tareas semanales personalizadas</p>
         </div>
       )}
 
       {loading && (
         <div style={{ padding: '3rem', textAlign: 'center' }}>
-          <p style={{ color: '#D4AF37', fontSize: 14, marginBottom: 8 }}>Analizando datos...</p>
-          <p style={{ color: '#555', fontSize: 12 }}>Generando contabilidad, estrategia y tareas semanales</p>
+          <p style={{ color: t.gold, fontSize: 14, marginBottom: 8 }}>Analizando datos...</p>
+          <p style={{ color: t.text4, fontSize: 12 }}>Generando contabilidad, estrategia y tareas semanales</p>
         </div>
       )}
 
@@ -162,13 +165,13 @@ export default function ReporteIA({ type }: Props) {
         <>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(145px, 1fr))', gap: 12, marginBottom: '1.5rem' }}>
             {cards.map((card: any) => (
-              <div key={card.label} style={{ background: '#151515', borderRadius: 14, padding: '1rem', border: '1px solid rgba(255,255,255,.05)' }}>
+              <div key={card.label} style={{ background: t.card, borderRadius: 14, padding: '1rem', border: `1px solid ${t.border}` }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
                   <Icon name={card.icon} />
-                  <p style={{ fontSize: 10, color: '#666', textTransform: 'uppercase', letterSpacing: 1, margin: 0 }}>{card.label}</p>
+                  <p style={{ fontSize: 10, color: t.text3, textTransform: 'uppercase', letterSpacing: 1, margin: 0 }}>{card.label}</p>
                 </div>
                 <p style={{ fontSize: 19, fontWeight: 700, color: card.color, margin: '0 0 2px' }}>{card.value}</p>
-                <p style={{ fontSize: 10, color: '#555', margin: '0 0 8px' }}>{card.sub}</p>
+                <p style={{ fontSize: 10, color: t.text4, margin: '0 0 8px' }}>{card.sub}</p>
                 <svg viewBox="0 0 60 20" style={{ width: '100%', opacity: 0.5 }}>
                   <polyline points="0,15 10,10 20,13 30,7 40,11 50,5 60,8" fill="none" stroke={card.color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
@@ -177,10 +180,10 @@ export default function ReporteIA({ type }: Props) {
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginBottom: '1.5rem' }}>
-            <div style={{ background: '#151515', borderRadius: 14, padding: '1.25rem', border: '1px solid rgba(255,255,255,.05)' }}>
+            <div style={{ background: t.card, borderRadius: 14, padding: '1.25rem', border: `1px solid ${t.border}` }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: '1rem' }}>
                 <Icon name="grafica" />
-                <p style={{ fontSize: 11, color: '#888', textTransform: 'uppercase', letterSpacing: 2, margin: 0 }}>
+                <p style={{ fontSize: 11, color: t.text3, textTransform: 'uppercase', letterSpacing: 2, margin: 0 }}>
                   {type === 'vendor' ? 'Mis Categorias' : 'Top Categorias'}
                 </p>
               </div>
@@ -188,10 +191,10 @@ export default function ReporteIA({ type }: Props) {
                 {topCats.slice(0, 5).map((cat: any, i: number) => (
                   <div key={i}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 5 }}>
-                      <p style={{ fontSize: 13, color: '#ccc', margin: 0, fontWeight: 500 }}>{cat[0]}</p>
+                      <p style={{ fontSize: 13, color: t.text2, margin: 0, fontWeight: 500 }}>{cat[0]}</p>
                       <p style={{ fontSize: 12, color: barColors[i], fontWeight: 700, margin: 0 }}>{cat[1]} productos</p>
                     </div>
-                    <div style={{ height: 5, background: '#0f0f0f', borderRadius: 999 }}>
+                    <div style={{ height: 5, background: t.card2, borderRadius: 999 }}>
                       <div style={{ height: '100%', width: Math.round((cat[1] / maxCat) * 100) + '%', background: barColors[i], borderRadius: 999 }} />
                     </div>
                   </div>
@@ -200,71 +203,71 @@ export default function ReporteIA({ type }: Props) {
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-              <div style={{ background: '#151515', borderRadius: 14, padding: '1.25rem', border: '1px solid rgba(255,255,255,.05)', flex: 1 }}>
+              <div style={{ background: t.card, borderRadius: 14, padding: '1.25rem', border: `1px solid ${t.border}`, flex: 1 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: '0.75rem' }}>
                   <Icon name="resumen" />
-                  <p style={{ fontSize: 11, color: '#888', textTransform: 'uppercase', letterSpacing: 2, margin: 0 }}>Resumen Inteligente</p>
+                  <p style={{ fontSize: 11, color: t.text3, textTransform: 'uppercase', letterSpacing: 2, margin: 0 }}>Resumen Inteligente</p>
                 </div>
-                <p style={{ fontSize: 13, color: '#ccc', lineHeight: 1.7, margin: 0 }}>{reporte.resumen}</p>
+                <p style={{ fontSize: 13, color: t.text2, lineHeight: 1.7, margin: 0 }}>{reporte.resumen}</p>
               </div>
               {reporte.meta && (
-                <div style={{ background: 'rgba(212,175,55,.06)', borderRadius: 14, padding: '1.25rem', border: '1px solid rgba(212,175,55,.2)' }}>
+                <div style={{ background: t.goldBg, borderRadius: 14, padding: '1.25rem', border: `1px solid ${t.goldBorder2}` }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: '0.5rem' }}>
                     <Icon name="meta" />
-                    <p style={{ fontSize: 11, color: '#D4AF37', textTransform: 'uppercase', letterSpacing: 2, margin: 0 }}>Meta del Mes</p>
+                    <p style={{ fontSize: 11, color: t.gold, textTransform: 'uppercase', letterSpacing: 2, margin: 0 }}>Meta del Mes</p>
                   </div>
-                  <p style={{ fontSize: 13, color: '#fff', lineHeight: 1.6, margin: 0, fontWeight: 500 }}>{reporte.meta}</p>
+                  <p style={{ fontSize: 13, color: t.text, lineHeight: 1.6, margin: 0, fontWeight: 500 }}>{reporte.meta}</p>
                 </div>
               )}
             </div>
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginBottom: '1.5rem' }}>
-            <div style={{ background: '#151515', borderRadius: 14, padding: '1.25rem', border: '1px solid rgba(255,255,255,.05)' }}>
+            <div style={{ background: t.card, borderRadius: 14, padding: '1.25rem', border: `1px solid ${t.border}` }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: '1rem' }}>
                 <Icon name="estrategia" />
-                <p style={{ fontSize: 11, color: '#D4AF37', textTransform: 'uppercase', letterSpacing: 2, margin: 0 }}>Estrategias</p>
+                <p style={{ fontSize: 11, color: t.gold, textTransform: 'uppercase', letterSpacing: 2, margin: 0 }}>Estrategias</p>
               </div>
               {reporte.estrategias.map((e: string, i: number) => (
                 <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, marginBottom: 10 }}>
-                  <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#D4AF37', flexShrink: 0, marginTop: 5 }} />
-                  <p style={{ fontSize: 12, color: '#ccc', lineHeight: 1.5, margin: 0 }}>{e}</p>
+                  <div style={{ width: 6, height: 6, borderRadius: '50%', background: t.gold, flexShrink: 0, marginTop: 5 }} />
+                  <p style={{ fontSize: 12, color: t.text2, lineHeight: 1.5, margin: 0 }}>{e}</p>
                 </div>
               ))}
             </div>
-            <div style={{ background: '#151515', borderRadius: 14, padding: '1.25rem', border: '1px solid rgba(255,255,255,.05)' }}>
+            <div style={{ background: t.card, borderRadius: 14, padding: '1.25rem', border: `1px solid ${t.border}` }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: '1rem' }}>
                 <Icon name="tareas" />
                 <p style={{ fontSize: 11, color: '#1D9E75', textTransform: 'uppercase', letterSpacing: 2, margin: 0 }}>Tareas Semanales</p>
               </div>
-              {reporte.tareas.map((t: string, i: number) => (
+              {reporte.tareas.map((tarea: string, i: number) => (
                 <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, marginBottom: 10 }}>
                   <div style={{ width: 16, height: 16, borderRadius: 4, border: '1px solid #1D9E75', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: 1 }}>
                     <div style={{ width: 8, height: 8, borderRadius: 2, background: '#1D9E75' }} />
                   </div>
-                  <p style={{ fontSize: 12, color: '#ccc', lineHeight: 1.5, margin: 0 }}>{t}</p>
+                  <p style={{ fontSize: 12, color: t.text2, lineHeight: 1.5, margin: 0 }}>{tarea}</p>
                 </div>
               ))}
             </div>
           </div>
 
           {type === 'vendor' && (
-            <div style={{ background: '#151515', borderRadius: 14, padding: '1.25rem', border: '1px solid rgba(29,158,117,.2)', marginBottom: '1rem' }}>
+            <div style={{ background: t.card, borderRadius: 14, padding: '1.25rem', border: '1px solid rgba(29,158,117,.2)', marginBottom: '1rem' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: '1rem' }}>
                 <Icon name="contabilidad" />
                 <p style={{ fontSize: 11, color: '#1D9E75', textTransform: 'uppercase', letterSpacing: 2, margin: 0 }}>Contabilidad</p>
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))', gap: 8 }}>
                 {[
-                  { label: 'Ingresos Brutos', value: '$' + (metrics.totalVentas ?? 0).toLocaleString('es-CO'), color: '#fff' },
-                  { label: 'Comision DMS (5%)', value: '- $' + (metrics.comisionPlataforma ?? 0).toLocaleString('es-CO'), color: '#ef4444' },
-                  { label: 'Ingresos Netos', value: '$' + (metrics.ingresosNetos ?? 0).toLocaleString('es-CO'), color: '#1D9E75' },
-                  { label: 'Saldo por Cobrar', value: '$' + (metrics.saldoPendiente ?? 0).toLocaleString('es-CO'), color: '#D4AF37' },
-                  { label: 'Saldo Liberado', value: '$' + (metrics.saldoLiberado ?? 0).toLocaleString('es-CO'), color: '#a78bfa' },
-                  { label: 'Proyeccion Mensual', value: '$' + ((metrics.ventasSemana ?? 0) * 4).toLocaleString('es-CO'), color: '#38bdf8' },
+                  { label: 'Ingresos Brutos',    value: '$' + (metrics.totalVentas ?? 0).toLocaleString('es-CO'),          color: t.text },
+                  { label: 'Comision DMS (5%)',  value: '- $' + (metrics.comisionPlataforma ?? 0).toLocaleString('es-CO'), color: '#ef4444' },
+                  { label: 'Ingresos Netos',     value: '$' + (metrics.ingresosNetos ?? 0).toLocaleString('es-CO'),        color: '#1D9E75' },
+                  { label: 'Saldo por Cobrar',   value: '$' + (metrics.saldoPendiente ?? 0).toLocaleString('es-CO'),       color: t.gold },
+                  { label: 'Saldo Liberado',     value: '$' + (metrics.saldoLiberado ?? 0).toLocaleString('es-CO'),        color: '#a78bfa' },
+                  { label: 'Proyeccion Mensual', value: '$' + ((metrics.ventasSemana ?? 0) * 4).toLocaleString('es-CO'),   color: '#38bdf8' },
                 ].map(item => (
-                  <div key={item.label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.6rem 0.75rem', background: '#0f0f0f', borderRadius: 8 }}>
-                    <p style={{ fontSize: 11, color: '#666', margin: 0 }}>{item.label}</p>
+                  <div key={item.label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.6rem 0.75rem', background: t.card2, borderRadius: 8 }}>
+                    <p style={{ fontSize: 11, color: t.text3, margin: 0 }}>{item.label}</p>
                     <p style={{ fontSize: 13, color: item.color, fontWeight: 700, margin: 0 }}>{item.value}</p>
                   </div>
                 ))}
@@ -277,8 +280,8 @@ export default function ReporteIA({ type }: Props) {
               <Icon name="insight" />
             </div>
             <div>
-              <p style={{ fontSize: 13, color: '#fff', fontWeight: 600, margin: '0 0 4px' }}>Insight de IA</p>
-              <p style={{ fontSize: 12, color: '#aaa', margin: 0, lineHeight: 1.5 }}>
+              <p style={{ fontSize: 13, color: t.text, fontWeight: 600, margin: '0 0 4px' }}>Insight de IA</p>
+              <p style={{ fontSize: 12, color: t.text5, margin: 0, lineHeight: 1.5 }}>
                 {topCats.length > 0
                   ? `La categoria ${topCats[0][0]} lidera tus publicaciones. Sigue ampliando tu catalogo en esta y otras categorias para atraer mas compradores.`
                   : 'Agrega mas productos para recibir insights personalizados de crecimiento.'}
