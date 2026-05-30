@@ -3,7 +3,6 @@ import Link from 'next/link'
 import ReporteIA from '@/components/ReporteIA'
 import { useState } from 'react'
 import { useTheme } from '@/lib/theme-context'
-import { useTheme } from '@/lib/theme-context'
 
 const THEMES = {
   dark: {
@@ -121,5 +120,6 @@ export default function AdminDashboardClient({ pendingVendors, pendingProducts, 
     </div>
   )
 }
+
 
 
