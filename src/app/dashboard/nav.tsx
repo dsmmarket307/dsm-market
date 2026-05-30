@@ -4,6 +4,7 @@ import { useTheme } from "@/lib/theme-context"
 import { logout } from "@/lib/actions/auth"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
+import SettingsPanel from "@/app/dashboard/settings/SettingsPanel"
 
 const roleLabels: any = { buyer: "Comprador", seller: "Vendedor", admin: "Administrador", provider: "Proveedor" }
 const LOGO = "https://awbepztacmvurjylfoas.supabase.co/storage/v1/object/public/assets/ChatGPT_Image_3_may_2026__21_13_12-removebg-preview.png"
@@ -26,47 +27,48 @@ function Icon({ type }: { type: string }) {
     finanzas:   <svg {...s}><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>,
     pagos:      <svg {...s}><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>,
     saas:       <svg {...s}><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>,
+    settings:   <svg {...s}><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>,
   }
   return icons[type] ?? icons.home
 }
 
 export default function DashboardNav({ role, name, email }: any) {
   const [open, setOpen] = useState(false)
-  const { theme, toggleTheme } = useTheme()
+  const [settingsOpen, setSettingsOpen] = useState(false)
+  const { theme, toggleTheme, accentHex } = useTheme()
   const pathname = usePathname()
 
-  const isLight = theme === "light"
+  const isLight   = theme === "light"
   const navBg     = isLight ? "#ffffff" : "#0B0B0B"
   const navBorder = isLight ? "rgba(0,0,0,0.08)" : "rgba(212,175,55,0.08)"
-  const navText   = isLight ? "#333333" : "#777777"
 
   const navItems = role === "admin" ? [
-    { href: "/dashboard/admin",                      label: "Inicio",              icon: "home" },
-    { href: "/dashboard/admin/vendors",              label: "Vendedores",          icon: "vendors" },
-    { href: "/dashboard/admin/products",             label: "Productos",           icon: "products" },
-    { href: "/dashboard/admin/orders",               label: "Ordenes y Pagos",     icon: "orders" },
-    { href: "/dashboard/admin/disputes",             label: "Disputas",            icon: "dispute" },
-    { href: "/dashboard/admin/subscriptions",        label: "Suscripciones SaaS",  icon: "saas" },
-    { href: "/dashboard/admin/usuarios",             label: "Usuarios",            icon: "vendors" },
-    { href: "/crm",                                  label: "CRM Dropi",           icon: "crm" },
-    { href: "/dashboard/admin/marketing",            label: "Marketing IA",        icon: "marketing" },
-    { href: "/dashboard/admin/finanzas",             label: "Finanzas",            icon: "finanzas" },
-    { href: "/dashboard/admin/pagos",                label: "Lib. Pagos",          icon: "pagos" },
+    { href: "/dashboard/admin",               label: "Inicio",             icon: "home"       },
+    { href: "/dashboard/admin/vendors",        label: "Vendedores",         icon: "vendors"    },
+    { href: "/dashboard/admin/products",       label: "Productos",          icon: "products"   },
+    { href: "/dashboard/admin/orders",         label: "Ordenes y Pagos",    icon: "orders"     },
+    { href: "/dashboard/admin/disputes",       label: "Disputas",           icon: "dispute"    },
+    { href: "/dashboard/admin/subscriptions",  label: "Suscripciones SaaS", icon: "saas"       },
+    { href: "/dashboard/admin/usuarios",       label: "Usuarios",           icon: "vendors"    },
+    { href: "/crm",                            label: "CRM Dropi",          icon: "crm"        },
+    { href: "/dashboard/admin/marketing",      label: "Marketing IA",       icon: "marketing"  },
+    { href: "/dashboard/admin/finanzas",       label: "Finanzas",           icon: "finanzas"   },
+    { href: "/dashboard/admin/pagos",          label: "Lib. Pagos",         icon: "pagos"      },
   ] : role === "seller" ? [
-    { href: "/dashboard/vendor",                     label: "Inicio",              icon: "home" },
-    { href: "/dashboard/vendor/orders",              label: "Mis Ordenes",         icon: "orders" },
-    { href: "/dashboard/vendor/products/new",        label: "Nuevo producto",      icon: "newproduct" },
-    { href: "/dashboard/vendor/disputes",            label: "Disputas",            icon: "dispute" },
-    { href: "/dashboard/vendor/mi-tienda",           label: "Mi Tienda",           icon: "store" },
+    { href: "/dashboard/vendor",               label: "Inicio",             icon: "home"       },
+    { href: "/dashboard/vendor/orders",        label: "Mis Ordenes",        icon: "orders"     },
+    { href: "/dashboard/vendor/products/new",  label: "Nuevo producto",     icon: "newproduct" },
+    { href: "/dashboard/vendor/disputes",      label: "Disputas",           icon: "dispute"    },
+    { href: "/dashboard/vendor/mi-tienda",     label: "Mi Tienda",          icon: "store"      },
   ] : role === "provider" ? [
-    { href: "/dashboard/provider",                   label: "Inicio",              icon: "home" },
-    { href: "/dashboard/provider/servicio",          label: "Mi servicio",         icon: "provider" },
-    { href: "/dashboard/provider/suscripcion",       label: "Mi suscripcion",      icon: "billing" },
+    { href: "/dashboard/provider",             label: "Inicio",             icon: "home"       },
+    { href: "/dashboard/provider/servicio",    label: "Mi servicio",        icon: "provider"   },
+    { href: "/dashboard/provider/suscripcion", label: "Mi suscripcion",     icon: "billing"    },
   ] : [
-    { href: "/dashboard/buyer",                      label: "Inicio",              icon: "home" },
-    { href: "/dashboard/buyer/products",             label: "Tienda",              icon: "store" },
-    { href: "/dashboard/buyer/disputes",             label: "Abrir disputa",       icon: "dispute" },
-    { href: "/dashboard/buyer/favorites",            label: "Favoritos",           icon: "heart" },
+    { href: "/dashboard/buyer",                label: "Inicio",             icon: "home"       },
+    { href: "/dashboard/buyer/products",       label: "Tienda",             icon: "store"      },
+    { href: "/dashboard/buyer/disputes",       label: "Abrir disputa",      icon: "dispute"    },
+    { href: "/dashboard/buyer/favorites",      label: "Favoritos",          icon: "heart"      },
   ]
 
   const initials = name?.charAt(0)?.toUpperCase() ?? "U"
@@ -75,24 +77,26 @@ export default function DashboardNav({ role, name, email }: any) {
   const css = `
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
     .dms-link{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:10px;text-decoration:none;color:#777;font-size:13.5px;font-weight:400;font-family:'Poppins',sans-serif;transition:all .2s;position:relative;}
-    .dms-link:hover{color:#D4AF37;background:rgba(212,175,55,.08);}
-    .dms-link.on{color:#D4AF37;background:rgba(212,175,55,.12);font-weight:600;}
-    .dms-link.on::before{content:'';position:absolute;left:0;top:20%;height:60%;width:3px;background:#D4AF37;border-radius:0 3px 3px 0;}
+    .dms-link:hover{color:${accentHex};background:${accentHex}14;}
+    .dms-link.on{color:${accentHex};background:${accentHex}18;font-weight:600;}
+    .dms-link.on::before{content:'';position:absolute;left:0;top:20%;height:60%;width:3px;background:${accentHex};border-radius:0 3px 3px 0;}
     .dms-out{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:10px;background:transparent;border:1px solid rgba(212,175,55,.2);color:#666;font-size:13px;cursor:pointer;width:100%;font-family:'Poppins',sans-serif;transition:all .2s;}
-    .dms-out:hover{border-color:#D4AF37;color:#D4AF37;background:rgba(212,175,55,.06);}
+    .dms-out:hover{border-color:${accentHex};color:${accentHex};background:${accentHex}10;}
+    .dms-settings{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:10px;background:transparent;border:1px solid ${accentHex}33;color:${accentHex};font-size:13px;cursor:pointer;width:100%;font-family:'Poppins',sans-serif;transition:all .2s;margin-bottom:6px;}
+    .dms-settings:hover{background:${accentHex}12;border-color:${accentHex}66;}
     .dms-toggle{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:10px;background:transparent;border:1px solid rgba(212,175,55,0.2);color:#888;font-size:13px;cursor:pointer;width:100%;font-family:Poppins,sans-serif;margin-top:6px;transition:all .2s;}
-    .dms-toggle:hover{border-color:#D4AF37;color:#D4AF37;background:rgba(212,175,55,.06);}
+    .dms-toggle:hover{border-color:${accentHex};color:${accentHex};background:${accentHex}10;}
     .dms-div{height:1px;background:rgba(255,255,255,.05);margin:6px 14px;}
     @media(max-width:768px){.dms-desk{display:none!important;}.dms-mob-bar{display:flex!important;}}
     @media(min-width:769px){.dms-mob-bar{display:none!important;}.dms-mob-menu{display:none!important;}}
   `
 
   const UserBlock = () => (
-    <div style={{display:"flex",alignItems:"center",gap:10,padding:"14px 16px",background:"rgba(212,175,55,.06)",borderRadius:12,border:"1px solid rgba(212,175,55,.12)"}}>
-      <div style={{width:38,height:38,borderRadius:"50%",background:"linear-gradient(135deg,#D4AF37,#f0d060)",display:"flex",alignItems:"center",justifyContent:"center",fontWeight:700,fontSize:16,color:"#0B0B0B",flexShrink:0}}>{initials}</div>
-      <div style={{overflow:"hidden"}}>
-        <p style={{color:isLight ? "#111111" : "#fff",fontWeight:600,fontSize:13,margin:0,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis",fontFamily:"'Poppins',sans-serif"}}>{display}</p>
-        <span style={{fontSize:11,color:"#D4AF37",background:"rgba(212,175,55,.12)",padding:"1px 8px",borderRadius:999,display:"inline-block",marginTop:2,fontFamily:"'Poppins',sans-serif"}}>{roleLabels[role] ?? "Usuario"}</span>
+    <div style={{ display:"flex", alignItems:"center", gap:10, padding:"14px 16px", background:`${accentHex}10`, borderRadius:12, border:`1px solid ${accentHex}20` }}>
+      <div style={{ width:38, height:38, borderRadius:"50%", background:`linear-gradient(135deg,${accentHex},${accentHex}99)`, display:"flex", alignItems:"center", justifyContent:"center", fontWeight:700, fontSize:16, color:"#0B0B0B", flexShrink:0 }}>{initials}</div>
+      <div style={{ overflow:"hidden" }}>
+        <p style={{ color: isLight ? "#111111" : "#fff", fontWeight:600, fontSize:13, margin:0, whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis", fontFamily:"'Poppins',sans-serif" }}>{display}</p>
+        <span style={{ fontSize:11, color:accentHex, background:`${accentHex}18`, padding:"1px 8px", borderRadius:999, display:"inline-block", marginTop:2, fontFamily:"'Poppins',sans-serif" }}>{roleLabels[role] ?? "Usuario"}</span>
       </div>
     </div>
   )
@@ -120,20 +124,34 @@ export default function DashboardNav({ role, name, email }: any) {
     </button>
   )
 
+  const SettingsBtn = () => (
+    <button onClick={() => setSettingsOpen(true)} className="dms-settings">
+      <Icon type="settings" />
+      Configuracion
+    </button>
+  )
+
   return (
     <>
       <style>{css}</style>
 
-      {/* DESKTOP SIDEBAR */}
-      <aside className="dms-desk" style={{width:240,background:navBg,borderRight:`1px solid ${navBorder}`,display:"flex",flexDirection:"column",minHeight:"100vh",position:"sticky",top:0,flexShrink:0}}>
-        <div style={{padding:"24px 20px 16px",borderBottom:"1px solid rgba(212,175,55,.08)"}}>
-          <img src={LOGO} alt="DMS Market" style={{width:110,objectFit:"contain"}} />
+      <SettingsPanel
+        open={settingsOpen}
+        onClose={() => setSettingsOpen(false)}
+        role={role}
+        name={name}
+        email={email}
+      />
+
+      <aside className="dms-desk" style={{ width:240, background:navBg, borderRight:`1px solid ${navBorder}`, display:"flex", flexDirection:"column", minHeight:"100vh", position:"sticky", top:0, flexShrink:0 }}>
+        <div style={{ padding:"24px 20px 16px", borderBottom:"1px solid rgba(212,175,55,.08)" }}>
+          <img src={LOGO} alt="DMS Market" style={{ width:110, objectFit:"contain" }} />
         </div>
-        <div style={{padding:12}}>
+        <div style={{ padding:12 }}>
           <UserBlock />
         </div>
         <div className="dms-div" />
-        <nav style={{flex:1,padding:"6px 10px",display:"flex",flexDirection:"column",gap:2}}>
+        <nav style={{ flex:1, padding:"6px 10px", display:"flex", flexDirection:"column", gap:2 }}>
           {navItems.map(item => (
             <Link key={item.href} href={item.href} className={`dms-link${pathname === item.href ? " on" : ""}`}>
               <Icon type={item.icon} />
@@ -142,27 +160,31 @@ export default function DashboardNav({ role, name, email }: any) {
           ))}
         </nav>
         <div className="dms-div" />
-        <div style={{padding:10}}>
+        <div style={{ padding:10 }}>
+          <SettingsBtn />
           <LogoutBtn />
           <ThemeToggle />
         </div>
       </aside>
 
-      {/* MOBILE TOPBAR */}
-      <div className="dms-mob-bar" style={{position:"fixed",top:0,left:0,right:0,height:56,background:navBg,borderBottom:`1px solid ${navBorder}`,zIndex:100,alignItems:"center",justifyContent:"space-between",padding:"0 16px"}}>
-        <img src={LOGO} alt="DMS Market" style={{height:32,objectFit:"contain"}} />
-        <button onClick={() => setOpen(!open)} style={{background:"rgba(212,175,55,.1)",border:"1px solid rgba(212,175,55,.2)",cursor:"pointer",color:"#D4AF37",padding:"6px 10px",borderRadius:8,fontSize:18,lineHeight:1}}>
-          {open ? "X" : "Menu"}
-        </button>
+      <div className="dms-mob-bar" style={{ position:"fixed", top:0, left:0, right:0, height:56, background:navBg, borderBottom:`1px solid ${navBorder}`, zIndex:100, alignItems:"center", justifyContent:"space-between", padding:"0 16px" }}>
+        <img src={LOGO} alt="DMS Market" style={{ height:32, objectFit:"contain" }} />
+        <div style={{ display:"flex", gap:8 }}>
+          <button onClick={() => setSettingsOpen(true)} style={{ background:`${accentHex}18`, border:`1px solid ${accentHex}33`, cursor:"pointer", color:accentHex, padding:"6px 10px", borderRadius:8, fontSize:12, fontWeight:600, fontFamily:"'Poppins',sans-serif", display:"flex", alignItems:"center", gap:6 }}>
+            <Icon type="settings" />
+          </button>
+          <button onClick={() => setOpen(!open)} style={{ background:`${accentHex}18`, border:`1px solid ${accentHex}33`, cursor:"pointer", color:accentHex, padding:"6px 10px", borderRadius:8, fontSize:18, lineHeight:1 }}>
+            {open ? "X" : "Menu"}
+          </button>
+        </div>
       </div>
 
-      {/* MOBILE MENU */}
       {open && (
-        <div className="dms-mob-menu" style={{position:"fixed",top:56,left:0,right:0,bottom:0,background:navBg,zIndex:99,overflowY:"auto"}}>
-          <div style={{padding:12,borderBottom:"1px solid rgba(212,175,55,.08)"}}>
+        <div className="dms-mob-menu" style={{ position:"fixed", top:56, left:0, right:0, bottom:0, background:navBg, zIndex:99, overflowY:"auto" }}>
+          <div style={{ padding:12, borderBottom:"1px solid rgba(212,175,55,.08)" }}>
             <UserBlock />
           </div>
-          <nav style={{padding:"6px 10px",display:"flex",flexDirection:"column",gap:2}}>
+          <nav style={{ padding:"6px 10px", display:"flex", flexDirection:"column", gap:2 }}>
             {navItems.map(item => (
               <Link key={item.href} href={item.href} className="dms-link" onClick={() => setOpen(false)}>
                 <Icon type={item.icon} />
@@ -170,7 +192,8 @@ export default function DashboardNav({ role, name, email }: any) {
               </Link>
             ))}
           </nav>
-          <div style={{padding:10,borderTop:"1px solid rgba(212,175,55,.08)"}}>
+          <div style={{ padding:10, borderTop:"1px solid rgba(212,175,55,.08)" }}>
+            <SettingsBtn />
             <LogoutBtn />
             <ThemeToggle />
           </div>
