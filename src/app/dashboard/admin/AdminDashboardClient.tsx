@@ -2,6 +2,8 @@
 import Link from 'next/link'
 import ReporteIA from '@/components/ReporteIA'
 import { useState } from 'react'
+import { useTheme } from '@/lib/theme-context'
+import { useTheme } from '@/lib/theme-context'
 
 const THEMES = {
   dark: {
@@ -32,7 +34,7 @@ interface Props {
 }
 
 export default function AdminDashboardClient({ pendingVendors, pendingProducts, pendingServices, totalRevenue }: Props) {
-  const [theme, setTheme] = useState<'dark' | 'light'>('dark')
+  const { theme, toggleTheme } = useTheme()
   const T = THEMES[theme]
 
   const menuItems = [
@@ -63,7 +65,7 @@ export default function AdminDashboardClient({ pendingVendors, pendingProducts, 
             <h1 style={{ fontSize: '2rem', fontWeight: 800, color: T.text, margin: 0 }}>Administrador</h1>
           </div>
           <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
-            <button onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+            <button onClick={toggleTheme}
               style={{ padding: '0.5rem 1rem', background: T.bg2, border: `1px solid ${T.border2}`, borderRadius: 10, color: T.text, fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
               {theme === 'dark' ? 'Modo claro' : 'Modo oscuro'}
             </button>
@@ -119,3 +121,5 @@ export default function AdminDashboardClient({ pendingVendors, pendingProducts, 
     </div>
   )
 }
+
+
