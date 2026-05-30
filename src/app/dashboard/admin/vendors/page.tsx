@@ -1,6 +1,7 @@
 ﻿import { createClient } from "@/lib/supabase/server"
 import { createClient as createAdmin } from "@supabase/supabase-js"
 import { redirect } from "next/navigation"
+import { approveVendor, rejectVendor } from "@/lib/actions/products"
 import VendorsClient from "./VendorsClient"
 
 export default async function AdminVendorsPage() {
@@ -22,5 +23,11 @@ export default async function AdminVendorsPage() {
     .eq("role", "seller")
     .order("created_at", { ascending: false })
 
-  return <VendorsClient vendors={vendors ?? []} />
+  return (
+    <VendorsClient
+      vendors={vendors ?? []}
+      approveVendor={approveVendor}
+      rejectVendor={rejectVendor}
+    />
+  )
 }

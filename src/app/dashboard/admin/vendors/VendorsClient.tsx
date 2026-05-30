@@ -1,13 +1,12 @@
 ﻿'use client'
 import { useTheme } from '@/lib/theme-context'
-import { approveVendor, rejectVendor } from '@/lib/actions/products'
 
 const THEMES = {
   dark: { bg: '#0f0f0f', bg2: '#1a1a1a', bg3: '#1a1600', text: '#ffffff', text2: '#999999', border: 'rgba(212,175,55,0.12)', gold: '#D4AF37' },
   light: { bg: '#f5f5f5', bg2: '#e8e8e8', bg3: '#fffdf0', text: '#111111', text2: '#666666', border: 'rgba(0,0,0,0.1)', gold: '#B8960C' },
 }
 
-export default function VendorsClient({ vendors }: { vendors: any[] }) {
+export default function VendorsClient({ vendors, approveVendor, rejectVendor }: { vendors: any[], approveVendor: any, rejectVendor: any }) {
   const { theme } = useTheme()
   const T = THEMES[theme]
 
@@ -66,21 +65,21 @@ export default function VendorsClient({ vendors }: { vendors: any[] }) {
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                 {vendor.seller_status === 'pending' && (
                   <>
-                    <form action={async () => { 'use server'; await approveVendor(vendor.id) }}>
+                    <form action={approveVendor.bind(null, vendor.id)}>
                       <button type="submit" style={{ padding: '0.5rem 1rem', background: '#4CAF7D', color: '#fff', border: 'none', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 600, width: '100%', borderRadius: 6 }}>Aprobar</button>
                     </form>
-                    <form action={async () => { 'use server'; await rejectVendor(vendor.id) }}>
+                    <form action={rejectVendor.bind(null, vendor.id)}>
                       <button type="submit" style={{ padding: '0.5rem 1rem', background: 'transparent', color: '#E05252', border: '1px solid #E05252', cursor: 'pointer', fontSize: '0.8rem', width: '100%', borderRadius: 6 }}>Rechazar</button>
                     </form>
                   </>
                 )}
                 {vendor.seller_status === 'approved' && (
-                  <form action={async () => { 'use server'; await rejectVendor(vendor.id) }}>
+                  <form action={rejectVendor.bind(null, vendor.id)}>
                     <button type="submit" style={{ padding: '0.5rem 1rem', background: 'transparent', color: '#E05252', border: '1px solid #E05252', cursor: 'pointer', fontSize: '0.8rem', width: '100%', borderRadius: 6 }}>Desactivar</button>
                   </form>
                 )}
                 {vendor.seller_status === 'rejected' && (
-                  <form action={async () => { 'use server'; await approveVendor(vendor.id) }}>
+                  <form action={approveVendor.bind(null, vendor.id)}>
                     <button type="submit" style={{ padding: '0.5rem 1rem', background: '#C9A84C', color: '#fff', border: 'none', cursor: 'pointer', fontSize: '0.8rem', width: '100%', borderRadius: 6 }}>Reactivar</button>
                   </form>
                 )}
