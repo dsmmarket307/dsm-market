@@ -1,5 +1,6 @@
 ﻿"use client"
 import { useState } from "react"
+import { useTheme } from "@/lib/theme-context"
 import { logout } from "@/lib/actions/auth"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
@@ -31,6 +32,7 @@ function Icon({ type }: { type: string }) {
 
 export default function DashboardNav({ role, name, email }: any) {
   const [open, setOpen] = useState(false)
+  const { theme, toggleTheme } = useTheme()
   const pathname = usePathname()
 
   const navItems = role === "admin" ? [
@@ -125,6 +127,11 @@ export default function DashboardNav({ role, name, email }: any) {
         <div className="dms-div" />
         <div style={{padding:10}}>
           <LogoutBtn />
+          <button onClick={toggleTheme}
+            style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", borderRadius: 10, background: "transparent", border: "1px solid rgba(212,175,55,0.2)", color: "#888", fontSize: 13, cursor: "pointer", width: "100%", fontFamily: "Poppins, sans-serif", marginTop: 6, transition: "all .2s" }}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+            {theme === "dark" ? "Modo claro" : "Modo oscuro"}
+          </button>
         </div>
       </aside>
 
@@ -158,6 +165,7 @@ export default function DashboardNav({ role, name, email }: any) {
     </>
   )
 }
+
 
 
 
