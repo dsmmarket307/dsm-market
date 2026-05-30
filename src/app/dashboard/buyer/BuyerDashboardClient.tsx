@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useTheme } from "@/lib/theme-context"
 import { confirmDelivery } from "@/lib/actions/orders"
@@ -49,7 +49,6 @@ export default function BuyerDashboardClient({ name, orders, totalSpent, active,
   return (
     <div style={{ padding: "2rem", fontFamily: "'Poppins', sans-serif", background: t.bg, minHeight: "100vh" }}>
 
-      {/* Header */}
       <div style={{ marginBottom: "2rem" }}>
         <p style={{ fontSize: "0.65rem", letterSpacing: "3px", textTransform: "uppercase", color: t.gold, marginBottom: "0.25rem" }}>
           Bienvenido de vuelta
@@ -59,7 +58,6 @@ export default function BuyerDashboardClient({ name, orders, totalSpent, active,
         </h1>
       </div>
 
-      {/* Stats */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "1rem", marginBottom: "2rem" }}>
         {[
           {
@@ -85,14 +83,12 @@ export default function BuyerDashboardClient({ name, orders, totalSpent, active,
         ))}
       </div>
 
-      {/* CTA */}
       <div style={{ marginBottom: "2rem" }}>
         <Link href="/dashboard/buyer/products" style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem", background: t.gold, color: "#0B0B0B", padding: "0.875rem 1.75rem", textDecoration: "none", fontSize: "0.875rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "1px", borderRadius: "8px", boxShadow: `0 4px 20px rgba(212,175,55,0.3)` }}>
           Ver productos
         </Link>
       </div>
 
-      {/* Orders */}
       <div style={{ background: t.card, border: `1px solid ${t.border}`, borderRadius: "12px", overflow: "hidden" }}>
         <div style={{ padding: "1.25rem 1.5rem", borderBottom: `1px solid ${t.border}` }}>
           <h2 style={{ fontSize: "1rem", fontWeight: 600, color: t.text, margin: 0 }}>Mis pedidos</h2>
@@ -106,7 +102,7 @@ export default function BuyerDashboardClient({ name, orders, totalSpent, active,
           <div style={{ display: "flex", flexDirection: "column" }}>
             {orders.map((order, i) => {
               const s = statusStyle(order.status)
-              const confirmAction = confirmDelivery.bind(null, order.id)
+              const confirmAction = async (_: FormData) => { await confirmDelivery(order.id) }
               return (
                 <div key={order.id} style={{ padding: "1.25rem 1.5rem", borderBottom: i < orders.length - 1 ? `1px solid ${t.borderSubtle}` : "none", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "1rem" }}>
                   <div>
