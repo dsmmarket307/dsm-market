@@ -1,18 +1,8 @@
-import { createClient } from "@/lib/supabase/server"
+﻿import { createClient } from "@/lib/supabase/server"
 import { createClient as createAdmin } from "@supabase/supabase-js"
 import { redirect } from "next/navigation"
 import { uploadGuide } from "@/lib/actions/orders"
 import OrdersClient from "./OrdersClient"
-
-function calcComisiones(total: number) {
-  const dsmFee = Math.round(total * 0.05)
-  const mpBase = Math.round(total * 0.0329)
-  const mpIva  = Math.round(mpBase * 0.19)
-  const mpFijo = 952
-  const mpTotal = mpBase + mpIva + mpFijo
-  const neto = total - dsmFee - mpTotal
-  return { dsmFee, mpTotal, neto }
-}
 
 export default async function VendorOrdersPage() {
   const supabase = await createClient()

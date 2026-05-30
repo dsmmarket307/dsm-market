@@ -1,6 +1,6 @@
-'use client'
+ï»¿'use client'
 import { useTheme } from '@/lib/theme-context'
-import { useState, useTransition } from 'react'
+import { useState } from 'react'
 
 const THEMES = {
   dark:  { bg: '#0f0f0f', bg2: '#1a1a1a', bg3: '#151515', text: '#ffffff', text2: '#999999', border: 'rgba(212,175,55,0.12)', borderFaint: 'rgba(212,175,55,0.08)', gold: '#D4AF37', cardBg: '#151515', headerBg: '#0B0B0B' },
@@ -21,7 +21,6 @@ export default function OrdersClient({ orders, uploadGuide }: { orders: any[]; u
   const { theme, toggleTheme } = useTheme()
   const T = THEMES[theme]
   const [query, setQuery] = useState('')
-  const [pending, startTransition] = useTransition()
 
   const filtered = orders.filter(o => {
     if (!query) return true
@@ -36,9 +35,9 @@ export default function OrdersClient({ orders, uploadGuide }: { orders: any[]; u
 
   const statusColor = (status: string) =>
     ['delivered','released'].includes(status) ? { bg: 'rgba(29,158,117,.1)', color: '#1D9E75' }
-    : status === 'paid'    ? { bg: theme === 'dark' ? 'rgba(212,175,55,.1)' : 'rgba(184,150,12,.12)', color: T.gold }
+    : status === 'paid'    ? { bg: 'rgba(212,175,55,.1)', color: T.gold }
     : status === 'shipped' ? { bg: 'rgba(167,139,250,.1)', color: '#a78bfa' }
-    : { bg: theme === 'dark' ? 'rgba(0,0,0,.06)' : 'rgba(0,0,0,.06)', color: T.text2 }
+    : { bg: 'rgba(0,0,0,.06)', color: T.text2 }
 
   const statusText = (s: string) => ({ released:'Pago liberado', delivered:'Entregado', shipped:'Enviado', paid:'Pago recibido' } as Record<string,string>)[s] ?? 'Pendiente'
 
@@ -46,14 +45,13 @@ export default function OrdersClient({ orders, uploadGuide }: { orders: any[]; u
     <div style={{ minHeight: '100vh', background: T.bg, fontFamily: "'Poppins',sans-serif", padding: '2rem', transition: 'background .3s, color .3s' }}>
       <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
 
-        {/* HEADER */}
         <div style={{ background: T.headerBg, borderRadius: 16, padding: '1.75rem 2rem', marginBottom: '1.5rem', border: `1px solid ${T.border}`, display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem' }}>
           <div>
             <p style={{ fontSize: 11, letterSpacing: 3, textTransform: 'uppercase', color: T.gold, marginBottom: 4 }}>Vendedor</p>
             <h1 style={{ fontSize: '1.5rem', fontWeight: 700, color: T.text, margin: 0 }}>Mis Ordenes</h1>
             <p style={{ color: T.text2, fontSize: 13, marginTop: 6 }}>{orders.length} orden{orders.length !== 1 ? 'es' : ''} en total</p>
           </div>
-          <button onClick={toggleTheme} title="Cambiar tema" style={{ background: 'transparent', border: `1px solid ${T.border}`, borderRadius: 10, padding: '8px 14px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8, color: T.text2, fontSize: 12, transition: 'all .2s' }}>
+          <button onClick={toggleTheme} title="Cambiar tema" style={{ background: 'transparent', border: `1px solid ${T.border}`, borderRadius: 10, padding: '8px 14px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8, color: T.text2, fontSize: 12 }}>
             {theme === 'dark' ? (
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
             ) : (
@@ -63,26 +61,17 @@ export default function OrdersClient({ orders, uploadGuide }: { orders: any[]; u
           </button>
         </div>
 
-        {/* SEARCH */}
         <div style={{ marginBottom: '1.5rem', position: 'relative' }}>
           <svg style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', color: T.text2 }} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
-          <input
-            type="text"
-            placeholder="Buscar por orden, producto o comprador..."
-            value={query}
-            onChange={e => setQuery(e.target.value)}
-            style={{ width: '100%', padding: '12px 16px 12px 44px', background: T.bg3, border: `1px solid ${T.border}`, borderRadius: 12, color: T.text, fontSize: 14, fontFamily: "'Poppins',sans-serif", outline: 'none' }}
-          />
+          <input type="text" placeholder="Buscar por orden, producto o comprador..." value={query} onChange={e => setQuery(e.target.value)} style={{ width: '100%', padding: '12px 16px 12px 44px', background: T.bg3, border: `1px solid ${T.border}`, borderRadius: 12, color: T.text, fontSize: 14, fontFamily: "'Poppins',sans-serif", outline: 'none' }} />
         </div>
 
-        {/* EMPTY */}
         {filtered.length === 0 && (
           <div style={{ background: T.cardBg, borderRadius: 16, padding: '3rem', textAlign: 'center', border: `1px solid ${T.borderFaint}` }}>
             <p style={{ color: T.text2, fontSize: 14 }}>{query ? 'Sin resultados.' : 'No tienes ordenes aun.'}</p>
           </div>
         )}
 
-        {/* CARDS */}
         {filtered.map((order: any) => {
           const total = Number(order.total_price ?? 0)
           const { dsmFee, mpTotal, neto } = calcComisiones(total)
@@ -92,7 +81,6 @@ export default function OrdersClient({ orders, uploadGuide }: { orders: any[]; u
           return (
             <div key={order.id} style={{ background: T.cardBg, borderRadius: 16, border: `1px solid ${T.borderFaint}`, marginBottom: '1.25rem', overflow: 'hidden' }}>
 
-              {/* TOP */}
               <div style={{ padding: '1.25rem 1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: `1px solid ${T.borderFaint}`, flexWrap: 'wrap', gap: '1rem' }}>
                 <div>
                   <p style={{ fontSize: 12, color: T.text2, marginBottom: 4 }}>Orden #{order.id?.slice(0,8).toUpperCase()}</p>
@@ -102,7 +90,6 @@ export default function OrdersClient({ orders, uploadGuide }: { orders: any[]; u
                 <span style={{ fontSize: 11, padding: '4px 12px', borderRadius: 999, fontWeight: 600, background: sc.bg, color: sc.color }}>{statusText(order.status)}</span>
               </div>
 
-              {/* PRODUCTO */}
               <div style={{ padding: '1.25rem 1.5rem', borderBottom: `1px solid ${T.borderFaint}` }}>
                 <p style={{ fontSize: 10, letterSpacing: 2, textTransform: 'uppercase', color: T.gold, marginBottom: 12, fontWeight: 700 }}>Producto comprado</p>
                 <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
@@ -115,7 +102,7 @@ export default function OrdersClient({ orders, uploadGuide }: { orders: any[]; u
                   )}
                   <div>
                     <div style={{ fontSize: 15, fontWeight: 700, color: T.text, marginBottom: 6, lineHeight: 1.3 }}>{product?.name || 'Producto no disponible'}</div>
-                    <div style={{ fontSize: 12, color: T.text2, marginBottom: 3 }}>Categoria: {product?.category || '—'}</div>
+                    <div style={{ fontSize: 12, color: T.text2, marginBottom: 3 }}>Categoria: {product?.category || '---'}</div>
                     <div style={{ fontSize: 12, color: T.text2, marginBottom: 3 }}>Cantidad: {order.quantity ?? 1}</div>
                     {order.variantes?.length > 0 && (
                       <div style={{ marginTop: 6 }}>
@@ -129,7 +116,6 @@ export default function OrdersClient({ orders, uploadGuide }: { orders: any[]; u
                 </div>
               </div>
 
-              {/* DATOS ENVIO */}
               <div style={{ padding: '1.25rem 1.5rem', borderBottom: `1px solid ${T.borderFaint}` }}>
                 <p style={{ fontSize: 10, letterSpacing: 2, textTransform: 'uppercase', color: T.gold, marginBottom: 12, fontWeight: 700 }}>Datos de envio del comprador</p>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, fontSize: 13.5 }}>
@@ -144,7 +130,6 @@ export default function OrdersClient({ orders, uploadGuide }: { orders: any[]; u
                 </div>
               </div>
 
-              {/* COMISIONES */}
               <div style={{ padding: '1.25rem 1.5rem', borderBottom: `1px solid ${T.borderFaint}` }}>
                 <p style={{ fontSize: 10, letterSpacing: 2, textTransform: 'uppercase', color: T.gold, marginBottom: 12, fontWeight: 700 }}>Desglose de comisiones</p>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, padding: '4px 0' }}><span style={{ color: T.text2 }}>Valor del producto</span><span style={{ fontWeight: 600, color: T.text }}>${total.toLocaleString('es-CO')}</span></div>
@@ -156,7 +141,6 @@ export default function OrdersClient({ orders, uploadGuide }: { orders: any[]; u
                 </div>
               </div>
 
-              {/* TRACKING */}
               {order.tracking_number && (
                 <div style={{ padding: '1.25rem 1.5rem', borderBottom: `1px solid ${T.borderFaint}` }}>
                   <p style={{ fontSize: 13, color: T.text2 }}>Transportadora: <strong style={{ color: T.text }}>{order.shipping_company}</strong></p>
@@ -164,7 +148,6 @@ export default function OrdersClient({ orders, uploadGuide }: { orders: any[]; u
                 </div>
               )}
 
-              {/* FORM GUIA */}
               {(order.status === 'paid' || order.status === 'shipped') && (
                 <div style={{ padding: '1.25rem 1.5rem' }}>
                   <p style={{ fontSize: 11, color: T.text2, marginBottom: 12, textTransform: 'uppercase', letterSpacing: 1 }}>
