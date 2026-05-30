@@ -89,7 +89,7 @@ export default function DashboardNav({ role, name, email }: any) {
     <div style={{display:"flex",alignItems:"center",gap:10,padding:"14px 16px",background:"rgba(212,175,55,.06)",borderRadius:12,border:"1px solid rgba(212,175,55,.12)"}}>
       <div style={{width:38,height:38,borderRadius:"50%",background:"linear-gradient(135deg,#D4AF37,#f0d060)",display:"flex",alignItems:"center",justifyContent:"center",fontWeight:700,fontSize:16,color:"#0B0B0B",flexShrink:0}}>{initials}</div>
       <div style={{overflow:"hidden"}}>
-        <p style={{color:navBg === "#ffffff" ? "#111111" : "#fff",fontWeight:600,fontSize:13,margin:0,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis",fontFamily:"'Poppins',sans-serif"}}>{display}</p>
+        <p style={{color:navText === "#333333" ? "#111111" : "#fff",fontWeight:600,fontSize:13,margin:0,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis",fontFamily:"'Poppins',sans-serif"}}>{display}</p>
         <span style={{fontSize:11,color:"#D4AF37",background:"rgba(212,175,55,.12)",padding:"1px 8px",borderRadius:999,display:"inline-block",marginTop:2,fontFamily:"'Poppins',sans-serif"}}>{roleLabels[role] ?? "Usuario"}</span>
       </div>
     </div>
@@ -170,6 +170,7 @@ export default function DashboardNav({ role, name, email }: any) {
     </>
   )
 }
+
 
 
 
