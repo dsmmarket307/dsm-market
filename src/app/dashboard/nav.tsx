@@ -34,11 +34,11 @@ export default function DashboardNav({ role, name, email }: any) {
   const [open, setOpen] = useState(false)
   const { theme, toggleTheme } = useTheme()
   const pathname = usePathname()
-  const isAdmin = role === "admin"
-  const navBg = isAdmin && theme === "light" ? "#ffffff" : "#0B0B0B"
-  const navBorder = isAdmin && theme === "light" ? "rgba(0,0,0,0.08)" : "rgba(212,175,55,0.08)"
-  const navText = isAdmin && theme === "light" ? "#333333" : "#777777"
-  const navUserBorder = isAdmin && theme === "light" ? "rgba(0,0,0,0.1)" : "rgba(212,175,55,0.12)"
+
+  const isLight = theme === "light"
+  const navBg     = isLight ? "#ffffff" : "#0B0B0B"
+  const navBorder = isLight ? "rgba(0,0,0,0.08)" : "rgba(212,175,55,0.08)"
+  const navText   = isLight ? "#333333" : "#777777"
 
   const navItems = role === "admin" ? [
     { href: "/dashboard/admin",                      label: "Inicio",              icon: "home" },
@@ -80,6 +80,8 @@ export default function DashboardNav({ role, name, email }: any) {
     .dms-link.on::before{content:'';position:absolute;left:0;top:20%;height:60%;width:3px;background:#D4AF37;border-radius:0 3px 3px 0;}
     .dms-out{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:10px;background:transparent;border:1px solid rgba(212,175,55,.2);color:#666;font-size:13px;cursor:pointer;width:100%;font-family:'Poppins',sans-serif;transition:all .2s;}
     .dms-out:hover{border-color:#D4AF37;color:#D4AF37;background:rgba(212,175,55,.06);}
+    .dms-toggle{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:10px;background:transparent;border:1px solid rgba(212,175,55,0.2);color:#888;font-size:13px;cursor:pointer;width:100%;font-family:Poppins,sans-serif;margin-top:6px;transition:all .2s;}
+    .dms-toggle:hover{border-color:#D4AF37;color:#D4AF37;background:rgba(212,175,55,.06);}
     .dms-div{height:1px;background:rgba(255,255,255,.05);margin:6px 14px;}
     @media(max-width:768px){.dms-desk{display:none!important;}.dms-mob-bar{display:flex!important;}}
     @media(min-width:769px){.dms-mob-bar{display:none!important;}.dms-mob-menu{display:none!important;}}
@@ -89,7 +91,7 @@ export default function DashboardNav({ role, name, email }: any) {
     <div style={{display:"flex",alignItems:"center",gap:10,padding:"14px 16px",background:"rgba(212,175,55,.06)",borderRadius:12,border:"1px solid rgba(212,175,55,.12)"}}>
       <div style={{width:38,height:38,borderRadius:"50%",background:"linear-gradient(135deg,#D4AF37,#f0d060)",display:"flex",alignItems:"center",justifyContent:"center",fontWeight:700,fontSize:16,color:"#0B0B0B",flexShrink:0}}>{initials}</div>
       <div style={{overflow:"hidden"}}>
-        <p style={{color:navText === "#333333" ? "#111111" : "#fff",fontWeight:600,fontSize:13,margin:0,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis",fontFamily:"'Poppins',sans-serif"}}>{display}</p>
+        <p style={{color:isLight ? "#111111" : "#fff",fontWeight:600,fontSize:13,margin:0,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis",fontFamily:"'Poppins',sans-serif"}}>{display}</p>
         <span style={{fontSize:11,color:"#D4AF37",background:"rgba(212,175,55,.12)",padding:"1px 8px",borderRadius:999,display:"inline-block",marginTop:2,fontFamily:"'Poppins',sans-serif"}}>{roleLabels[role] ?? "Usuario"}</span>
       </div>
     </div>
@@ -106,6 +108,16 @@ export default function DashboardNav({ role, name, email }: any) {
         Cerrar sesion
       </button>
     </form>
+  )
+
+  const ThemeToggle = () => (
+    <button onClick={toggleTheme} className="dms-toggle">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75">
+        <circle cx="12" cy="12" r="5"/>
+        <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+      </svg>
+      {theme === "dark" ? "Modo claro" : "Modo oscuro"}
+    </button>
   )
 
   return (
@@ -132,11 +144,7 @@ export default function DashboardNav({ role, name, email }: any) {
         <div className="dms-div" />
         <div style={{padding:10}}>
           <LogoutBtn />
-          <button onClick={toggleTheme}
-            style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", borderRadius: 10, background: "transparent", border: "1px solid rgba(212,175,55,0.2)", color: "#888", fontSize: 13, cursor: "pointer", width: "100%", fontFamily: "Poppins, sans-serif", marginTop: 6, transition: "all .2s" }}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
-            {theme === "dark" ? "Modo claro" : "Modo oscuro"}
-          </button>
+          <ThemeToggle />
         </div>
       </aside>
 
@@ -164,23 +172,10 @@ export default function DashboardNav({ role, name, email }: any) {
           </nav>
           <div style={{padding:10,borderTop:"1px solid rgba(212,175,55,.08)"}}>
             <LogoutBtn />
+            <ThemeToggle />
           </div>
         </div>
       )}
     </>
   )
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
