@@ -108,7 +108,7 @@ export default function DashboardNav({ role, name, email }: any) {
       <style>{css}</style>
 
       {/* DESKTOP SIDEBAR */}
-      <aside className="dms-desk" style={{width:240,background:"#0B0B0B",borderRight:"1px solid rgba(212,175,55,.08)",display:"flex",flexDirection:"column",minHeight:"100vh",position:"sticky",top:0,flexShrink:0}}>
+      <aside className="dms-desk" style={{width:240,background:navBg,borderRight:`1px solid ${navBorder}`,display:"flex",flexDirection:"column",minHeight:"100vh",position:"sticky",top:0,flexShrink:0}}>
         <div style={{padding:"24px 20px 16px",borderBottom:"1px solid rgba(212,175,55,.08)"}}>
           <img src={LOGO} alt="DMS Market" style={{width:110,objectFit:"contain"}} />
         </div>
@@ -136,7 +136,7 @@ export default function DashboardNav({ role, name, email }: any) {
       </aside>
 
       {/* MOBILE TOPBAR */}
-      <div className="dms-mob-bar" style={{position:"fixed",top:0,left:0,right:0,height:56,background:"#0B0B0B",borderBottom:"1px solid rgba(212,175,55,.15)",zIndex:100,alignItems:"center",justifyContent:"space-between",padding:"0 16px"}}>
+      <div className="dms-mob-bar" style={{position:"fixed",top:0,left:0,right:0,height:56,background:navBg,borderBottom:`1px solid ${navBorder}`,zIndex:100,alignItems:"center",justifyContent:"space-between",padding:"0 16px"}}>
         <img src={LOGO} alt="DMS Market" style={{height:32,objectFit:"contain"}} />
         <button onClick={() => setOpen(!open)} style={{background:"rgba(212,175,55,.1)",border:"1px solid rgba(212,175,55,.2)",cursor:"pointer",color:"#D4AF37",padding:"6px 10px",borderRadius:8,fontSize:18,lineHeight:1}}>
           {open ? "X" : "Menu"}
@@ -145,7 +145,7 @@ export default function DashboardNav({ role, name, email }: any) {
 
       {/* MOBILE MENU */}
       {open && (
-        <div className="dms-mob-menu" style={{position:"fixed",top:56,left:0,right:0,bottom:0,background:"#0B0B0B",zIndex:99,overflowY:"auto"}}>
+        <div className="dms-mob-menu" style={{position:"fixed",top:56,left:0,right:0,bottom:0,background:navBg,zIndex:99,overflowY:"auto"}}>
           <div style={{padding:12,borderBottom:"1px solid rgba(212,175,55,.08)"}}>
             <UserBlock />
           </div>
@@ -165,6 +165,9 @@ export default function DashboardNav({ role, name, email }: any) {
     </>
   )
 }
+
+
+
 
 
 
