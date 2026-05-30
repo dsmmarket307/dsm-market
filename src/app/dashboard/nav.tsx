@@ -34,6 +34,11 @@ export default function DashboardNav({ role, name, email }: any) {
   const [open, setOpen] = useState(false)
   const { theme, toggleTheme } = useTheme()
   const pathname = usePathname()
+  const isAdmin = role === "admin"
+  const navBg = isAdmin && theme === "light" ? "#ffffff" : "#0B0B0B"
+  const navBorder = isAdmin && theme === "light" ? "rgba(0,0,0,0.08)" : "rgba(212,175,55,0.08)"
+  const navText = isAdmin && theme === "light" ? "#333333" : "#777777"
+  const navUserBorder = isAdmin && theme === "light" ? "rgba(0,0,0,0.1)" : "rgba(212,175,55,0.12)"
 
   const navItems = role === "admin" ? [
     { href: "/dashboard/admin",                      label: "Inicio",              icon: "home" },
@@ -165,6 +170,7 @@ export default function DashboardNav({ role, name, email }: any) {
     </>
   )
 }
+
 
 
 
