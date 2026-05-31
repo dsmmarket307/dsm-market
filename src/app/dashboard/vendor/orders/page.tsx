@@ -38,10 +38,6 @@ export default async function VendorOrdersPage() {
       : []
   }))
 
-  async function handleUpload(formData: FormData): Promise<void> {
-    "use server"
-    await uploadGuide(formData)
-  }
-
-  return <OrdersClient orders={enriched} uploadGuide={handleUpload} />
+  return <OrdersClient orders={enriched} uploadGuide={uploadGuide} />
 }
+
