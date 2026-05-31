@@ -17,7 +17,7 @@ function calcComisiones(total: number) {
   return { dsmFee, mpTotal, neto }
 }
 
-export default function OrdersClient({ orders, uploadGuide }: { orders: any[]; uploadGuide: (formData: FormData) => Promise<void> }) {
+export default function OrdersClient({ orders, uploadGuide }: { orders: any[]; uploadGuide: (formData: FormData) => Promise<any> }) {
   const { theme, toggleTheme } = useTheme()
   const T = THEMES[theme]
   const [query, setQuery] = useState('')
