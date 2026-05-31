@@ -22,6 +22,7 @@ function RegisterForm() {
     if (password.length < 6) { setError('Minimo 6 caracteres'); return }
     const firstName = formData.get('firstName') as string
     const lastName = formData.get('lastName') as string
+    formData.set('ref_code', refCode)
     formData.set('name', `${firstName} ${lastName}`.trim())
     setLoading(true)
     const result = await register(formData)
@@ -168,3 +169,5 @@ export default function RegisterPage() {
     </Suspense>
   )
 }
+
+

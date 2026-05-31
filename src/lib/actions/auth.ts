@@ -12,7 +12,7 @@ export async function register(formData: FormData) {
   const password = formData.get('password') as string
   const role = (formData.get('role') as UserRole) || 'buyer'
   const redirectTo = formData.get('redirectTo') as string
-  const refCode = (formData.get('refCode') as string) || null
+  const refCode = (formData.get('ref_code') as string) || null
 
   const { data, error } = await supabase.auth.signUp({
     email,
@@ -112,3 +112,4 @@ export async function resetPassword(formData: FormData) {
   revalidatePath('/', 'layout')
   redirect('/dashboard')
 }
+
