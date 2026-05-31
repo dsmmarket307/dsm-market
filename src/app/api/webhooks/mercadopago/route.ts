@@ -84,7 +84,24 @@ export async function POST(req: NextRequest) {
     const body = await req.json()
     const topic = body.topic || body.type
     const resourceId = body.id || body.data?.id
-    if (topic !== "payment" || !resourceId) return NextResponse.json({ ok: true })
+    if (!resourceId) return NextResponse.json({ ok: true })
+    if (topic === "merchant_order") {
+      const moRes = await fetch("https://api.mercadopago.com/merchant_orders/" + resourceId, {
+        headers: { Authorization: "Bearer " + process.env.MP_ACCESS_TOKEN },
+      })
+      if (!moRes.ok) return NextResponse.json({ ok: true })
+      const mo = await moRes.json()
+      const approved = mo.payments?.find((p: any) => p.status === "approved")
+      if (!approved) return NextResponse.json({ ok: true })
+      const admin = getAdmin()
+      const { data: order } = await admin.from("orders").select("*").eq("preference_id", mo.preference_id).single()
+      if (order) {
+        await admin.from("orders").update({ status: "paid", payment_id: String(approved.id), payment_status: "approved", paid_at: new Date().toISOString() }).eq("id", order.id)
+        await procesarPedidoDropi(admin, order)
+      }
+      return NextResponse.json({ ok: true })
+    }
+    if (topic !== "payment") return NextResponse.json({ ok: true })
 
     const mpRes = await fetch("https://api.mercadopago.com/v1/payments/" + resourceId, {
       headers: { Authorization: "Bearer " + process.env.MP_ACCESS_TOKEN },
@@ -147,4 +164,5 @@ export async function POST(req: NextRequest) {
 export async function GET() {
   return NextResponse.json({ ok: true })
 }
+
 
