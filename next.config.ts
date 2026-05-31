@@ -6,6 +6,15 @@ const nextConfig: NextConfig = {
       bodySizeLimit: "10mb",
     },
   },
+  async redirects() {
+    return [
+      {
+        source: "/register",
+        destination: "/auth/register",
+        permanent: true,
+      },
+    ]
+  },
   async headers() {
     return [
       {
@@ -20,3 +29,4 @@ const nextConfig: NextConfig = {
   },
 };
 export default nextConfig;
+
