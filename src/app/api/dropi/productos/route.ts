@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
     const url = `https://app.dropi.co/api/v1/products?search=${encodeURIComponent(q)}&page=${page}&per_page=20`
     const res = await fetch(url, {
       headers: {
-        'dropi-integration-key': token,
+        'dropi-integracion-key': token,
         'Content-Type': 'application/json',
       },
       cache: 'no-store',

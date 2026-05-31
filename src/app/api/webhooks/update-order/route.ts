@@ -1,4 +1,4 @@
-﻿import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 
 function getAdmin() {
@@ -34,7 +34,7 @@ async function crearPedidoDropi(order: any, product: any) {
     const res = await fetch('https://app.dropi.co/api/v1/orders', {
       method: 'POST',
       headers: {
-        'dropi-integration-key': token,
+        'dropi-integracion-key': token,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(body),
