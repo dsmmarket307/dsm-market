@@ -1,4 +1,4 @@
-﻿import { NextRequest, NextResponse } from "next/server"
+import { NextRequest, NextResponse } from "next/server"
 import { createClient } from "@supabase/supabase-js"
 
 function getAdmin() {
@@ -40,8 +40,9 @@ async function crearPedidoDropi(order: any, product: any) {
       body: JSON.stringify(body),
     })
     const data = await res.json()
+    console.log('DROPI_RESPONSE:', JSON.stringify(data))
     return data
-  } catch {
+  } catch (e: any) {
     return null
   }
 }
@@ -146,3 +147,4 @@ export async function POST(req: NextRequest) {
 export async function GET() {
   return NextResponse.json({ ok: true })
 }
+
