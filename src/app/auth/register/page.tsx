@@ -10,6 +10,7 @@ function RegisterForm() {
   const [loading, setLoading] = useState(false)
   const searchParams = useSearchParams()
   const redirectTo = searchParams.get('redirect') || '/dashboard'
+  const refCode = searchParams.get('ref') || ''
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -45,6 +46,13 @@ function RegisterForm() {
         <div style={{ width: '36px', height: '2px', background: '#D4AF37', margin: '0 auto' }} />
       </div>
 
+      {refCode && (
+        <div style={{ marginBottom: '1rem', padding: '0.75rem 1rem', background: 'rgba(212,175,55,0.08)', border: '1px solid rgba(212,175,55,0.25)', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: 8 }}>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" strokeWidth="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          <p style={{ color: '#D4AF37', fontSize: '0.78rem', fontWeight: 600, margin: 0 }}>Referido por codigo: <span style={{ fontFamily: 'monospace', letterSpacing: 2 }}>{refCode}</span></p>
+        </div>
+      )}
+
       {error && (
         <div style={{ marginBottom: '1.25rem', padding: '0.75rem 1rem', background: 'rgba(220,38,38,0.1)', border: '1px solid rgba(220,38,38,0.3)', color: '#f87171', fontSize: '0.85rem', borderRadius: '8px' }}>
           {error}
@@ -53,8 +61,8 @@ function RegisterForm() {
 
       <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
         <input type="hidden" name="redirectTo" value={redirectTo} />
+        <input type="hidden" name="refCode" value={refCode} />
 
-        {/* Nombre y Apellido */}
         <div style={{ display: 'flex', gap: '0.75rem' }}>
           <div style={{ flex: 1 }}>
             <label style={labelStyle}>Nombre</label>
@@ -74,7 +82,6 @@ function RegisterForm() {
           </div>
         </div>
 
-        {/* Email */}
         <div>
           <label style={labelStyle}>Correo electronico</label>
           <input name="email" type="email" required placeholder="tu@correo.com"
@@ -84,12 +91,15 @@ function RegisterForm() {
           />
         </div>
 
-        {/* Celular con bandera Colombia SVG */}
         <div>
           <label style={labelStyle}>Celular</label>
           <div style={{ display: 'flex', alignItems: 'center', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', background: '#151515', overflow: 'hidden' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '0.75rem 10px', borderRight: '1px solid rgba(255,255,255,0.08)', flexShrink: 0 }}>
-              <svg width="20" height="14" viewBox="0 0 20 14" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="20" height="14" rx="2" fill="#FCD116"/><rect y="7" width="20" height="7" fill="#003893"/><rect y="10.5" width="20" height="3.5" fill="#CE1126"/></svg>
+              <svg width="20" height="14" viewBox="0 0 20 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect width="20" height="14" rx="2" fill="#FCD116"/>
+                <rect y="7" width="20" height="7" fill="#003893"/>
+                <rect y="10.5" width="20" height="3.5" fill="#CE1126"/>
+              </svg>
               <span style={{ color: '#aaa', fontSize: '0.8rem' }}>+57</span>
             </div>
             <input name="phone" type="tel" required placeholder="300 123 4567"
@@ -100,7 +110,6 @@ function RegisterForm() {
           </div>
         </div>
 
-        {/* Tipo de cuenta */}
         <div>
           <label style={labelStyle}>Tipo de cuenta</label>
           <select name="role" defaultValue="buyer" style={inputStyle}
@@ -112,7 +121,6 @@ function RegisterForm() {
           </select>
         </div>
 
-        {/* Contrasenas */}
         {[
           { label: 'Contrasena', name: 'password', placeholder: 'Minimo 6 caracteres' },
           { label: 'Confirmar contrasena', name: 'confirmPassword', placeholder: 'Repite la contrasena' },
@@ -160,4 +168,3 @@ export default function RegisterPage() {
     </Suspense>
   )
 }
-
