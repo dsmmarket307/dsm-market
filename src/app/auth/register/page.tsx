@@ -89,11 +89,7 @@ function RegisterForm() {
           <label style={labelStyle}>Celular</label>
           <div style={{ display: 'flex', alignItems: 'center', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', background: '#151515', overflow: 'hidden' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '0.75rem 10px', borderRight: '1px solid rgba(255,255,255,0.08)', flexShrink: 0 }}>
-              <svg width="20" height="14" viewBox="0 0 20 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <rect width="20" height="14" rx="2" fill="#FCD116"/>
-                <rect width="6.66" height="14" fill="#003893"/>
-                <rect x="13.34" width="6.66" height="14" fill="#CE1126"/>
-              </svg>
+              <svg width="20" height="14" viewBox="0 0 20 14" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="20" height="14" rx="2" fill="#FCD116"/><rect y="7" width="20" height="7" fill="#003893"/><rect y="10.5" width="20" height="3.5" fill="#CE1126"/></svg>
               <span style={{ color: '#aaa', fontSize: '0.8rem' }}>+57</span>
             </div>
             <input name="phone" type="tel" required placeholder="300 123 4567"
@@ -164,3 +160,4 @@ export default function RegisterPage() {
     </Suspense>
   )
 }
+
