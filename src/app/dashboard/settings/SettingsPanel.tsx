@@ -8,7 +8,7 @@ const THEMES = {
   light: { bg: '#f5f5f5', bg2: '#ffffff',  bg3: '#e8e8e8', text: '#111111', text2: '#555555', text3: '#888888', border: 'rgba(0,0,0,0.1)'  },
 }
 
-type Section = 'perfil' | 'apariencia' | 'accesibilidad' | 'notificaciones' | 'referidos' | 'calendario' | 'rol'
+type Section = 'perfil' | 'apariencia' | 'accesibilidad' | 'notificaciones' | 'referidos' | 'calendario' | 'rol' | 'seguridad'
 
 interface Props { open: boolean; onClose: () => void; role: string; name: string; email: string }
 
@@ -68,8 +68,63 @@ export default function SettingsPanel({ open, onClose, role, name, email }: Prop
   const [savingEvent, setSavingEvent] = useState(false)
   const [showEventForm, setShowEventForm] = useState(false)
 
+  // SEGURIDAD
+  const [sessions, setSessions] = useState<any[]>([])
+  const [loadingSec, setLoadingSec] = useState(false)
+  const [lastSign, setLastSign] = useState<string | null>(null)
+  const [changingPass, setChangingPass] = useState(false)
+  const [secNewPass, setSecNewPass] = useState('')
+  const [secConfirmPass, setSecConfirmPass] = useState('')
+  const [secError, setSecError] = useState('')
+  const [secSaved, setSecSaved] = useState(false)
+
   useEffect(() => { if (open && section === 'referidos') loadReferidos() }, [open, section])
   useEffect(() => { if (open && section === 'calendario') loadCalendar() }, [open, section, calMonth])
+  useEffect(() => { if (open && section === 'seguridad') loadSecurity() }, [open, section])
+
+  async function loadSecurity() {
+    setLoadingSec(true)
+    try {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) return
+      setLastSign(user.last_sign_in_at ?? null)
+      const { data: logs } = await supabase
+        .from('security_logs')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(10)
+      setSessions(logs ?? [])
+    } catch (e: any) {
+      setSessions([])
+    } finally {
+      setLoadingSec(false)
+    }
+  }
+
+  async function handleChangePassword() {
+    setSecError('')
+    if (!secNewPass || secNewPass.length < 6) { setSecError('Minimo 6 caracteres'); return }
+    if (secNewPass !== secConfirmPass) { setSecError('Las contrasenas no coinciden'); return }
+    setChangingPass(true)
+    try {
+      const { error: e } = await supabase.auth.updateUser({ password: secNewPass })
+      if (e) throw new Error(e.message)
+      setSecSaved(true)
+      setSecNewPass('')
+      setSecConfirmPass('')
+      setTimeout(() => setSecSaved(false), 2500)
+    } catch (e: any) {
+      setSecError(e.message)
+    } finally {
+      setChangingPass(false)
+    }
+  }
+
+  async function handleSignOutAll() {
+    await supabase.auth.signOut()
+    window.location.href = '/auth/login'
+  }
 
   async function loadReferidos() {
     setLoadingRef(true)
@@ -226,6 +281,7 @@ export default function SettingsPanel({ open, onClose, role, name, email }: Prop
     { key: 'notificaciones', label: 'Notif.',    icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg> },
     { key: 'referidos',      label: 'Referidos', icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> },
     { key: 'calendario',     label: 'Agenda',    icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> },
+    { key: 'seguridad',      label: 'Seguridad', icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> },
     { key: 'rol', label: role === 'admin' ? 'Admin' : role === 'seller' ? 'Tienda' : role === 'provider' ? 'Servicio' : role === 'support' ? 'Agente' : 'Cuenta', icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg> },
   ]
 
@@ -351,7 +407,6 @@ export default function SettingsPanel({ open, onClose, role, name, email }: Prop
           {/* CALENDARIO */}
           {section === 'calendario' && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-              {/* Nav mes */}
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <button onClick={prevMonth} style={{ background: t.bg2, border: `1px solid ${t.border}`, borderRadius: 8, width: 32, height: 32, cursor: 'pointer', color: t.text2, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="15 18 9 12 15 6"/></svg>
@@ -361,8 +416,6 @@ export default function SettingsPanel({ open, onClose, role, name, email }: Prop
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="9 18 15 12 9 6"/></svg>
                 </button>
               </div>
-
-              {/* Grid calendario */}
               <div style={{ background: t.bg2, borderRadius: 12, padding: 12, border: `1px solid ${t.border}` }}>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7,1fr)', gap: 2, marginBottom: 4 }}>
                   {['D','L','M','M','J','V','S'].map((d,i) => <div key={i} style={{ textAlign: 'center', fontSize: 10, color: t.text2, fontWeight: 700, padding: '4px 0' }}>{d}</div>)}
@@ -383,14 +436,10 @@ export default function SettingsPanel({ open, onClose, role, name, email }: Prop
                   })}
                 </div>
               </div>
-
-              {/* Boton agregar */}
               <button onClick={() => setShowEventForm(!showEventForm)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '10px', background: `${accentHex}15`, border: `1px solid ${accentHex}40`, borderRadius: 10, color: accentHex, fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                 {showEventForm ? 'Cancelar' : 'Agregar evento'}
               </button>
-
-              {/* Form nuevo evento */}
               {showEventForm && (
                 <div style={{ background: t.bg2, borderRadius: 12, padding: 16, border: `1px solid ${t.border}`, display: 'flex', flexDirection: 'column', gap: 12 }}>
                   {ST('Nuevo evento')}
@@ -405,8 +454,6 @@ export default function SettingsPanel({ open, onClose, role, name, email }: Prop
                   <SaveBtn onClick={handleSaveEvent} loading={savingEvent} label="Guardar evento" />
                 </div>
               )}
-
-              {/* Lista eventos del mes */}
               {calLoading ? <p style={{ color: t.text2, fontSize: 13 }}>Cargando...</p> : (
                 <div>
                   {ST(`Eventos de ${monthName}`)}
@@ -435,6 +482,73 @@ export default function SettingsPanel({ open, onClose, role, name, email }: Prop
                   )}
                 </div>
               )}
+            </div>
+          )}
+
+          {/* SEGURIDAD */}
+          {section === 'seguridad' && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+              {ST('Seguridad de la cuenta')}
+
+              {/* Ultima sesion */}
+              <div style={{ background: t.bg2, borderRadius: 12, padding: 16, border: `1px solid ${t.border}` }}>
+                <p style={{ fontSize: 11, color: t.text2, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 8, fontWeight: 600 }}>Ultima sesion</p>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#10b981', boxShadow: '0 0 0 3px rgba(16,185,129,0.2)', flexShrink: 0 }} />
+                  <p style={{ color: t.text, fontSize: 13, fontWeight: 600, margin: 0 }}>
+                    {lastSign ? new Date(lastSign).toLocaleDateString('es-CO', { day: '2-digit', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'No disponible'}
+                  </p>
+                </div>
+              </div>
+
+              {/* Cambiar contrasena */}
+              <div style={{ background: t.bg2, borderRadius: 12, padding: 16, border: `1px solid ${t.border}`, display: 'flex', flexDirection: 'column', gap: 12 }}>
+                <p style={{ fontSize: 11, color: t.text2, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 4, fontWeight: 600 }}>Cambiar contrasena</p>
+                {secError && <div style={{ padding: '8px 12px', background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.25)', borderRadius: 8, color: '#f87171', fontSize: 12 }}>{secError}</div>}
+                {secSaved && <div style={{ padding: '8px 12px', background: 'rgba(16,185,129,0.1)', border: '1px solid rgba(16,185,129,0.3)', borderRadius: 8, color: '#10b981', fontSize: 12 }}>Contrasena actualizada</div>}
+                <Field label="Nueva contrasena"><input style={inputStyle} type="password" value={secNewPass} onChange={e => setSecNewPass(e.target.value)} placeholder="Minimo 6 caracteres" /></Field>
+                <Field label="Confirmar contrasena"><input style={inputStyle} type="password" value={secConfirmPass} onChange={e => setSecConfirmPass(e.target.value)} placeholder="Repite la contrasena" /></Field>
+                <SaveBtn onClick={handleChangePassword} loading={changingPass} label="Actualizar contrasena" />
+              </div>
+
+              {/* Historial acceso */}
+              <div style={{ background: t.bg2, borderRadius: 12, padding: 16, border: `1px solid ${t.border}` }}>
+                <p style={{ fontSize: 11, color: t.text2, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 12, fontWeight: 600 }}>Historial de acceso</p>
+                {loadingSec ? (
+                  <p style={{ color: t.text2, fontSize: 13 }}>Cargando...</p>
+                ) : sessions.length === 0 ? (
+                  <div style={{ padding: '1rem', textAlign: 'center' }}>
+                    <p style={{ color: t.text2, fontSize: 13, margin: 0 }}>Sin historial registrado aun.</p>
+                    <p style={{ color: t.text3, fontSize: 11, margin: '4px 0 0' }}>Los accesos se registraran automaticamente.</p>
+                  </div>
+                ) : (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                    {sessions.map((s: any, i: number) => (
+                      <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 12px', background: t.bg3, borderRadius: 8, border: `1px solid ${t.border}` }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke={t.text2} strokeWidth="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+                          <div>
+                            <p style={{ color: t.text, fontSize: 12, fontWeight: 600, margin: 0 }}>{s.action ?? 'Inicio de sesion'}</p>
+                            <p style={{ color: t.text2, fontSize: 11, margin: '1px 0 0' }}>{s.ip ?? 'IP no disponible'}</p>
+                          </div>
+                        </div>
+                        <p style={{ color: t.text3, fontSize: 11, margin: 0 }}>
+                          {new Date(s.created_at).toLocaleDateString('es-CO', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Cerrar todas las sesiones */}
+              <div style={{ background: 'rgba(239,68,68,0.05)', borderRadius: 12, padding: 16, border: '1px solid rgba(239,68,68,0.15)' }}>
+                <p style={{ color: t.text, fontSize: 13, fontWeight: 600, margin: '0 0 4px' }}>Cerrar todas las sesiones</p>
+                <p style={{ color: t.text2, fontSize: 12, margin: '0 0 12px', lineHeight: 1.6 }}>Cierra sesion en todos los dispositivos donde hayas iniciado sesion con tu cuenta.</p>
+                <button onClick={handleSignOutAll} style={{ padding: '10px 20px', background: 'transparent', border: '1.5px solid rgba(239,68,68,0.4)', borderRadius: 8, color: '#f87171', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: "'Poppins',sans-serif", width: '100%', transition: 'all 0.2s' }}>
+                  Cerrar todas las sesiones
+                </button>
+              </div>
             </div>
           )}
 
