@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 import { useTheme } from '@/lib/theme-context'
 import { useState } from 'react'
 
@@ -153,7 +153,7 @@ export default function OrdersClient({ orders, uploadGuide }: { orders: any[]; u
                   <p style={{ fontSize: 11, color: T.text2, marginBottom: 12, textTransform: 'uppercase', letterSpacing: 1 }}>
                     {order.tracking_number ? 'Editar guia de envio' : 'Subir guia de envio'}
                   </p>
-                  <form action={uploadGuide.bind(null, order.id)}>
+                  <form action={uploadGuide}>
                     <input type="hidden" name="orderId" value={order.id} />
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr auto', gap: 12, alignItems: 'end' }}>
                       <div>
@@ -183,3 +183,4 @@ export default function OrdersClient({ orders, uploadGuide }: { orders: any[]; u
     </div>
   )
 }
+
