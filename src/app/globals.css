@@ -46,7 +46,7 @@ body::before {
 }
 
 ::-webkit-scrollbar { width: 4px; }
-::-webkit-scrollbar-track { background: var(--black); }
+::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--gold-dim); border-radius: 2px; }
 
 *:focus-visible {
@@ -170,3 +170,4 @@ body::before {
   animation: spin 0.6s linear infinite;
   display: inline-block;
 }
+
