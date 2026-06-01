@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 import { createContext, useContext, useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 
@@ -129,6 +129,15 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     document.documentElement.style.fontSize = FONT_SIZE_MAP[prefs.fontSize]
   }, [prefs.fontSize])
 
+  // Aplicar tema al body
+  useEffect(() => {
+    if (prefs.theme === "light") {
+      document.body.classList.add("theme-light")
+    } else {
+      document.body.classList.remove("theme-light")
+    }
+  }, [prefs.theme])
+
   const savePreferences = async (partial: Partial<Preferences>) => {
     const next = { ...prefs, ...partial }
     setPrefs(next)
@@ -178,3 +187,4 @@ export function useTheme() {
 }
 
 export type { Theme, FontSize, AccentColor, Language, Preferences }
+
