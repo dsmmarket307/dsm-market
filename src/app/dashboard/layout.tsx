@@ -13,11 +13,12 @@ export default async function DashboardLayout({ children }: any) {
     <ThemeProvider>
       <div style={{ minHeight: "100vh", display: "flex", fontFamily: "sans-serif", background: "inherit" }}>
         <DashboardNav role={role} name={name} email={user.email ?? ""} />
-        <main style={{ flex: 1, overflow: "auto" }}>
+        <main style={{ flex: 1, overflow: "auto", background: "inherit" }}>
           {children}
         </main>
       </div>
     </ThemeProvider>
   )
 }
+
 
