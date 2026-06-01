@@ -22,7 +22,6 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-title" content="DMS Market" />
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="theme-color" content="#D4AF37" />
-        <link rel="manifest" href="/manifest.json" />
         <link rel="apple-touch-icon" href="/icons/icon-192.png" />
         <script dangerouslySetInnerHTML={{ __html: `if ("serviceWorker" in navigator) { navigator.serviceWorker.register("/sw.js"); }` }} />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -36,4 +35,5 @@ export default function RootLayout({
     </html>
   )
 }
+
 
