@@ -16,7 +16,7 @@ const priceRanges = [
   { label: "Menos de $50.000",  min: 0,      max: 50000 },
   { label: "$50.000 - $150.000",min: 50000,  max: 150000 },
   { label: "$150.000 - $500.000",min:150000, max: 500000 },
-  { label: "MÃ¡s de $500.000",   min: 500000, max: Infinity },
+  { label: "Más de $500.000",   min: 500000, max: Infinity },
 ]
 
 function Stars({ rating }: { rating: number }) {
@@ -34,32 +34,23 @@ function Stars({ rating }: { rating: number }) {
 
 function Heart({ productId, userId }: { productId: string, userId: string | null }) {
   const [on, setOn] = useState(false)
-  const [loading, setLoading] = useState(false)
   const supabase = createClient()
 
   useEffect(() => {
     if (!userId) return
-    supabase.from("favorites").select("id").eq("user_id", userId).eq("product_id", productId).maybeSingle()
+    supabase.from("favorites").select("id").eq("user_id", userId).eq("product_id", productId).single()
       .then(({ data }) => { if (data) setOn(true) })
   }, [userId, productId])
 
   async function toggle(e: React.MouseEvent) {
     e.stopPropagation()
-    if (!userId) { window.location.href = "/auth/login"; return }
-    if (loading) return
-    setLoading(true)
-    try {
-      if (on) {
-        await supabase.from("favorites").delete().eq("user_id", userId).eq("product_id", productId)
-        setOn(false)
-      } else {
-        await supabase.from("favorites").insert({ user_id: userId, product_id: productId })
-        setOn(true)
-      }
-    } catch (err) {
-      console.error("Error favorito:", err)
+    if (!userId) return
+    if (on) {
+      await supabase.from("favorites").delete().eq("user_id", userId).eq("product_id", productId)
+    } else {
+      await supabase.from("favorites").insert({ user_id: userId, product_id: productId })
     }
-    setLoading(false)
+    setOn(!on)
   }
 
   return (
@@ -73,9 +64,9 @@ function Heart({ productId, userId }: { productId: string, userId: string | null
 }
 
 const benefits = [
-  { title:"Compra segura",          desc:"Protegemos tu informaciÃ³n y tu dinero",    icon:<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg> },
+  { title:"Compra segura",          desc:"Protegemos tu información y tu dinero",    icon:<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg> },
   { title:"Vendedores verificados", desc:"Trabajamos con los mejores vendedores",    icon:<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> },
-  { title:"EnvÃ­os rÃ¡pidos",         desc:"Recibe tus productos a tiempo",            icon:<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 5v3h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg> },
+  { title:"Envíos rápidos",         desc:"Recibe tus productos a tiempo",            icon:<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 5v3h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg> },
   { title:"Soporte 24/7",           desc:"Estamos para ayudarte siempre",            icon:<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.37a16 16 0 0 0 6.29 6.29l1.16-.94a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg> },
 ]
 
@@ -98,12 +89,36 @@ export default function BuyerProductsPage() {
   }, [])
 
   const range = priceRanges[priceRange]
-  const filtered = products.filter(p => {
-    const ms = p.name.toLowerCase().includes(search.toLowerCase()) || p.category.toLowerCase().includes(search.toLowerCase())
-    const mc = category === "Todas" || p.category === category
-    const pr = Number(p.price); const mp = pr >= range.min && pr <= range.max
-    return ms && mc && mp
-  })
+
+  const filtered = (() => {
+    const words = search.toLowerCase().trim().split(/\s+/).filter(Boolean)
+    const base = products.filter(p => {
+      const haystack = [p.name ?? "", p.category ?? "", p.description ?? ""].join(" ").toLowerCase()
+      const ms = words.length === 0 || words.every(w => haystack.includes(w))
+      const mc = category === "Todas" || p.category === category
+      const pr = Number(p.price)
+      const mp = pr >= range.min && pr <= range.max
+      return ms && mc && mp
+    })
+    if (base.length > 0 || words.length === 0) return base
+    // fallback: busca al menos 1 palabra
+    return products.filter(p => {
+      const haystack = [p.name ?? "", p.category ?? "", p.description ?? ""].join(" ").toLowerCase()
+      const ms = words.some(w => haystack.includes(w))
+      const mc = category === "Todas" || p.category === category
+      const pr = Number(p.price)
+      const mp = pr >= range.min && pr <= range.max
+      return ms && mc && mp
+    })
+  })()
+
+  const isFallback = search.trim().length > 0 &&
+    products.filter(p => {
+      const words = search.toLowerCase().trim().split(/\s+/).filter(Boolean)
+      const haystack = [p.name ?? "", p.category ?? "", p.description ?? ""].join(" ").toLowerCase()
+      return words.every(w => haystack.includes(w))
+    }).length === 0 && filtered.length > 0
+
   const getImg = (id: string) => images.find(i => i.product_id === id)?.url
 
   const css = `
@@ -163,7 +178,7 @@ export default function BuyerProductsPage() {
         <div className="pp-header">
           <div className="pp-search-wrap">
             <div className="pp-search-group">
-              <input className="pp-input" value={search} onChange={e => setSearch(e.target.value)} placeholder="Buscar productos..." />
+              <input className="pp-input" value={search} onChange={e => setSearch(e.target.value)} placeholder="Buscar productos..." onKeyDown={e => e.key === 'Enter' && e.preventDefault()} />
               <button className="pp-btn">Buscar</button>
             </div>
             <select className="pp-select" value={category} onChange={e => setCategory(e.target.value)}>
@@ -182,6 +197,12 @@ export default function BuyerProductsPage() {
               ? <><span>{filtered.length}</span> resultados encontrados</>
               : <>Productos <span>disponibles</span></>}
           </h2>
+
+          {isFallback && (
+            <p style={{ fontSize: 13, color: '#888', marginBottom: 20, fontFamily: "'Poppins',sans-serif" }}>
+              No encontramos coincidencias exactas. Aquí tienes productos relacionados.
+            </p>
+          )}
 
           {loading ? (
             <div className="pp-loading">Cargando productos...</div>
@@ -213,8 +234,8 @@ export default function BuyerProductsPage() {
                       }
                       {hasDisc
                         ? <><div className="pp-badge-offer">Oferta</div><div className="pp-badge-pct">-{pct}%</div></>
-                        : product.badge === "Lo mÃ¡s vendido"
-                          ? <div className="pp-badge-hot">Lo mÃ¡s vendido</div>
+                        : product.badge === "Lo más vendido"
+                          ? <div className="pp-badge-hot">Lo más vendido</div>
                           : product.badge
                             ? <div className="pp-badge-offer">{product.badge}</div>
                             : null

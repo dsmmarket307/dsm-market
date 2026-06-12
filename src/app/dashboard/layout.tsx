@@ -1,25 +1,26 @@
-import { redirect } from "next/navigation"
-import { createClient } from "@/lib/supabase/server"
-import DashboardNav from "./nav"
-import { ThemeProvider } from "@/lib/theme-context"
+import { redirect } from 'next/navigation'
+import { createClient } from '@/lib/supabase/server'
+import DashboardNav from './nav'
 
-export default async function DashboardLayout({ children }: any) {
+export default async function DashboardLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect("/auth/login")
-  const role = user.user_metadata?.role ?? "buyer"
-  const name = user.user_metadata?.name ?? user.email?.split("@")[0] ?? ""
+  if (!user) redirect('/auth/login')
+
+  const meta = user.user_metadata
+  const role = (meta?.role as string) ?? 'buyer'
+  const name = (meta?.name as string) ?? user.email?.split('@')[0] ?? ''
+
   return (
-    <ThemeProvider>
-      <div style={{ minHeight: "100vh", display: "flex", fontFamily: "sans-serif", background: "transparent" }}>
-        <DashboardNav role={role} name={name} email={user.email ?? ""} />
-        <main style={{ flex: 1, overflow: "auto", background: "inherit" }}>
-          {children}
-        </main>
-      </div>
-    </ThemeProvider>
+    <div className="min-h-screen flex" style={{ background: '#0A0A0A' }}>
+      <DashboardNav role={role} name={name} email={user.email ?? ''} />
+      <main className="flex-1 md:pt-0 pt-16 overflow-auto">
+        {children}
+      </main>
+    </div>
   )
 }
-
-
-

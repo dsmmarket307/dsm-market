@@ -154,7 +154,7 @@ export default function ProductDetail({ product, images, reviews: initialReviews
 
             <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "0.5rem" }}>
               <Stars rating={productRating} />
-              <span style={{ fontSize: "0.8rem", color: "#888" }}>({reviews.length} reseñas)</span>
+             <span style={{ fontSize: '0.8rem', color: '#888' }}>({reviews?.length ?? 0} reseñas)</span>
             </div>
 
             {vendidos > 0 && (
